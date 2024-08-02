@@ -1,35 +1,48 @@
 package com.example.movie_service.repository;
 
 import com.example.movie_service.dto.MovieSearchResultDTO;
-import com.example.movie_service.entity.Movie;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import jakarta.persistence.TypedQuery;
-import org.hibernate.query.NativeQuery;
-import org.hibernate.transform.Transformers;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Repository
 public class CustomMovieRepositoryImpl implements CustomMovieRepository {
 
-    @PersistenceContext
+    @PersistenceContext //This is specific for EntityManager that provides Transaction-Scoped Behavior
     private EntityManager entityManager;
 
     @Override
     public List<MovieSearchResultDTO> searchMovies(String title, String releasedYear, String director, String genre, int limit, int page, String orderBy, String direction) {
-        StringBuilder queryBuilder = new StringBuilder("SELECT m, d.name " +
-                "FROM Movie m " +
-                "LEFT JOIN m.directors d " +
-                "LEFT JOIN m.genres g " +
-                "WHERE m.title LIKE :title ");
+        String sqlQuery = buildSqlQuery(releasedYear, director, genre, orderBy, direction);
 
-        // Add optional parameters
+        Query query = entityManager.createNativeQuery(sqlQuery);
+        setQueryParameters(query, title, releasedYear, director, genre, limit, page);
+
+        List<Object[]> results = query.getResultList();
+
+        return mapResultsToDTOs(results);
+    }
+
+    private String buildSqlQuery(String releasedYear, String director, String genre, String orderBy, String direction) {
+        StringBuilder queryBuilder = new StringBuilder(
+                "SELECT m.tconst AS id, " +
+                        "m.primaryTitle AS title, " +
+                        "m.releaseTime AS releaseTime, " +
+                        "GROUP_CONCAT(DISTINCT d.name ORDER BY d.name SEPARATOR ', ') AS directors, " +
+                        "m.backdrop_path AS backdropPath, " +
+                        "m.poster_path AS posterPath " +
+                        "FROM movie m " +
+                        "LEFT JOIN movie_directors md ON m.tconst = md.movie_id " +
+                        "LEFT JOIN people d ON md.director_id = d.nconst " +
+                        "LEFT JOIN movie_genres mg ON m.tconst = mg.movie_id " +
+                        "LEFT JOIN genres g ON mg.genre_id = g.id " +
+                        "WHERE m.primaryTitle LIKE :title "
+        );
+
         if (releasedYear != null && !releasedYear.isEmpty()) {
             queryBuilder.append("AND m.releaseTime LIKE :releasedYear ");
         }
@@ -40,11 +53,17 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
             queryBuilder.append("AND g.name LIKE :genre ");
         }
 
-        // Add sorting
-        queryBuilder.append("ORDER BY m.").append(orderBy).append(" ").append(direction);
+        queryBuilder.append("GROUP BY m.tconst ")
+                .append("ORDER BY ").append(orderBy).append(" ").append(direction)
+                .append(" LIMIT :limit OFFSET :offset");
 
-        TypedQuery<Object[]> query = entityManager.createQuery(queryBuilder.toString(), Object[].class);
+        return queryBuilder.toString();
+    }
+
+    private void setQueryParameters(Query query, String title, String releasedYear, String director, String genre, int limit, int page) {
         query.setParameter("title", "%" + title + "%");
+        query.setParameter("limit", limit);
+        query.setParameter("offset", page * limit);
 
         if (releasedYear != null && !releasedYear.isEmpty()) {
             query.setParameter("releasedYear", "%" + releasedYear + "%");
@@ -55,37 +74,43 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         if (genre != null && !genre.isEmpty()) {
             query.setParameter("genre", "%" + genre + "%");
         }
+    }
 
-        // Set pagination
-        query.setFirstResult(page * limit);
-        query.setMaxResults(limit);
-
-        List<Object[]> results = query.getResultList();
-
-        // Process results to remove duplicates and concatenate directors
-        Map<String, MovieSearchResultDTO> movieMap = new HashMap<>();
+    private List<MovieSearchResultDTO> mapResultsToDTOs(List<Object[]> results) {
+        List<MovieSearchResultDTO> dtoList = new ArrayList<>();
         for (Object[] result : results) {
-            Movie movie = (Movie) result[0];
-            String directorName = (String) result[1];
+            String id = (String) result[0];
+            String movieTitle = (String) result[1];
+            String releaseTime = (String) result[2];
+            String directors = (String) result[3];
+            String backdropPath = (String) result[4];
+            String posterPath = (String) result[5];
 
-            MovieSearchResultDTO dto = movieMap.get(movie.getId());
-            if (dto == null) {
-                dto = new MovieSearchResultDTO(
-                        movie.getId(),
-                        movie.getTitle(),
-                        movie.getReleaseTime(),
-                        directorName,  // Start with first director
-                        movie.getBackdropPath(),
-                        movie.getPosterPath()
-                );
-                movieMap.put(movie.getId(), dto);
-            } else {
-                // Concatenate director names
-                dto.setDirectors(dto.getDirectors() + ", " + directorName);
-            }
+            MovieSearchResultDTO dto = new MovieSearchResultDTO(
+                    id,
+                    movieTitle,
+                    releaseTime,
+                    directors,
+                    backdropPath,
+                    posterPath
+            );
+
+            dtoList.add(dto);
         }
 
-        return new ArrayList<>(movieMap.values());
+        // Debugging: Print mapped DTO results
+        printMappedDtoResults(dtoList);
+
+        return dtoList;
     }
+
+    private void printMappedDtoResults(List<MovieSearchResultDTO> dtoList) {
+        System.out.println("Mapped DTO Results:");
+        for (MovieSearchResultDTO dto : dtoList) {
+            System.out.println(dto.toString());
+            System.out.println("------------");
+        }
+    }
+
 
 }

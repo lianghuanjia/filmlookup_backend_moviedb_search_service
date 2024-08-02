@@ -12,7 +12,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="movie_basics")
+@Table(name="movie")
 public class Movie {
 
 
