@@ -23,9 +23,9 @@ public class MovieDirector {
     @ManyToOne
     @MapsId("directorId")
     @JoinColumn(name = "director_id")
-    private People director;
+    private Person director;
 
-    public MovieDirector(Movie movie, People director) {
+    public MovieDirector(Movie movie, Person director) {
         this.movie = movie;
         this.director = director;
         this.id = new MovieDirectorId(movie.getId(), director.getId());

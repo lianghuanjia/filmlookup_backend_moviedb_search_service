@@ -1,13 +1,16 @@
 package com.example.movie_service.repository;
 
 import com.example.movie_service.dto.MovieSearchResultDTO;
+import com.example.movie_service.entity.Movie;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 public class CustomMovieRepositoryImpl implements CustomMovieRepository {
@@ -16,7 +19,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
     private EntityManager entityManager;
 
     @Override
-    public List<MovieSearchResultDTO> searchMovies(String title, String releasedYear, String director, String genre, int limit, int page, String orderBy, String direction) {
+    public List<MovieSearchResultDTO> searchMovies(String title, String releasedYear, String director, String genre, Integer limit, Integer page, String orderBy, String direction) {
         String sqlQuery = buildSqlQuery(releasedYear, director, genre, orderBy, direction);
 
         Query query = entityManager.createNativeQuery(sqlQuery);
@@ -25,6 +28,43 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         List<Object[]> results = query.getResultList();
 
         return mapResultsToDTOs(results);
+    }
+
+    @Override
+    public List<MovieSearchResultDTO> searchMoviesByPersonId(String personId, Integer limit, Integer page, String orderBy, String direction) {
+
+        // JPQL Query to find movies by person ID with sorting
+        String jpqlQuery = "SELECT m FROM Movie m " +
+                "WHERE m.id IN (" +
+                "SELECT DISTINCT mc.id.tconst " +
+                "FROM MovieCrew mc " +
+                "WHERE mc.id.nconst = :personId) " +
+                "ORDER BY m." + orderBy + " " + direction;
+
+        // Create the query and set the parameter
+        TypedQuery<Movie> query = entityManager.createQuery(jpqlQuery, Movie.class);
+        query.setParameter("personId", personId);
+
+        // Apply pagination
+        query.setFirstResult(page * limit);
+        query.setMaxResults(limit);
+
+        // Execute the query and get the results
+        List<Movie> movies = query.getResultList();
+
+        // Map the results to MovieSearchResultDTO
+        return movies.stream()
+                .map(movie -> new MovieSearchResultDTO(
+                        movie.getId(),
+                        movie.getTitle(),
+                        movie.getReleaseTime(),
+                        movie.getDirectors().stream()
+                                .map(director -> director.getName())
+                                .collect(Collectors.joining(", ")),
+                        movie.getBackdropPath(),
+                        movie.getPosterPath()
+                ))
+                .collect(Collectors.toList());
     }
 
     private String buildSqlQuery(String releasedYear, String director, String genre, String orderBy, String direction) {

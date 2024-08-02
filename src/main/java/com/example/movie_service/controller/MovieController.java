@@ -9,10 +9,7 @@ import com.example.movie_service.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Year;
 import java.util.List;
@@ -69,34 +66,21 @@ public class MovieController {
             throw new ValidationException("invalid_year");
         }
 
-        if (limit != null && (limit != 10 && limit != 20 && limit != 30)){
-            System.out.println("Invalid limit");
-            throw new ValidationException("invalid_limit");
-        }
-
-        if (page != null && page < 0){
-            throw new ValidationException("invalid_page");
-        }
-
-        if (orderBy != null && !orderBy.equals("rating") && !orderBy.equals("title") && !orderBy.equals("year")){
-            throw new ValidationException("invalid_orderBy");
-        }
-
-        if (direction != null && !direction.equals("asc") && !direction.equals("desc")){
-            throw new ValidationException("invalid_direction");
-        }
+        validateParameters(limit, page, orderBy, direction);
 
         // Get movies from the movie service
         List<MovieSearchResultDTO> movieList = movieService.searchMovies(title, releasedYear,director,genre,limit,page,orderBy,direction);
 
-        ResponseConfig.ResponseMessage successDetail = responseConfig.getSuccess().get("movies_found");
+
         CustomResponse<List<MovieSearchResultDTO>> customResponse;
 
         // Prepare the response
         if (movieList != null){
+            ResponseConfig.ResponseMessage successDetail = responseConfig.getSuccess().get("movies_found");
             customResponse = new CustomResponse<>(successDetail.getCode(), successDetail.getMessage(), movieList);
         }
         else{
+            ResponseConfig.ResponseMessage successDetail = responseConfig.getSuccess().get("movies_not_found");
             customResponse = new CustomResponse<>(successDetail.getCode(), successDetail.getMessage(), null);
         }
 
@@ -104,7 +88,63 @@ public class MovieController {
         return new ResponseEntity<>(customResponse, HttpStatus.OK);
     }
 
+    @GetMapping("/movies/{personId}")
+    public ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovieByPersonId
+            (@PathVariable String personId,
+             @RequestParam(defaultValue = "10") Integer limit,
+             @RequestParam(defaultValue = "0") Integer page,
+             @RequestParam(defaultValue = "title") String orderBy,
+             @RequestParam(defaultValue = "asc") String direction){
+
+        // Validate the limit, page, orderBy, and direction
+        validateParameters(limit, page, orderBy, direction);
+
+        List<MovieSearchResultDTO> moviesList = movieService.searchMovieByPersonId(personId, limit, page, orderBy, direction);
+
+        CustomResponse<List<MovieSearchResultDTO>> customResponse;
+
+        if (moviesList != null){
+            ResponseConfig.ResponseMessage successDetail = responseConfig.getSuccess().get("movies_found_with_personId");
+            customResponse = new CustomResponse<>(successDetail.getCode(), successDetail.getMessage(), moviesList);
+        }
+        else{
+            ResponseConfig.ResponseMessage successDetail = responseConfig.getSuccess().get("movies_not_found_with_personId");
+            customResponse = new CustomResponse<>(successDetail.getCode(), successDetail.getMessage(), null);
+        }
+
+        // Return the response entity
+        return new ResponseEntity<>(customResponse, HttpStatus.OK);
+
+    }
 
 
 
+
+
+    /**
+     * Validates common request parameters.
+     *
+     * @param limit     the number of results to return per page
+     * @param page      the page number to return
+     * @param orderBy   the field to order the results by
+     * @param direction the direction to order the results
+     */
+    private void validateParameters(Integer limit, Integer page, String orderBy, String direction) {
+        if (limit != null && (limit != 10 && limit != 20 && limit != 30)) {
+            System.out.println("Invalid limit");
+            throw new ValidationException("invalid_limit");
+        }
+
+        if (page != null && page < 0) {
+            throw new ValidationException("invalid_page");
+        }
+
+        if (orderBy != null && !orderBy.equals("rating") && !orderBy.equals("title") && !orderBy.equals("releaseTime")) {
+            throw new ValidationException("invalid_orderBy");
+        }
+
+        if (direction != null && !direction.equals("asc") && !direction.equals("desc")) {
+            throw new ValidationException("invalid_direction");
+        }
+    }
 }

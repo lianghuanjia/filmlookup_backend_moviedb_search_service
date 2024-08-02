@@ -40,6 +40,10 @@ responses:
       status: 403
       code: 40301
       message: "No permission to access this endpoint"
+    personId_not_found:
+      status: 404
+      code: 40401
+      message: "PersonId not found"
     internal_error:
       status: 500
       code: 500
@@ -53,6 +57,15 @@ responses:
       status: 200
       code: 20002
       message: "Movie(s) not found"
+    movies_found_with_personId:
+      status: 200
+      code: 20003
+      message: "Movie(s) found with personId"
+    movies_not_found_with_personId:
+      status: 200
+      code: 20004
+      message: "Movie(s) not found with personId"
+
 
 spring:
   jpa:

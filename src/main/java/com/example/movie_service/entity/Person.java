@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Table(name="people")
-public class People {
+public class Person {
 
     @Id
     @GenericGenerator(name = "custom-name-id", type = CustomTitleIdGenerator.class)

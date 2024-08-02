@@ -45,6 +45,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<CustomResponse<Object>> handleResourceNotFoundException(ResourceNotFoundException exception){
+        ResponseConfig.ResponseMessage responseMessage = responseConfig.getError().get(exception.getNotFoundResource());
+        CustomResponse<Object> response = new CustomResponse<>(responseMessage.getCode(), responseMessage.getMessage(), null);
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
     /**
      * Handles MissingServletRequestParameterException exceptions. This Handler will catch this exception when there is
      * missing required parameters in the request.

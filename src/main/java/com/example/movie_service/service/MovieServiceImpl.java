@@ -2,7 +2,10 @@ package com.example.movie_service.service;
 
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.entity.Movie;
+import com.example.movie_service.exception.ResourceNotFoundException;
 import com.example.movie_service.repository.CustomMovieRepository;
+import com.example.movie_service.repository.MovieRepository;
+import com.example.movie_service.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +18,7 @@ import java.util.List;
 public class MovieServiceImpl implements MovieService {
 
     private CustomMovieRepository movieRepository;
+    private PersonRepository personRepository;
 
     // Default constructor
     public MovieServiceImpl() {
@@ -25,8 +29,9 @@ public class MovieServiceImpl implements MovieService {
      * @param movieRepository the repository for accessing movie data
      */
     @Autowired
-    public MovieServiceImpl(CustomMovieRepository movieRepository) {
+    public MovieServiceImpl(CustomMovieRepository movieRepository, PersonRepository personRepository) {
         this.movieRepository = movieRepository;
+        this.personRepository = personRepository;
     }
 
     /**
@@ -53,11 +58,19 @@ public class MovieServiceImpl implements MovieService {
 
     /**
      * Searches for a movie by its ID.
-     * @param id the ID of the movie to search for
+     * @param personId the ID of the movie to search for
      * @return the movie that matches the given ID
      */
     @Override
-    public Movie searchMovieById(String id) {
-        return null;
+    public List<MovieSearchResultDTO> searchMovieByPersonId(String personId, Integer limit, Integer page, String orderBy, String direction) {
+        // Validate if personId exists in database
+        if (!personRepository.existsById(personId)){
+            throw new ResourceNotFoundException("personId");
+        }
+
+        List<MovieSearchResultDTO> movieSearchResultDTOList = movieRepository.searchMoviesByPersonId(personId, limit, page, orderBy, direction);
+
+
+        return movieSearchResultDTOList;
     }
 }

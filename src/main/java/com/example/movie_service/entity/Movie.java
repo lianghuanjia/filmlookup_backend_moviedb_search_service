@@ -78,7 +78,9 @@ public class Movie {
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "director_id")
     )
-    private Set<People> directors;
+    private Set<Person> directors;
+
+
 
     public Movie(String id) {
         this.id = id;
