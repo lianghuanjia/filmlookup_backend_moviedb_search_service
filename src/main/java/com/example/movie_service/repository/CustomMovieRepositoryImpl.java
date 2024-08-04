@@ -30,15 +30,13 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         return mapResultsToDTOs(results);
     }
 
+
     @Override
     public List<MovieSearchResultDTO> searchMoviesByPersonId(String personId, Integer limit, Integer page, String orderBy, String direction) {
-
         // JPQL Query to find movies by person ID with sorting
-        String jpqlQuery = "SELECT m FROM Movie m " +
-                "WHERE m.id IN (" +
-                "SELECT DISTINCT mc.id.tconst " +
-                "FROM MovieCrew mc " +
-                "WHERE mc.id.nconst = :personId) " +
+        String jpqlQuery = "SELECT DISTINCT m FROM Movie m " +
+                "JOIN FETCH m.movieCrews mc " +
+                "WHERE mc.person.id = :personId " +
                 "ORDER BY m." + orderBy + " " + direction;
 
         // Create the query and set the parameter
@@ -54,32 +52,39 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
 
         // Map the results to MovieSearchResultDTO
         return movies.stream()
-                .map(movie -> new MovieSearchResultDTO(
-                        movie.getId(),
-                        movie.getTitle(),
-                        movie.getReleaseTime(),
-                        movie.getDirectors().stream()
-                                .map(director -> director.getName())
-                                .collect(Collectors.joining(", ")),
-                        movie.getBackdropPath(),
-                        movie.getPosterPath()
-                ))
+                .map(movie -> {
+                    // Extract director names from movieCrews
+                    String directors = movie.getMovieCrews().stream()
+                            .filter(crew -> "director".equalsIgnoreCase(crew.getJob()))
+                            .map(crew -> crew.getPerson().getName())
+                            .collect(Collectors.joining(", "));
+
+                    return new MovieSearchResultDTO(
+                            movie.getId(),
+                            movie.getTitle(),
+                            movie.getReleaseTime(),
+                            directors,
+                            movie.getBackdropPath(),
+                            movie.getPosterPath()
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
+
     private String buildSqlQuery(String releasedYear, String director, String genre, String orderBy, String direction) {
         StringBuilder queryBuilder = new StringBuilder(
-                "SELECT m.tconst AS id, " +
+                "SELECT m.movie_id AS id, " +
                         "m.primaryTitle AS title, " +
                         "m.releaseTime AS releaseTime, " +
                         "GROUP_CONCAT(DISTINCT d.name ORDER BY d.name SEPARATOR ', ') AS directors, " +
                         "m.backdrop_path AS backdropPath, " +
                         "m.poster_path AS posterPath " +
                         "FROM movie m " +
-                        "LEFT JOIN movie_directors md ON m.tconst = md.movie_id " +
-                        "LEFT JOIN people d ON md.director_id = d.nconst " +
-                        "LEFT JOIN movie_genres mg ON m.tconst = mg.movie_id " +
-                        "LEFT JOIN genres g ON mg.genre_id = g.id " +
+                        "LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id " +
+                        "LEFT JOIN person d ON mc.person_id = d.person_id AND mc.job = 'director' " +
+                        "LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id " +
+                        "LEFT JOIN genre g ON mg.genre_id = g.id " +
                         "WHERE m.primaryTitle LIKE :title "
         );
 
@@ -93,13 +98,26 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
             queryBuilder.append("AND g.name LIKE :genre ");
         }
 
-        queryBuilder.append("GROUP BY m.tconst ")
+        queryBuilder.append("GROUP BY m.movie_id ")
                 .append("ORDER BY ").append(orderBy).append(" ").append(direction)
                 .append(" LIMIT :limit OFFSET :offset");
 
         return queryBuilder.toString();
     }
 
+
+    /**
+     * Sets the parameters for a database query based on the provided input criteria.
+     * @param query         The query object to set parameters on.
+     * @param title         The title of the movie to search for. Wildcards (%) are added for partial matching
+     * @param releasedYear  The released year of the movie. Wildcards (%) are added for partial matching. Can be null.
+     * @param director      The director of the movie. Wildcards (%) are added for partial matching. Can be null.
+     * @param genre         The genre of the movie. Wildcards (%) are added for partial matching. Can be null.
+     * @param limit         The maximum number of results to return (for pagination).
+     * @param page          The page number of results to return, used to calculate the offset.
+     *
+     * Assumes that the query object is a valid and non-null instance of a query with named parameters.
+     */
     private void setQueryParameters(Query query, String title, String releasedYear, String director, String genre, int limit, int page) {
         query.setParameter("title", "%" + title + "%");
         query.setParameter("limit", limit);
@@ -116,6 +134,12 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         }
     }
 
+
+    /**
+     * Converts a list of raw query result objects into a list of MovieSearchResultDTOs.
+     * @param results The query results returned from the search
+     * @return
+     */
     private List<MovieSearchResultDTO> mapResultsToDTOs(List<Object[]> results) {
         List<MovieSearchResultDTO> dtoList = new ArrayList<>();
         for (Object[] result : results) {
@@ -137,12 +161,9 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
 
             dtoList.add(dto);
         }
-
-        // Debugging: Print mapped DTO results
-        printMappedDtoResults(dtoList);
-
         return dtoList;
     }
+
 
     private void printMappedDtoResults(List<MovieSearchResultDTO> dtoList) {
         System.out.println("Mapped DTO Results:");
