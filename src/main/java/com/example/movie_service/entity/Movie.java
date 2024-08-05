@@ -87,4 +87,10 @@ public class Movie {
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<MovieCrew> movieCrews;
 
+    @OneToMany(mappedBy="movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<MovieAkas> movieAkas;
+
+    @OneToOne(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private MovieRating movieRating;
+
 }

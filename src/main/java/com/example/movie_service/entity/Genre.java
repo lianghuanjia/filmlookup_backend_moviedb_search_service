@@ -13,7 +13,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name="genres")
+@Table(name="genre")
 public class Genre {
 
     @Id

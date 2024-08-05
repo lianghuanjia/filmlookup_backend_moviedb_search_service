@@ -1,6 +1,7 @@
 package com.example.movie_service.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "movie_rating")
 public class MovieRating {
 
@@ -33,11 +35,5 @@ public class MovieRating {
     @JoinColumn(name = "movie_id") // "movie_id" refers to the movie_id column in the movie_rating table
     private Movie movie;
 
-    // Constructors, getters, setters
-    public MovieRating(Double averageRating, Integer numVotes, Movie movie) {
-        this.averageRating = averageRating;
-        this.numVotes = numVotes;
-        this.movie = movie;
-        this.movieId = movie.getId();
-    }
+
 }

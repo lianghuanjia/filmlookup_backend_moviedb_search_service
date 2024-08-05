@@ -52,7 +52,7 @@ public class MovieController {
             @RequestParam(required = false) String director,
             @RequestParam(required = false) String genre,
             @RequestParam(defaultValue = "10") Integer limit,
-            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "title") String orderBy,
             @RequestParam(defaultValue = "asc") String direction) {
 
@@ -92,7 +92,7 @@ public class MovieController {
     public ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovieByPersonId
             (@PathVariable String personId,
              @RequestParam(defaultValue = "10") Integer limit,
-             @RequestParam(defaultValue = "0") Integer page,
+             @RequestParam(defaultValue = "1") Integer page,
              @RequestParam(defaultValue = "title") String orderBy,
              @RequestParam(defaultValue = "asc") String direction){
 
@@ -135,7 +135,7 @@ public class MovieController {
             throw new ValidationException("invalid_limit");
         }
 
-        if (page != null && page < 0) {
+        if (page != null && page < 1) {
             throw new ValidationException("invalid_page");
         }
 
