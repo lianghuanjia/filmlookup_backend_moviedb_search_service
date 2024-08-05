@@ -97,6 +97,7 @@ public class MovieController {
              @RequestParam(defaultValue = "title") String orderBy,
              @RequestParam(defaultValue = "asc") String direction){
 
+        // All things below should be in service layer
         // Validate the limit, page, orderBy, and direction
         validateParameters(limit, page, orderBy, direction);
 
