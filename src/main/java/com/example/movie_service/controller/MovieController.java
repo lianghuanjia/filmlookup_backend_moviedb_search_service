@@ -19,7 +19,7 @@ import java.util.List;
 public class MovieController {
 
     private MovieService movieService;
-    private ResponseConfig responseConfig;
+
 
 //    // Default constructor
 //    public MovieController() {
@@ -27,9 +27,8 @@ public class MovieController {
 
     // Constructor with dependencies injection
     @Autowired
-    public MovieController(MovieService movieService, ResponseConfig responseConfig) {
+    public MovieController(MovieService movieService) {
         this.movieService = movieService;
-        this.responseConfig = responseConfig;
     }
 
     /**
@@ -47,77 +46,51 @@ public class MovieController {
      */
     @GetMapping("/movies")
     public ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovies(
-            @RequestParam String title,
+            @RequestParam(required = true) String title,
             @RequestParam(required = false) String releasedYear,
             @RequestParam(required = false) String director,
             @RequestParam(required = false) String genre,
-            @RequestParam(defaultValue = "10") Integer limit,
-            @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "title") String orderBy,
-            @RequestParam(defaultValue = "asc") String direction) {
-
-        // Validate request parameters
-        if (title == null || title.isEmpty()) {
-            throw new ValidationException("invalid_title");
-        }
-
-        if (releasedYear != null && Integer.parseInt(releasedYear) > Year.now().getValue()){
-            System.out.println("Invalid year");
-            throw new ValidationException("invalid_year");
-        }
-
-        validateParameters(limit, page, orderBy, direction);
-
-        // Get movies from the movie service
-        List<MovieSearchResultDTO> movieList = movieService.searchMovies(title, releasedYear,director,genre,limit,page,orderBy,direction);
+            @RequestParam(required = false, defaultValue = "10") Integer limit,
+            @RequestParam(required = false, defaultValue = "1") Integer page,
+            @RequestParam(required = false, defaultValue = "title") String orderBy,
+            @RequestParam(required = false, defaultValue = "asc") String direction) {
 
 
-        CustomResponse<List<MovieSearchResultDTO>> customResponse;
-
-        // Prepare the response
-        if (movieList != null){
-            ResponseConfig.ResponseMessage successDetail = responseConfig.getSuccess().get("movies_found");
-            customResponse = new CustomResponse<>(successDetail.getCode(), successDetail.getMessage(), movieList);
-        }
-        else{
-            ResponseConfig.ResponseMessage successDetail = responseConfig.getSuccess().get("movies_not_found");
-            customResponse = new CustomResponse<>(successDetail.getCode(), successDetail.getMessage(), null);
-        }
 
         // Return the response entity
-        return new ResponseEntity<>(customResponse, HttpStatus.OK);
+        return movieService.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
 
     }
 
-    @GetMapping("/movies/{personId}")
-    public ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovieByPersonId
-            (@PathVariable String personId,
-             @RequestParam(defaultValue = "10") Integer limit,
-             @RequestParam(defaultValue = "1") Integer page,
-             @RequestParam(defaultValue = "title") String orderBy,
-             @RequestParam(defaultValue = "asc") String direction){
-
-        // All things below should be in service layer
-        // Validate the limit, page, orderBy, and direction
-        validateParameters(limit, page, orderBy, direction);
-
-        List<MovieSearchResultDTO> moviesList = movieService.searchMovieByPersonId(personId, limit, page, orderBy, direction);
-
-        CustomResponse<List<MovieSearchResultDTO>> customResponse;
-
-        if (moviesList != null){
-            ResponseConfig.ResponseMessage successDetail = responseConfig.getSuccess().get("movies_found_with_personId");
-            customResponse = new CustomResponse<>(successDetail.getCode(), successDetail.getMessage(), moviesList);
-        }
-        else{
-            ResponseConfig.ResponseMessage successDetail = responseConfig.getSuccess().get("movies_not_found_with_personId");
-            customResponse = new CustomResponse<>(successDetail.getCode(), successDetail.getMessage(), null);
-        }
-
-        // Return the response entity
-        return new ResponseEntity<>(customResponse, HttpStatus.OK);
-
-    }
+//    @GetMapping("/movies/{personId}")
+//    public ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovieByPersonId
+//            (@PathVariable String personId,
+//             @RequestParam(defaultValue = "10") Integer limit,
+//             @RequestParam(defaultValue = "1") Integer page,
+//             @RequestParam(defaultValue = "title") String orderBy,
+//             @RequestParam(defaultValue = "asc") String direction){
+//
+//        // All things below should be in service layer
+//        // Validate the limit, page, orderBy, and direction
+//        validateParameters(limit, page, orderBy, direction);
+//
+//        List<MovieSearchResultDTO> moviesList = movieService.searchMovieByPersonId(personId, limit, page, orderBy, direction);
+//
+//        CustomResponse<List<MovieSearchResultDTO>> customResponse;
+//
+//        if (moviesList != null){
+//            ResponseConfig.ResponseMessage successDetail = responseConfig.getSuccess().get("movies_found_with_personId");
+//            customResponse = new CustomResponse<>(successDetail.getCode(), successDetail.getMessage(), moviesList);
+//        }
+//        else{
+//            ResponseConfig.ResponseMessage successDetail = responseConfig.getSuccess().get("movies_not_found_with_personId");
+//            customResponse = new CustomResponse<>(successDetail.getCode(), successDetail.getMessage(), null);
+//        }
+//
+//        // Return the response entity
+//        return new ResponseEntity<>(customResponse, HttpStatus.OK);
+//
+//    }
 
 
 

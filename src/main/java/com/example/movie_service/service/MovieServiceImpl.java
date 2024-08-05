@@ -1,15 +1,22 @@
 package com.example.movie_service.service;
 
+import com.example.movie_service.config.ResponseConfig;
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.entity.Movie;
 import com.example.movie_service.exception.ResourceNotFoundException;
+import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.repository.CustomMovieRepository;
 import com.example.movie_service.repository.MovieRepository;
 import com.example.movie_service.repository.PersonRepository;
+import com.example.movie_service.response.CustomResponse;
+import org.apache.el.util.Validation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.Year;
 import java.util.List;
 
 /**
@@ -20,6 +27,8 @@ public class MovieServiceImpl implements MovieService {
 
     private CustomMovieRepository movieRepository; // Should I make this final?
     private PersonRepository personRepository;
+    private ValidationService validationService;
+    private ResponseConfig responseConfig;
     // Default constructor
     public MovieServiceImpl() {
     }
@@ -29,10 +38,12 @@ public class MovieServiceImpl implements MovieService {
      * @param movieRepository the repository for accessing movie data
      */
     @Autowired
-    public MovieServiceImpl(CustomMovieRepository movieRepository, PersonRepository personRepository) {
+    public MovieServiceImpl(CustomMovieRepository movieRepository, PersonRepository personRepository,
+                            ValidationService validationService, ResponseConfig responseConfig) {
         this.movieRepository = movieRepository;
         this.personRepository = personRepository;
-
+        this.validationService = validationService;
+        this.responseConfig = responseConfig;
     }
 
     /**
@@ -40,22 +51,31 @@ public class MovieServiceImpl implements MovieService {
      * @return a list of movies that match the search criteria
      */
     @Override
-    public List<MovieSearchResultDTO> searchMovies(String title, String releasedYear, String director, String genre,
+    public ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovies(String title, String releasedYear, String director, String genre,
                                                    Integer limit, Integer page, String orderBy, String direction) {
-        if (limit <= 0) {
-            limit = 10;
-        }
-        if (page < 0) {
-            page = 0;
-        }
-        if (orderBy == null || orderBy.isEmpty()) {
-            orderBy = "primaryTitle"; // static string is not good. Create a constant file
-        }
-        if (direction == null || direction.isEmpty()) {
-            direction = "asc";
-        }
 
-        return movieRepository.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+        // Validate parameters:
+        validationService.validateTitle(title);
+        validationService.validateReleasedYear(releasedYear);
+        validationService.validateLimit(limit);
+        validationService.validatePage(page);
+        validationService.validateOrderBy(orderBy);
+        validationService.validateDirection(direction);
+
+        List<MovieSearchResultDTO> movieList = movieRepository.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+
+        CustomResponse<List<MovieSearchResultDTO>> customResponse;
+
+        // Prepare the response
+        if (movieList != null){
+            ResponseConfig.ResponseMessage successDetail = responseConfig.getSuccess().get("movies_found");
+            customResponse = new CustomResponse<>(successDetail.getCode(), successDetail.getMessage(), movieList);
+        }
+        else{
+            ResponseConfig.ResponseMessage successDetail = responseConfig.getSuccess().get("movies_not_found");
+            customResponse = new CustomResponse<>(successDetail.getCode(), successDetail.getMessage(), null);
+        }
+        return new ResponseEntity<>(customResponse, HttpStatus.OK);
     }
 
     /**
