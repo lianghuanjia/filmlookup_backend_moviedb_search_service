@@ -21,9 +21,9 @@ public class MovieController {
     private MovieService movieService;
     private ResponseConfig responseConfig;
 
-    // Default constructor
-    public MovieController() {
-    }
+//    // Default constructor
+//    public MovieController() {
+//    }
 
     // Constructor with dependencies injection
     @Autowired
@@ -86,6 +86,7 @@ public class MovieController {
 
         // Return the response entity
         return new ResponseEntity<>(customResponse, HttpStatus.OK);
+
     }
 
     @GetMapping("/movies/{personId}")

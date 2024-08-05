@@ -9,7 +9,7 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class ValidationException extends RuntimeException{
+public class ValidationException extends RuntimeException {
 
     /**
      * The type of validation_error_type must match the error type in the application.yaml.

@@ -5,11 +5,10 @@ import jakarta.persistence.ConstructorResult;
 import jakarta.persistence.SqlResultSetMapping;
 import lombok.*;
 
-@Getter
-@Setter
+
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class MovieSearchResultDTO {
     private String id;
     private String title;

@@ -7,6 +7,7 @@ import com.example.movie_service.repository.CustomMovieRepository;
 import com.example.movie_service.repository.MovieRepository;
 import com.example.movie_service.repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,9 +18,8 @@ import java.util.List;
 @Service
 public class MovieServiceImpl implements MovieService {
 
-    private CustomMovieRepository movieRepository;
+    private CustomMovieRepository movieRepository; // Should I make this final?
     private PersonRepository personRepository;
-
     // Default constructor
     public MovieServiceImpl() {
     }
@@ -32,6 +32,7 @@ public class MovieServiceImpl implements MovieService {
     public MovieServiceImpl(CustomMovieRepository movieRepository, PersonRepository personRepository) {
         this.movieRepository = movieRepository;
         this.personRepository = personRepository;
+
     }
 
     /**
@@ -39,7 +40,8 @@ public class MovieServiceImpl implements MovieService {
      * @return a list of movies that match the search criteria
      */
     @Override
-    public List<MovieSearchResultDTO> searchMovies(String title, String releasedYear, String director, String genre, Integer limit, Integer page, String orderBy, String direction) {
+    public List<MovieSearchResultDTO> searchMovies(String title, String releasedYear, String director, String genre,
+                                                   Integer limit, Integer page, String orderBy, String direction) {
         if (limit <= 0) {
             limit = 10;
         }
@@ -47,7 +49,7 @@ public class MovieServiceImpl implements MovieService {
             page = 0;
         }
         if (orderBy == null || orderBy.isEmpty()) {
-            orderBy = "primaryTitle";
+            orderBy = "primaryTitle"; // static string is not good. Create a constant file
         }
         if (direction == null || direction.isEmpty()) {
             direction = "asc";

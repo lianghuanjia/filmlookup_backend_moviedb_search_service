@@ -29,7 +29,9 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
 
 
 
-    private List<MovieSearchResultDTO> buildAndExecuteQuery(String title, String releasedYear, String director, String genre, Integer limit, Integer page, String orderBy, String direction) {
+    private List<MovieSearchResultDTO> buildAndExecuteQuery(String title, String releasedYear, String director,
+                                                            String genre, Integer limit, Integer page, String orderBy,
+                                                            String direction) {
         String jpql = "SELECT DISTINCT m FROM Movie m "+
                 "LEFT JOIN FETCH m.movieCrews movieCrew " +
                 "LEFT JOIN FETCH movieCrew.person movieCrewPerson "+
@@ -73,9 +75,11 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         query.setFirstResult(offSet);
         query.setMaxResults(limit);
 
-
+        // Execute the query and get the results
         List<Movie> movies = query.getResultList();
-        // Execute the query and return the results
+
+
+        // After we retrieve the data, that's the end of the repository. The logic below should be handled in service layer
 
         List<MovieSearchResultDTO> dtoList = new ArrayList<>();
 
@@ -90,6 +94,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
                     .collect(Collectors.joining(","));
 
             // Map the information we collect so far into MovieSearchResultDTO
+            // Have a separate class to do the convertion
             MovieSearchResultDTO dto = new MovieSearchResultDTO(
                     movie.getId(),
                     movie.getTitle(),
