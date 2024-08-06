@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.Year;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -62,14 +63,16 @@ public class MovieServiceImpl implements MovieService {
         validationService.validateOrderBy(orderBy);
         validationService.validateDirection(direction);
 
-        List<MovieSearchResultDTO> movieList = movieRepository.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+        List<Object[]> movieList = movieRepository.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+
+        List<MovieSearchResultDTO> mappedResults = mapResultsToDTOs(movieList);
 
         CustomResponse<List<MovieSearchResultDTO>> customResponse;
 
         // Prepare the response
         if (movieList != null){
             ResponseConfig.ResponseMessage successDetail = responseConfig.getSuccess().get("movies_found");
-            customResponse = new CustomResponse<>(successDetail.getCode(), successDetail.getMessage(), movieList);
+            customResponse = new CustomResponse<>(successDetail.getCode(), successDetail.getMessage(), mappedResults);
         }
         else{
             ResponseConfig.ResponseMessage successDetail = responseConfig.getSuccess().get("movies_not_found");
@@ -94,5 +97,35 @@ public class MovieServiceImpl implements MovieService {
 
 
         return movieSearchResultDTOList;
+    }
+
+
+    /**
+     * Converts a list of raw query result objects into a list of MovieSearchResultDTOs.
+     * @param results The query results returned from the search
+     * @return
+     */
+    private List<MovieSearchResultDTO> mapResultsToDTOs(List<Object[]> results) {
+        List<MovieSearchResultDTO> dtoList = new ArrayList<>();
+        for (Object[] result : results) {
+            String id = (String) result[0];
+            String movieTitle = (String) result[1];
+            String releaseTime = (String) result[2];
+            String directors = (String) result[3];
+            String backdropPath = (String) result[4];
+            String posterPath = (String) result[5];
+
+            MovieSearchResultDTO dto = new MovieSearchResultDTO(
+                    id,
+                    movieTitle,
+                    releaseTime,
+                    directors,
+                    backdropPath,
+                    posterPath
+            );
+
+            dtoList.add(dto);
+        }
+        return dtoList;
     }
 }

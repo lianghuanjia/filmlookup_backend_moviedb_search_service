@@ -19,7 +19,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
     private EntityManager entityManager;
 
     @Override
-    public List<MovieSearchResultDTO> searchMovies(String title, String releasedYear, String director, String genre, Integer limit, Integer page, String orderBy, String direction) {
+    public List<Object[]> searchMovies(String title, String releasedYear, String director, String genre, Integer limit, Integer page, String orderBy, String direction) {
         String sqlQuery = buildSqlQuery(releasedYear, director, genre, orderBy, direction);
 
         Query query = entityManager.createNativeQuery(sqlQuery);
@@ -27,7 +27,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
 
         List<Object[]> results = query.getResultList();
 
-        return mapResultsToDTOs(results);
+        return results;
     }
 
 
@@ -92,36 +92,6 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         if (genre != null && !genre.isEmpty()) {
             query.setParameter("genre", "%" + genre + "%");
         }
-    }
-
-
-    /**
-     * Converts a list of raw query result objects into a list of MovieSearchResultDTOs.
-     * @param results The query results returned from the search
-     * @return
-     */
-    private List<MovieSearchResultDTO> mapResultsToDTOs(List<Object[]> results) {
-        List<MovieSearchResultDTO> dtoList = new ArrayList<>();
-        for (Object[] result : results) {
-            String id = (String) result[0];
-            String movieTitle = (String) result[1];
-            String releaseTime = (String) result[2];
-            String directors = (String) result[3];
-            String backdropPath = (String) result[4];
-            String posterPath = (String) result[5];
-
-            MovieSearchResultDTO dto = new MovieSearchResultDTO(
-                    id,
-                    movieTitle,
-                    releaseTime,
-                    directors,
-                    backdropPath,
-                    posterPath
-            );
-
-            dtoList.add(dto);
-        }
-        return dtoList;
     }
 
 
