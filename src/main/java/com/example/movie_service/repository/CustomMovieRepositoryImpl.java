@@ -9,9 +9,7 @@ import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
@@ -22,93 +20,49 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
 
     @Override
     public List<MovieSearchResultDTO> searchMovies(String title, String releasedYear, String director, String genre, Integer limit, Integer page, String orderBy, String direction) {
-        List<MovieSearchResultDTO> resultDTOS = buildAndExecuteQuery(title, releasedYear, director, genre, limit, page,  orderBy, direction);
+        String sqlQuery = buildSqlQuery(releasedYear, director, genre, orderBy, direction);
 
-        return resultDTOS;
+        Query query = entityManager.createNativeQuery(sqlQuery);
+        setQueryParameters(query, title, releasedYear, director, genre, limit, page);
+
+        List<Object[]> results = query.getResultList();
+
+        return mapResultsToDTOs(results);
     }
 
 
 
-    private List<MovieSearchResultDTO> buildAndExecuteQuery(String title, String releasedYear, String director,
-                                                            String genre, Integer limit, Integer page, String orderBy,
-                                                            String direction) {
-        String jpql = "SELECT DISTINCT m FROM Movie m "+
-                "LEFT JOIN FETCH m.movieCrews movieCrew " +
-                "LEFT JOIN FETCH movieCrew.person movieCrewPerson "+
-                "LEFT JOIN FETCH m.genres genre "+
-                "WHERE m.title LIKE :title ";
+    private String buildSqlQuery(String releasedYear, String director, String genre, String orderBy, String direction) {
+        StringBuilder queryBuilder = new StringBuilder(
+                "SELECT m.movie_id AS id, " +
+                        "m.primaryTitle AS title, " +
+                        "m.releaseTime AS releaseTime, " +
+                        "GROUP_CONCAT(DISTINCT d.name ORDER BY d.name SEPARATOR ', ') AS directors, " +
+                        "m.backdrop_path AS backdropPath, " +
+                        "m.poster_path AS posterPath " +
+                        "FROM movie m " +
+                        "LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id " +
+                        "LEFT JOIN person d ON mc.person_id = d.person_id AND mc.job = 'director' " +
+                        "LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id " +
+                        "LEFT JOIN genre g ON mg.genre_id = g.id " +
+                        "WHERE m.primaryTitle LIKE :title "
+        );
 
-        // Create a map to store parameter values
-        Map<String, Object> parameters = new HashMap<>();
-
-        parameters.put("title", "%" + title + "%"); // Use wildcard %% to treat the title to be a substring to search
-
-
-        // Add additional conditions dynamically
         if (releasedYear != null && !releasedYear.isEmpty()) {
-            jpql += "AND m.releaseTime LIKE :releasedYear ";
-            parameters.put("releasedYear", releasedYear+"%"); // Use the % at the end to look for releasedYear that starts with the given parameter releasedYear
+            queryBuilder.append("AND m.releaseTime LIKE :releasedYear ");
         }
         if (director != null && !director.isEmpty()) {
-            jpql += "AND movieCrewPerson.name LIKE :director ";
-            parameters.put("director", "%"+director+"%");
-
+            queryBuilder.append("AND d.name LIKE :director ");
         }
         if (genre != null && !genre.isEmpty()) {
-            jpql += "AND genre.name LIKE :genre ";
-            parameters.put("genre", "%"+genre+"%");
+            queryBuilder.append("AND g.name LIKE :genre ");
         }
 
-        // Add the order by and direction. They have default value, so they always have values and are not null
-        jpql += "ORDER BY m." + orderBy + " " + direction;
+        queryBuilder.append("GROUP BY m.movie_id ")
+                .append("ORDER BY ").append(orderBy).append(" ").append(direction)
+                .append(" LIMIT :limit OFFSET :offset");
 
-
-        TypedQuery<Movie> query = entityManager.createQuery(jpql, Movie.class);
-
-        // Set all parameters that are present in the parameters map into the query:
-        for (Map.Entry<String, Object> param : parameters.entrySet()) {
-            query.setParameter(param.getKey(), param.getValue());
-        }
-
-        // set the offset and max results return each time
-        int offSet = (page-1) * limit;
-        query.setFirstResult(offSet);
-        query.setMaxResults(limit);
-
-        // Execute the query and get the results
-        List<Movie> movies = query.getResultList();
-
-
-        // After we retrieve the data, that's the end of the repository. The logic below should be handled in service layer
-
-        List<MovieSearchResultDTO> dtoList = new ArrayList<>();
-
-
-        for (Movie movie: movies) {
-            // Get director(s)'s name of those movies and concatenate them using "," if there are more than 1 director of one movie
-            String directors = movie.getMovieCrews().stream()
-                    .filter(mc -> "director".equals(mc.getJob()))
-                    .map(mc -> mc.getPerson().getName())
-                    .distinct()
-                    .sorted()
-                    .collect(Collectors.joining(","));
-
-            // Map the information we collect so far into MovieSearchResultDTO
-            // Have a separate class to do the convertion
-            MovieSearchResultDTO dto = new MovieSearchResultDTO(
-                    movie.getId(),
-                    movie.getTitle(),
-                    movie.getReleaseTime(),
-                    movie.getBackdropPath(),
-                    movie.getPosterPath(),
-                    directors
-            );
-
-            // Add the created MovieSearchResultDTO into dtoList
-            dtoList.add(dto);
-        }
-
-        return dtoList;
+        return queryBuilder.toString();
     }
 
 
