@@ -1,49 +1,49 @@
 responses:
   error:
-    invalid_year:
+    InvalidYear:
       code: 40001
       message: "Invalid year"
-    invalid_limit:
+    InvalidLimit:
       code: 40002
       message: "Invalid limit"
-    invalid_page:
+    InvalidPage:
       code: 40003
       message: "Invalid page"
-    invalid_orderBy:
+    InvalidOrderBy:
       code: 40004
       message: "Invalid orderBy"
-    invalid_direction:
+    InvalidDirection:
       code: 40005
       message: "Invalid direction"
-    missing_title:
+    MissingTitle:
       code: 40006
       message: "Missing title"
-    unauthorized:
+    Unauthorized:
       code: 40101
       message: "Unauthorized request"
-    invalid_credential:
+    InvalidCredential:
       code: 40102
       message: "Invalid credential"
-    failed_authorization:
+    FailedAuthorization:
       code: 40103
       message: "Authorization failed"
-    no_permission:
+    NoPermission:
       code: 40301
       message: "No permission to access this endpoint"
-    personId_not_found:
+    PersonIdNotFound:
       code: 40401
       message: "PersonId not found"
   success:
-    movies_found:
+    MoviesFound:
       code: 20001
       message: "Movie(s) found"
-    movies_not_found:
+    MoviesNotFound:
       code: 20002
       message: "No movies found with the given search parameters"
-    movies_found_with_personId:
+    MoviesFoundWithPersonId:
       code: 20003
       message: "Movie(s) found with personId"
-    movies_not_found_with_personId:
+    MoviesNotFoundWithPersonId:
       code: 20004
       message: "No movies found with the given personId"
 

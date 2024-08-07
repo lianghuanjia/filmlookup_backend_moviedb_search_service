@@ -11,35 +11,35 @@ public class ValidationServiceImpl implements ValidationService{
     @Override
     public void validateTitle(String title) throws ValidationException {
         if (title == null || title.isEmpty()) {
-            throw new ValidationException("invalid_title");
+            throw new ValidationException("InvalidTitle");
         }
     }
 
     @Override
     public void validateReleasedYear(String releasedYear) throws ValidationException {
         if (releasedYear != null && Integer.parseInt(releasedYear) > Year.now().getValue()) {
-            throw new ValidationException("invalid_year");
+            throw new ValidationException("InvalidYear");
         }
     }
 
     @Override
     public void validateLimit(Integer limit) throws ValidationException {
         if (limit != null && (limit != 10 && limit != 20 && limit != 30)) {
-            throw new ValidationException("invalid_limit");
+            throw new ValidationException("InvalidLimit");
         }
     }
 
     @Override
     public void validatePage(Integer page) throws ValidationException {
         if (page != null && page < 0) {
-            throw new ValidationException("invalid_page");
+            throw new ValidationException("InvalidPage");
         }
     }
 
     @Override
     public void validateOrderBy(String orderBy) throws ValidationException {
         if (orderBy != null && !orderBy.equals("rating") && !orderBy.equals("title") && !orderBy.equals("releaseTime")) {
-            throw new ValidationException("invalid_orderBy");
+            throw new ValidationException("InvalidOrderBy");
         }
     }
 

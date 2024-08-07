@@ -59,7 +59,7 @@ public class MovieServiceImpl implements MovieService {
 
         // Prepare the response's code and message
         ResponseConstants.ResponseCodeAndMessage responseCodeAndMessage = responseConstants.getSuccess().get(
-                mappedResults.isEmpty() ? "movies_not_found" : "movies_found");
+                mappedResults.isEmpty() ? "MoviesNotFound" : "MoviesFound");
 
         // Prepare the custom response
         CustomResponse<List<MovieSearchResultDTO>> customResponse = new CustomResponse<>(
