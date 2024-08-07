@@ -1,17 +1,13 @@
 package com.example.movie_service.controller;
 
-import com.example.movie_service.config.ResponseConfig;
 import com.example.movie_service.dto.MovieSearchResultDTO;
-import com.example.movie_service.entity.Movie;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.response.CustomResponse;
 import com.example.movie_service.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Year;
 import java.util.List;
 
 @RestController
@@ -51,7 +47,7 @@ public class MovieController {
             @RequestParam(required = false) String director,
             @RequestParam(required = false) String genre,
             @RequestParam(required = false, defaultValue = "10") Integer limit,
-            @RequestParam(required = false, defaultValue = "1") Integer page,
+            @RequestParam(required = false, defaultValue = "0") Integer page,
             @RequestParam(required = false, defaultValue = "title") String orderBy,
             @RequestParam(required = false, defaultValue = "asc") String direction) {
 
@@ -66,7 +62,7 @@ public class MovieController {
 //    public ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovieByPersonId
 //            (@PathVariable String personId,
 //             @RequestParam(defaultValue = "10") Integer limit,
-//             @RequestParam(defaultValue = "1") Integer page,
+//             @RequestParam(defaultValue = "0") Integer page,
 //             @RequestParam(defaultValue = "title") String orderBy,
 //             @RequestParam(defaultValue = "asc") String direction){
 //

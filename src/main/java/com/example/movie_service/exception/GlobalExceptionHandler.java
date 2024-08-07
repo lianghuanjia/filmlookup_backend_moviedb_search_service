@@ -3,7 +3,7 @@ package com.example.movie_service.exception;
 //import com.example.movie_service.config.ErrorResponseConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.example.movie_service.config.ResponseConfig;
+import com.example.movie_service.config.ResponseConstants;
 import com.example.movie_service.response.CustomResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,22 +13,20 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.awt.*;
-
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    private ResponseConfig responseConfig;
+    private ResponseConstants responseConstants;
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     /**
      * Constructor to inject ResponseConfig dependency
-     * @param responseConfig the response configuration. It is a Map of Map that maps the custom response and message
+     * @param responseConstants the response configuration. It is a Map of Map that maps the custom response and message
      *                       in the application.yaml
      */
     @Autowired
-    public GlobalExceptionHandler(ResponseConfig responseConfig){
-        this.responseConfig = responseConfig;
+    public GlobalExceptionHandler(ResponseConstants responseConstants){
+        this.responseConstants = responseConstants;
     }
 
     /**
@@ -40,15 +38,15 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<CustomResponse<Object>> handleRequestParamValidationException(ValidationException exception){
-        ResponseConfig.ResponseMessage responseMessage = responseConfig.getError().get(exception.getValidation_error_type());
-        CustomResponse<Object> response = new CustomResponse<>(responseMessage.getCode(), responseMessage.getMessage(), null);
+        ResponseConstants.ResponseCodeAndMessage responseCodeAndMessage = responseConstants.getError().get(exception.getValidation_error_type());
+        CustomResponse<Object> response = new CustomResponse<>(responseCodeAndMessage.getCode(), responseCodeAndMessage.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<CustomResponse<Object>> handleResourceNotFoundException(ResourceNotFoundException exception){
-        ResponseConfig.ResponseMessage responseMessage = responseConfig.getError().get(exception.getNotFoundResource());
-        CustomResponse<Object> response = new CustomResponse<>(responseMessage.getCode(), responseMessage.getMessage(), null);
+        ResponseConstants.ResponseCodeAndMessage responseCodeAndMessage = responseConstants.getError().get(exception.getNotFoundResource());
+        CustomResponse<Object> response = new CustomResponse<>(responseCodeAndMessage.getCode(), responseCodeAndMessage.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
@@ -62,8 +60,8 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<CustomResponse<Object>> handleMissingServletRequestParameterException(MissingServletRequestParameterException exception){
         String parameterName = exception.getParameterName();
-        ResponseConfig.ResponseMessage responseMessage = responseConfig.getError().get("missing_"+parameterName);
-        CustomResponse<Object> response = new CustomResponse<>(responseMessage.getCode(),responseMessage.getMessage(), null);
+        ResponseConstants.ResponseCodeAndMessage responseCodeAndMessage = responseConstants.getError().get("missing_"+parameterName);
+        CustomResponse<Object> response = new CustomResponse<>(responseCodeAndMessage.getCode(), responseCodeAndMessage.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 

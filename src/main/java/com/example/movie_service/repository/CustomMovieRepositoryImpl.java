@@ -7,8 +7,6 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,8 +19,9 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
     @Override
     public List<Object[]> searchMovies(String title, String releasedYear, String director, String genre, Integer limit, Integer page, String orderBy, String direction) {
         String sqlQuery = buildSqlQuery(releasedYear, director, genre, orderBy, direction);
-
+        // Create bare-bones native SQL Query
         Query query = entityManager.createNativeQuery(sqlQuery);
+        // Set the query's parameters based on the function's parameters
         setQueryParameters(query, title, releasedYear, director, genre, limit, page);
 
         List<Object[]> results = query.getResultList();
@@ -30,19 +29,35 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         return results;
     }
 
+    private String getQueryWithParameters(String sqlQuery, String title, String releasedYear, String director, String genre, int limit, int page) {
+        sqlQuery = sqlQuery.replace(":title", "'%" + title + "%'");
+        sqlQuery = sqlQuery.replace(":limit", Integer.toString(limit));
+        sqlQuery = sqlQuery.replace(":offset", Integer.toString((page) * limit));  // Corrected offset calculation
 
+        if (releasedYear != null && !releasedYear.isEmpty()) {
+            sqlQuery = sqlQuery.replace(":releasedYear", "'%" + releasedYear + "%'");
+        }
+        if (director != null && !director.isEmpty()) {
+            sqlQuery = sqlQuery.replace(":director", "'%" + director + "%'");
+        }
+        if (genre != null && !genre.isEmpty()) {
+            sqlQuery = sqlQuery.replace(":genre", "'%" + genre + "%'");
+        }
+
+        return sqlQuery;
+    }
 
     private String buildSqlQuery(String releasedYear, String director, String genre, String orderBy, String direction) {
         StringBuilder queryBuilder = new StringBuilder(
                 "SELECT m.movie_id AS id, " +
                         "m.primaryTitle AS title, " +
                         "m.releaseTime AS releaseTime, " +
-                        "GROUP_CONCAT(DISTINCT d.name ORDER BY d.name SEPARATOR ', ') AS directors, " +
+                        "GROUP_CONCAT(DISTINCT p.name ORDER BY p.name SEPARATOR ', ') AS directors, " +
                         "m.backdrop_path AS backdropPath, " +
                         "m.poster_path AS posterPath " +
                         "FROM movie m " +
                         "LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id " +
-                        "LEFT JOIN person d ON mc.person_id = d.person_id AND mc.job = 'director' " +
+                        "LEFT JOIN person p ON mc.person_id = p.person_id AND mc.job = 'director' " +
                         "LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id " +
                         "LEFT JOIN genre g ON mg.genre_id = g.id " +
                         "WHERE m.primaryTitle LIKE :title "
@@ -52,15 +67,15 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
             queryBuilder.append("AND m.releaseTime LIKE :releasedYear ");
         }
         if (director != null && !director.isEmpty()) {
-            queryBuilder.append("AND d.name LIKE :director ");
+            queryBuilder.append("AND p.name LIKE :director ");
         }
         if (genre != null && !genre.isEmpty()) {
             queryBuilder.append("AND g.name LIKE :genre ");
         }
 
-        queryBuilder.append("GROUP BY m.movie_id ")
-                .append("ORDER BY ").append(orderBy).append(" ").append(direction)
-                .append(" LIMIT :limit OFFSET :offset");
+        queryBuilder.append("GROUP BY m.movie_id, m.primaryTitle, m.releaseTime, m.backdrop_path, m.poster_path ")
+                .append("ORDER BY ").append(orderBy).append(" ").append(direction).append(" ")
+                .append("LIMIT :limit OFFSET :offset");
 
         return queryBuilder.toString();
     }
@@ -84,7 +99,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         query.setParameter("offset", page * limit);
 
         if (releasedYear != null && !releasedYear.isEmpty()) {
-            query.setParameter("releasedYear", "%" + releasedYear + "%");
+            query.setParameter("releasedYear", releasedYear + "%");
         }
         if (director != null && !director.isEmpty()) {
             query.setParameter("director", "%" + director + "%");

@@ -9,14 +9,13 @@ import java.util.Map;
 @Data
 @Configuration
 @ConfigurationProperties(prefix="responses")
-public class ResponseConfig {
+public class ResponseConstants {
 
-    private Map<String, ResponseMessage> success;
-    private Map<String, ResponseMessage> error;
+    private Map<String, ResponseCodeAndMessage> success;
+    private Map<String, ResponseCodeAndMessage> error;
 
     @Data
-    public static class ResponseMessage{
-        private int status;
+    public static class ResponseCodeAndMessage {
         private int code;
         private String message;
     }

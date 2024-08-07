@@ -1,66 +1,51 @@
 responses:
   error:
     invalid_year:
-      status: 400
       code: 40001
       message: "Invalid year"
     invalid_limit:
-      status: 400
       code: 40002
       message: "Invalid limit"
     invalid_page:
-      status: 400
       code: 40003
       message: "Invalid page"
     invalid_orderBy:
-      status: 400
       code: 40004
       message: "Invalid orderBy"
     invalid_direction:
-      status: 400
       code: 40005
       message: "Invalid direction"
     missing_title:
-      status: 400
       code: 40006
       message: "Missing title"
     unauthorized:
-      status: 401
       code: 40101
       message: "Unauthorized request"
     invalid_credential:
-      status: 401
       code: 40102
       message: "Invalid credential"
     failed_authorization:
-      status: 401
       code: 40103
       message: "Authorization failed"
     no_permission:
-      status: 403
       code: 40301
       message: "No permission to access this endpoint"
     personId_not_found:
-      status: 404
       code: 40401
       message: "PersonId not found"
   success:
     movies_found:
-      status: 200
       code: 20001
       message: "Movie(s) found"
     movies_not_found:
-      status: 200
       code: 20002
-      message: "Movie(s) not found"
+      message: "No movies found with the given search parameters"
     movies_found_with_personId:
-      status: 200
       code: 20003
       message: "Movie(s) found with personId"
     movies_not_found_with_personId:
-      status: 200
       code: 20004
-      message: "Movie(s) not found with personId"
+      message: "No movies found with the given personId"
 
 
 spring:

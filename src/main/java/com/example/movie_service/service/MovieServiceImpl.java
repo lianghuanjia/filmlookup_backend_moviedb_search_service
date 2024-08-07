@@ -1,24 +1,16 @@
 package com.example.movie_service.service;
 
-import com.example.movie_service.config.ResponseConfig;
-import com.example.movie_service.config.SuccessResponseConstants;
+import com.example.movie_service.config.ResponseConstants;
 import com.example.movie_service.dto.MovieSearchResultDTO;
-import com.example.movie_service.config.SuccessResponseConstants;
-import com.example.movie_service.entity.Movie;
 import com.example.movie_service.exception.ResourceNotFoundException;
-import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.repository.CustomMovieRepository;
-import com.example.movie_service.repository.MovieRepository;
 import com.example.movie_service.repository.PersonRepository;
 import com.example.movie_service.response.CustomResponse;
-import org.apache.el.util.Validation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +23,7 @@ public class MovieServiceImpl implements MovieService {
     private final CustomMovieRepository movieRepository; // Should I make this final?
     private final PersonRepository personRepository;
     private final ValidationService validationService;
-    private final ResponseConfig responseConfig;
+    private final ResponseConstants responseConstants;
 
     /**
      * Constructor with dependencies injection.
@@ -39,11 +31,11 @@ public class MovieServiceImpl implements MovieService {
      */
     @Autowired
     public MovieServiceImpl (CustomMovieRepository movieRepository, PersonRepository personRepository,
-                            ValidationService validationService, ResponseConfig responseConfig) {
+                            ValidationService validationService, ResponseConstants responseConstants) {
         this.movieRepository = movieRepository;
         this.personRepository = personRepository;
         this.validationService = validationService;
-        this.responseConfig = responseConfig;
+        this.responseConstants = responseConstants;
     }
 
     /**
@@ -51,7 +43,7 @@ public class MovieServiceImpl implements MovieService {
      * @return a list of movies that match the search criteria
      */
     @Override
-    public ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovies (String title, String releasedYear,
+    public ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovies(String title, String releasedYear,
                                                                                     String director, String genre,
                                                                                     Integer limit, Integer page,
                                                                                     String orderBy, String direction) {
@@ -65,11 +57,13 @@ public class MovieServiceImpl implements MovieService {
         // Map the results to DTO
         List<MovieSearchResultDTO> mappedResults = mapResultsToDTOs(movieList);
 
-        // Prepare the response
-        CustomResponse<List<MovieSearchResultDTO>> customResponse;
-        customResponse = new CustomResponse<>(SuccessResponseConstants.MovieFound.CODE,
-                                                SuccessResponseConstants.MovieFound.MESSAGE,
-                                                mappedResults);
+        // Prepare the response's code and message
+        ResponseConstants.ResponseCodeAndMessage responseCodeAndMessage = responseConstants.getSuccess().get(
+                mappedResults.isEmpty() ? "movies_not_found" : "movies_found");
+
+        // Prepare the custom response
+        CustomResponse<List<MovieSearchResultDTO>> customResponse = new CustomResponse<>(
+                responseCodeAndMessage.getCode(), responseCodeAndMessage.getMessage(), mappedResults);
 
         return new ResponseEntity<>(customResponse, HttpStatus.OK);
     }
@@ -96,20 +90,18 @@ public class MovieServiceImpl implements MovieService {
             throw new ResourceNotFoundException("personId");
         }
 
-        List<MovieSearchResultDTO> movieSearchResultDTOList = movieRepository.searchMoviesByPersonId(personId, limit, page, orderBy, direction);
-
-
-        return movieSearchResultDTOList;
+        return movieRepository.searchMoviesByPersonId(personId, limit, page, orderBy, direction);
     }
 
 
     /**
      * Converts a list of raw query result objects into a list of MovieSearchResultDTOs.
      * @param results The query results returned from the search
-     * @return
+     * @return returns a list of MovieSearchResultDTO
      */
     private List<MovieSearchResultDTO> mapResultsToDTOs(List<Object[]> results) {
         List<MovieSearchResultDTO> dtoList = new ArrayList<>();
+
         for (Object[] result : results) {
             String id = (String) result[0];
             String movieTitle = (String) result[1];

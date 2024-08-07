@@ -31,7 +31,7 @@ public class ValidationServiceImpl implements ValidationService{
 
     @Override
     public void validatePage(Integer page) throws ValidationException {
-        if (page != null && page < 1) {
+        if (page != null && page < 0) {
             throw new ValidationException("invalid_page");
         }
     }
