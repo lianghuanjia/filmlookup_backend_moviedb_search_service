@@ -1,7 +1,9 @@
 package com.example.movie_service.service;
 
 import com.example.movie_service.config.ResponseConfig;
+import com.example.movie_service.config.SuccessResponseConstants;
 import com.example.movie_service.dto.MovieSearchResultDTO;
+import com.example.movie_service.config.SuccessResponseConstants;
 import com.example.movie_service.entity.Movie;
 import com.example.movie_service.exception.ResourceNotFoundException;
 import com.example.movie_service.exception.ValidationException;
@@ -26,20 +28,17 @@ import java.util.List;
 @Service
 public class MovieServiceImpl implements MovieService {
 
-    private CustomMovieRepository movieRepository; // Should I make this final?
-    private PersonRepository personRepository;
-    private ValidationService validationService;
-    private ResponseConfig responseConfig;
-    // Default constructor
-    public MovieServiceImpl() {
-    }
+    private final CustomMovieRepository movieRepository; // Should I make this final?
+    private final PersonRepository personRepository;
+    private final ValidationService validationService;
+    private final ResponseConfig responseConfig;
 
     /**
      * Constructor with dependencies injection.
      * @param movieRepository the repository for accessing movie data
      */
     @Autowired
-    public MovieServiceImpl(CustomMovieRepository movieRepository, PersonRepository personRepository,
+    public MovieServiceImpl (CustomMovieRepository movieRepository, PersonRepository personRepository,
                             ValidationService validationService, ResponseConfig responseConfig) {
         this.movieRepository = movieRepository;
         this.personRepository = personRepository;
@@ -52,33 +51,37 @@ public class MovieServiceImpl implements MovieService {
      * @return a list of movies that match the search criteria
      */
     @Override
-    public ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovies(String title, String releasedYear, String director, String genre,
-                                                   Integer limit, Integer page, String orderBy, String direction) {
+    public ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovies (String title, String releasedYear,
+                                                                                    String director, String genre,
+                                                                                    Integer limit, Integer page,
+                                                                                    String orderBy, String direction) {
 
         // Validate parameters:
+        validateSearchMoviesParameters(title, releasedYear, limit, page, orderBy, direction);
+
+        // Get search results from repository layer
+        List<Object[]> movieList = movieRepository.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+
+        // Map the results to DTO
+        List<MovieSearchResultDTO> mappedResults = mapResultsToDTOs(movieList);
+
+        // Prepare the response
+        CustomResponse<List<MovieSearchResultDTO>> customResponse;
+        customResponse = new CustomResponse<>(SuccessResponseConstants.MovieFound.CODE,
+                                                SuccessResponseConstants.MovieFound.MESSAGE,
+                                                mappedResults);
+
+        return new ResponseEntity<>(customResponse, HttpStatus.OK);
+    }
+
+    private void validateSearchMoviesParameters(String title, String releasedYear, Integer limit, Integer page,
+                                                String orderBy, String direction) {
         validationService.validateTitle(title);
         validationService.validateReleasedYear(releasedYear);
         validationService.validateLimit(limit);
         validationService.validatePage(page);
         validationService.validateOrderBy(orderBy);
         validationService.validateDirection(direction);
-
-        List<Object[]> movieList = movieRepository.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
-
-        List<MovieSearchResultDTO> mappedResults = mapResultsToDTOs(movieList);
-
-        CustomResponse<List<MovieSearchResultDTO>> customResponse;
-
-        // Prepare the response
-        if (movieList != null){
-            ResponseConfig.ResponseMessage successDetail = responseConfig.getSuccess().get("movies_found");
-            customResponse = new CustomResponse<>(successDetail.getCode(), successDetail.getMessage(), mappedResults);
-        }
-        else{
-            ResponseConfig.ResponseMessage successDetail = responseConfig.getSuccess().get("movies_not_found");
-            customResponse = new CustomResponse<>(successDetail.getCode(), successDetail.getMessage(), null);
-        }
-        return new ResponseEntity<>(customResponse, HttpStatus.OK);
     }
 
     /**

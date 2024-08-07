@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/v1/api")
 public class MovieController {
 
-    private MovieService movieService;
+    private final MovieService movieService;
 
 
 //    // Default constructor

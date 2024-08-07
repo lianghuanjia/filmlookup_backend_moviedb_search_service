@@ -44,10 +44,6 @@ responses:
       status: 404
       code: 40401
       message: "PersonId not found"
-    internal_error:
-      status: 500
-      code: 500
-      message: "Internal service error"
   success:
     movies_found:
       status: 200
