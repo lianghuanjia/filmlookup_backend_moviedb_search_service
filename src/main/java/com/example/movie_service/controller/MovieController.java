@@ -16,11 +16,6 @@ public class MovieController {
 
     private final MovieService movieService;
 
-
-//    // Default constructor
-//    public MovieController() {
-//    }
-
     // Constructor with dependencies injection
     @Autowired
     public MovieController(MovieService movieService) {
@@ -50,8 +45,6 @@ public class MovieController {
             @RequestParam(required = false, defaultValue = "0") Integer page,
             @RequestParam(required = false, defaultValue = "title") String orderBy,
             @RequestParam(required = false, defaultValue = "asc") String direction) {
-
-
 
         // Return the response entity
         return movieService.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);

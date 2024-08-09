@@ -24,9 +24,6 @@ public class Movie {
     @GeneratedValue(generator = "custom-title-id")
     private String id;
 
-    @Column(name="titleType")
-    private String titleType;
-
     @Column(name="primaryTitle") // Ensure this matches the column name exactly
     private String title;
 

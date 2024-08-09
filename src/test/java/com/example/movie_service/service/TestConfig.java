@@ -1,4 +1,4 @@
-package com.example.movie_service.controller;
+package com.example.movie_service.service;
 
 import com.example.movie_service.config.ResponseConstants;
 import com.example.movie_service.exception.GlobalExceptionHandler;
