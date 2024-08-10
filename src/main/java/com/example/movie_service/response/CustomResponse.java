@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class CustomResponse<T> {
     private int code;       // response code (e.g., 20001)
     private String message; // Response message (e.g., "Movie(s) found")

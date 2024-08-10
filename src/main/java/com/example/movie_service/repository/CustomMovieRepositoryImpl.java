@@ -17,7 +17,8 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
     private EntityManager entityManager;
 
     @Override
-    public List<Object[]> searchMovies(String title, String releasedYear, String director, String genre, Integer limit, Integer page, String orderBy, String direction) {
+    public List<Object[]> searchMovies(String title, String releasedYear, String director, String genre, Integer limit,
+                                       Integer page, String orderBy, String direction) {
         String sqlQuery = buildSqlQuery(releasedYear, director, genre, orderBy, direction);
         // Create bare-bones native SQL Query
         Query query = entityManager.createNativeQuery(sqlQuery);

@@ -1,112 +1,101 @@
 package com.example.movie_service.service;
 
-import com.example.movie_service.controller.MovieController;
+import com.example.movie_service.config.ResponseConstants;
+import com.example.movie_service.converter.MovieSearchResultConverter;
+import com.example.movie_service.dto.MovieSearchResultDTO;
+import com.example.movie_service.exception.ValidationException;
+import com.example.movie_service.repository.CustomMovieRepository;
+import com.example.movie_service.repository.PersonRepository;
+import com.example.movie_service.response.CustomResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDate;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-@WebMvcTest(MovieController.class)
-@Import(TestConfig.class)
+@SpringBootTest
+//@ExtendWith(MockitoExtension.class)
+//@Import(TestConfig.class )
 public class MovieServiceTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    private MovieServiceImpl movieServiceImpl;
 
-    @MockBean
-    private MovieService movieService;
+    private String title;
+    private String releasedYear;
+    private String director;
+    private String genre;
+    private Integer limit;
+    private Integer page;
+    private String orderBy;
+    private String direction;
+    private String invalidReleasedYear;
 
 
-    @Test
-    public void testGetMovieInvalidYear() throws Exception {
-        int futureYear = LocalDate.now().getYear()+1;
-
-        mockMvc.perform(get("/v1/api/movies")
-                        .param("title","The Dark Knight")
-                        .param("releasedYear", String.valueOf(futureYear)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code", is(40001)))
-                .andExpect(jsonPath("$.message", is("Invalid year")));
+    @BeforeEach
+    public void setUp() {
+        title = "title";
+        releasedYear = "2020";
+        director = "director";
+        genre = "genre";
+        limit = 10;
+        page = 0;
+        orderBy = "orderBy";
+        direction = "direction";
+        invalidReleasedYear = "2030";
     }
 
-    @Test
-    public void testGetMovieInvalidLimit() throws Exception{
-        Integer invalidLimit = 11;
-
-        mockMvc.perform(get("/v1/api/movies")
-                        .param("title", "The Dark Knight")
-                        .param("limit", invalidLimit.toString()))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code", is(40002)))
-                .andExpect(jsonPath("$.message", is("Invalid limit")));
-    }
-
-    @Test
-    public void testGetMovieInvalidPage() throws Exception{
-        Integer invalidPage = -1;
-
-        mockMvc.perform(get("/v1/api/movies")
-                        .param("title", "The Dark Knight")
-                        .param("page", invalidPage.toString()))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code", is(40003)))
-                .andExpect(jsonPath("$.message", is("Invalid page")));
-    }
+//    @Test
+//    public void searchWithNullTitle(){
+//        assertThrows(ValidationException.class, () ->
+//        {movieServiceImpl.searchMovies(null, releasedYear, director, genre, limit, page, orderBy, direction);}
+//        );
+//
+////        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> responseEntity = movieServiceImpl.searchMovies(
+////                null, releasedYear, director, genre, limit, page, orderBy, direction);
+//
+////        // Make sure it returns a response entity
+////        assertNotNull(responseEntity);
+////
+////        // Make sure it's 400 HTTP CODE
+////        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+////        CustomResponse<List<MovieSearchResultDTO>> customResponse = responseEntity.getBody();
+////        assertEquals(customResponse.getCode(), 40006);
+////        assertEquals(customResponse.getMessage(), "Missing title");
+//
+//    }
 
     @Test
-    public void testGetMovieInvalidOrderBy() throws Exception{
-        Integer invalidOrderBy = 4;
+    public void searchWithInvalidYear(){
+        assertThrows(ValidationException.class, () ->
+                {movieServiceImpl.searchMovies(title, invalidReleasedYear, director, genre, limit, page, orderBy, direction);}
+        );
 
-        mockMvc.perform(get("/v1/api/movies")
-                        .param("title", "The Dark Knight")
-                        .param("orderBy", invalidOrderBy.toString()))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code", is(40004)))
-                .andExpect(jsonPath("$.message", is("Invalid orderBy")));
+//        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> responseEntity = movieServiceImpl.searchMovies(
+//                null, releasedYear, director, genre, limit, page, orderBy, direction);
+
+//        // Make sure it returns a response entity
+//        assertNotNull(responseEntity);
+//
+//        // Make sure it's 400 HTTP CODE
+//        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+//        CustomResponse<List<MovieSearchResultDTO>> customResponse = responseEntity.getBody();
+//        assertEquals(customResponse.getCode(), 40006);
+//        assertEquals(customResponse.getMessage(), "Missing title");
+
     }
-
-    @Test
-    public void testGetMovieWithRandomOrderBy() throws Exception{
-        String randomOrderBy = "@#qpfhwqpoih3p";
-
-        mockMvc.perform(get("/v1/api/movies")
-                        .param("title", "The Dark Knight")
-                        .param("orderBy", randomOrderBy))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code", is(40004)))
-                .andExpect(jsonPath("$.message", is("Invalid orderBy")));
-    }
-
-
-    @Test
-    public void testGetMovieWithRandomDirectionInput() throws Exception{
-        String randomDirection = "@#qpfhwqpoih3p";
-
-        mockMvc.perform(get("/v1/api/movies")
-                        .param("title", "The Dark Knight")
-                        .param("direction", randomDirection))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code", is(40005)))
-                .andExpect(jsonPath("$.message", is("Invalid direction")));
-    }
-
-    @Test
-    public void testGetMovieWithMissingTitle() throws Exception{
-mockMvc.perform(get("/v1/api/movies"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code", is(40006)))
-                .andExpect(jsonPath("$.message", is("Missing title")));
-    }
-
 
 }

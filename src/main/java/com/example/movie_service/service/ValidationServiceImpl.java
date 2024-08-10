@@ -7,11 +7,10 @@ import java.time.Year;
 
 @Service
 public class ValidationServiceImpl implements ValidationService{
-
     @Override
     public void validateTitle(String title) throws ValidationException {
-        if (title == null || title.isEmpty()) {
-            throw new ValidationException("InvalidTitle");
+        if (title == null || title.isEmpty()){
+            throw new ValidationException("MissingTitle");
         }
     }
 
@@ -24,28 +23,28 @@ public class ValidationServiceImpl implements ValidationService{
 
     @Override
     public void validateLimit(Integer limit) throws ValidationException {
-        if (limit != null && (limit != 10 && limit != 20 && limit != 30)) {
+        if (limit != 10 && limit != 20 && limit != 30) {
             throw new ValidationException("InvalidLimit");
         }
     }
 
     @Override
     public void validatePage(Integer page) throws ValidationException {
-        if (page != null && page < 0) {
+        if (page < 0) {
             throw new ValidationException("InvalidPage");
         }
     }
 
     @Override
     public void validateOrderBy(String orderBy) throws ValidationException {
-        if (orderBy != null && !orderBy.equals("rating") && !orderBy.equals("title") && !orderBy.equals("releaseTime")) {
+        if (!orderBy.equals("rating") && !orderBy.equals("title") && !orderBy.equals("releaseTime")) {
             throw new ValidationException("InvalidOrderBy");
         }
     }
 
     @Override
     public void validateDirection(String direction) throws ValidationException {
-        if (direction != null && !direction.equals("asc") && !direction.equals("desc")) {
+        if (!direction.equals("asc") && !direction.equals("desc")) {
             throw new ValidationException("invalid_direction");
         }
     }

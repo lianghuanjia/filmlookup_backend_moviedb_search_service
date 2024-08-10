@@ -1,19 +1,27 @@
 package com.example.movie_service.service;
 
 import com.example.movie_service.config.ResponseConstants;
+import com.example.movie_service.constant.MovieConstant;
 import com.example.movie_service.converter.MovieSearchResultConverter;
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.exception.ResourceNotFoundException;
+import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.repository.CustomMovieRepository;
 import com.example.movie_service.repository.PersonRepository;
 import com.example.movie_service.response.CustomResponse;
+import jakarta.persistence.PersistenceException;
+import org.hibernate.QueryTimeoutException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.example.movie_service.constant.MovieConstant.MOVIE_FOUND;
+import static com.example.movie_service.constant.MovieConstant.MOVIE_NOT_FOUND;
 
 /**
  * Implementation of MovieService interface
@@ -26,6 +34,7 @@ public class MovieServiceImpl implements MovieService {
     private final ValidationService validationService;
     private final ResponseConstants responseConstants;
     private final MovieSearchResultConverter movieSearchResultConverter;
+    private final ConversionService conversionService;
 
     /**
      * Constructor with dependencies injection.
@@ -34,12 +43,14 @@ public class MovieServiceImpl implements MovieService {
     @Autowired
     public MovieServiceImpl (CustomMovieRepository movieRepository, PersonRepository personRepository,
                             ValidationService validationService, ResponseConstants responseConstants,
-                             MovieSearchResultConverter movieSearchResultConverter) {
+                             MovieSearchResultConverter movieSearchResultConverter,
+                             ConversionService conversionService) {
         this.movieRepository = movieRepository;
         this.personRepository = personRepository;
         this.validationService = validationService;
         this.responseConstants = responseConstants;
         this.movieSearchResultConverter = movieSearchResultConverter;
+        this.conversionService = conversionService;
     }
 
     /**
@@ -50,12 +61,16 @@ public class MovieServiceImpl implements MovieService {
     public ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovies(String title, String releasedYear,
                                                                                     String director, String genre,
                                                                                     Integer limit, Integer page,
-                                                                                    String orderBy, String direction) {
+                                                                                    String orderBy, String direction)
+            throws QueryTimeoutException, PersistenceException, ValidationException
+            {
+        // Proceed with logic assuming `title` is non-null
 
         // Validate parameters:
         validateSearchMoviesParameters(title, releasedYear, limit, page, orderBy, direction);
 
         // Get search results from repository layer
+        // If the query times out, it's possible there will be QueryTimeoutException or PersistenceException
         List<Object[]> movieList = movieRepository.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
 
         // Convert the search results to a List of DTO
@@ -63,7 +78,7 @@ public class MovieServiceImpl implements MovieService {
 
         // Prepare the response's code and message
         ResponseConstants.ResponseCodeAndMessage responseCodeAndMessage = responseConstants.getSuccess().get(
-                mappedResults.isEmpty() ? "MoviesNotFound" : "MoviesFound");
+                mappedResults.isEmpty() ? MOVIE_NOT_FOUND : MOVIE_FOUND);
 
         // Prepare the custom response
         CustomResponse<List<MovieSearchResultDTO>> customResponse = new CustomResponse<>(

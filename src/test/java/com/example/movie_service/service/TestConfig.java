@@ -3,7 +3,9 @@ package com.example.movie_service.service;
 import com.example.movie_service.config.ResponseConstants;
 import com.example.movie_service.exception.GlobalExceptionHandler;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
 public class TestConfig {
 
     @Bean

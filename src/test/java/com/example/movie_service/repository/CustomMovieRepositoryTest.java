@@ -34,52 +34,52 @@ public class CustomMovieRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        // Insert reusable test data into the in-memory database
-        entityManager.persist(new Movie(
-                "tt0468569", // String id
-                "Movie 1", // String title
-                "Movie 1", // String originalTitle
-                Byte.valueOf((byte) 0), // Byte isAdult
-                "2008-07-16", // String releaseTime
-                Integer.valueOf(2008), // Integer endYear
-                Integer.valueOf(152), // Integer runtimeMinutes
-                "backdrop1.jpg", // String backdropPath
-                "posterPath1", // String posterPath
-                "Batman raises the stakes in his war on crime.", // String overview
-                "Welcome to a world without rules.", // String tagline
-                Long.valueOf(1004558444L), // Long revenue
-                "Released", // String status
-                Long.valueOf(185000000L), // Long budget
-                null, // Set<Genre> genres
-                null, // Set<MovieCrew> movieCrews
-                null, // Set<MovieAkas> movieAkas
-                null // MovieRating movieRating
-        ));
-
-        entityManager.persist(new Movie(
-                "tt1345836", // String id
-                "Movie 2", // String title
-                "Movie 2", // String originalTitle
-                Byte.valueOf((byte) 0), // Byte isAdult
-                "2012-07-17", // String releaseTime
-                null, // Integer endYear
-                Integer.valueOf(164), // Integer runtimeMinutes
-                "backdrop2.jpg", // String backdropPath
-                "posterPath2", // String posterPath
-                "Following the death of District Attorney Harvey Dent.", // String overview
-                "A fire will rise.", // String tagline
-                Long.valueOf(1081041287L), // Long revenue
-                "Released", // String status
-                Long.valueOf(250000000), // Long budget
-                null, // Set<Genre> genres
-                null, // Set<MovieCrew> movieCrews
-                null, // Set<MovieAkas> movieAkas
-                null // MovieRating movieRating
-        ));
+//        // Insert reusable test data into the in-memory database
+//        entityManager.merge(new Movie(
+//                "tt0468569", // String id
+//                "Movie 1", // String title
+//                "Movie 1", // String originalTitle
+//                Byte.valueOf((byte) 0), // Byte isAdult
+//                "2008-07-16", // String releaseTime
+//                Integer.valueOf(2008), // Integer endYear
+//                Integer.valueOf(152), // Integer runtimeMinutes
+//                "backdrop1.jpg", // String backdropPath
+//                "posterPath1", // String posterPath
+//                "Batman raises the stakes in his war on crime.", // String overview
+//                "Welcome to a world without rules.", // String tagline
+//                Long.valueOf(1004558444L), // Long revenue
+//                "Released", // String status
+//                Long.valueOf(185000000L), // Long budget
+//                null, // Set<Genre> genres
+//                null, // Set<MovieCrew> movieCrews
+//                null, // Set<MovieAkas> movieAkas
+//                null // MovieRating movieRating
+//        ));
+//
+//        entityManager.merge(new Movie(
+//                "tt1345836", // String id
+//                "Movie 2", // String title
+//                "Movie 2", // String originalTitle
+//                Byte.valueOf((byte) 0), // Byte isAdult
+//                "2012-07-17", // String releaseTime
+//                null, // Integer endYear
+//                Integer.valueOf(164), // Integer runtimeMinutes
+//                "backdrop2.jpg", // String backdropPath
+//                "posterPath2", // String posterPath
+//                "Following the death of District Attorney Harvey Dent.", // String overview
+//                "A fire will rise.", // String tagline
+//                Long.valueOf(1081041287L), // Long revenue
+//                "Released", // String status
+//                Long.valueOf(250000000), // Long budget
+//                null, // Set<Genre> genres
+//                null, // Set<MovieCrew> movieCrews
+//                null, // Set<MovieAkas> movieAkas
+//                null // MovieRating movieRating
+//        ));
 
         // Flush and clear to ensure data is persisted
-        entityManager.flush();
-        entityManager.clear();
+//        entityManager.flush();
+//        entityManager.clear();
     }
 
     @Test

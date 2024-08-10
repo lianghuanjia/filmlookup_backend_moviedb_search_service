@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import static com.example.movie_service.constant.MovieConstant.INTERNAL_SERVICE_ERROR_CODE;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -38,6 +40,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<CustomResponse<Object>> handleRequestParamValidationException(ValidationException exception){
+        System.out.println("Go here");
         ResponseConstants.ResponseCodeAndMessage responseCodeAndMessage = responseConstants.getError().get(exception.getValidation_error_type());
         CustomResponse<Object> response = new CustomResponse<>(responseCodeAndMessage.getCode(), responseCodeAndMessage.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -56,14 +59,16 @@ public class GlobalExceptionHandler {
      * @param exception the MissingServletRequestParameterException exception
      * @return a ResponseEntity with a custom response and BAD_REQUEST status.
      */
-    @ExceptionHandler(MissingServletRequestParameterException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<CustomResponse<Object>> handleMissingServletRequestParameterException(MissingServletRequestParameterException exception){
-        String parameterName = exception.getParameterName();
-        ResponseConstants.ResponseCodeAndMessage responseCodeAndMessage = responseConstants.getError().get("missing_"+parameterName);
-        CustomResponse<Object> response = new CustomResponse<>(responseCodeAndMessage.getCode(), responseCodeAndMessage.getMessage(), null);
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
+//    @ExceptionHandler(MissingServletRequestParameterException.class)
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public ResponseEntity<CustomResponse<Object>> handleMissingServletRequestParameterException(MissingServletRequestParameterException exception){
+//        System.out.println(exception.toString());
+//        exception.printStackTrace();
+//        String parameterName = exception.getParameterName();
+//        ResponseConstants.ResponseCodeAndMessage responseCodeAndMessage = responseConstants.getError().get("MissingTitle");
+//        CustomResponse<Object> response = new CustomResponse<>(responseCodeAndMessage.getCode(), responseCodeAndMessage.getMessage(), null);
+//        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+//    }
 
     /**
      * Handles all other exceptions
@@ -73,6 +78,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<CustomResponse<Object>> handleGeneralException(Exception exception){
         logger.error("Exception occurred: ", exception);
-        return new ResponseEntity<>(new CustomResponse<>(500, exception.getMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+//        exception.printStackTrace();
+        return new ResponseEntity<>(new CustomResponse<>(INTERNAL_SERVICE_ERROR_CODE, exception.getMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

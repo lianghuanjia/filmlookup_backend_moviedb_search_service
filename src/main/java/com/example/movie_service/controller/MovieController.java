@@ -4,12 +4,15 @@ import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.response.CustomResponse;
 import com.example.movie_service.service.MovieService;
+import org.hibernate.annotations.processing.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping("/v1/api")
 public class MovieController {
@@ -37,7 +40,7 @@ public class MovieController {
      */
     @GetMapping("/movies")
     public ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovies(
-            @RequestParam(required = true) String title,
+            @RequestParam String title,
             @RequestParam(required = false) String releasedYear,
             @RequestParam(required = false) String director,
             @RequestParam(required = false) String genre,
