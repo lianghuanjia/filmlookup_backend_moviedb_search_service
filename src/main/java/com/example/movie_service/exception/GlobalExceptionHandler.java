@@ -1,9 +1,6 @@
 package com.example.movie_service.exception;
 
-//import com.example.movie_service.config.ErrorResponseConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.example.movie_service.config.ResponseConstants;
+import lombok.extern.slf4j.Slf4j;
 import com.example.movie_service.response.CustomResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,23 +10,17 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import static com.example.movie_service.constant.MovieConstant.INTERNAL_SERVICE_ERROR_CODE;
+import static com.example.movie_service.constant.MovieConstant.*;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    private ResponseConstants responseConstants;
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
     /**
      * Constructor to inject ResponseConfig dependency
-     * @param responseConstants the response configuration. It is a Map of Map that maps the custom response and message
-     *                       in the application.yaml
      */
     @Autowired
-    public GlobalExceptionHandler(ResponseConstants responseConstants){
-        this.responseConstants = responseConstants;
-    }
+    public GlobalExceptionHandler(){}
 
     /**
      * Handles ValidationException exceptions
@@ -40,16 +31,15 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<CustomResponse<Object>> handleRequestParamValidationException(ValidationException exception){
-        System.out.println("Go here");
-        ResponseConstants.ResponseCodeAndMessage responseCodeAndMessage = responseConstants.getError().get(exception.getValidation_error_type());
-        CustomResponse<Object> response = new CustomResponse<>(responseCodeAndMessage.getCode(), responseCodeAndMessage.getMessage(), null);
+        log.error("handleRequestParamValidationException: ", exception);
+        CustomResponse<Object> response = new CustomResponse<>(exception.getErrorCode(), exception.getErrorMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<CustomResponse<Object>> handleResourceNotFoundException(ResourceNotFoundException exception){
-        ResponseConstants.ResponseCodeAndMessage responseCodeAndMessage = responseConstants.getError().get(exception.getNotFoundResource());
-        CustomResponse<Object> response = new CustomResponse<>(responseCodeAndMessage.getCode(), responseCodeAndMessage.getMessage(), null);
+        log.error("handleResourceNotFoundException: ", exception);
+        CustomResponse<Object> response = new CustomResponse<>(exception.getErrorCode(), exception.getErrorMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
@@ -59,16 +49,14 @@ public class GlobalExceptionHandler {
      * @param exception the MissingServletRequestParameterException exception
      * @return a ResponseEntity with a custom response and BAD_REQUEST status.
      */
-//    @ExceptionHandler(MissingServletRequestParameterException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public ResponseEntity<CustomResponse<Object>> handleMissingServletRequestParameterException(MissingServletRequestParameterException exception){
-//        System.out.println(exception.toString());
-//        exception.printStackTrace();
-//        String parameterName = exception.getParameterName();
-//        ResponseConstants.ResponseCodeAndMessage responseCodeAndMessage = responseConstants.getError().get("MissingTitle");
-//        CustomResponse<Object> response = new CustomResponse<>(responseCodeAndMessage.getCode(), responseCodeAndMessage.getMessage(), null);
-//        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-//    }
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<CustomResponse<Object>> handleMissingServletRequestParameterException(MissingServletRequestParameterException exception){
+        log.error("handleMissingServletRequestParameterException: ", exception);
+        String parameterName = exception.getParameterName();
+        CustomResponse<Object> response = new CustomResponse<>(MISSING_PARAM_ERROR_CODE.get(parameterName), MISSING_PARAM_ERROR_MESSAGE.get(parameterName), null);
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 
     /**
      * Handles all other exceptions
@@ -77,7 +65,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<CustomResponse<Object>> handleGeneralException(Exception exception){
-        logger.error("Exception occurred: ", exception);
+        log.error("handleGeneralException: ", exception);
 //        exception.printStackTrace();
         return new ResponseEntity<>(new CustomResponse<>(INTERNAL_SERVICE_ERROR_CODE, exception.getMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
     }

@@ -1,7 +1,5 @@
 package com.example.movie_service.service;
 
-import com.example.movie_service.config.ResponseConstants;
-import com.example.movie_service.constant.MovieConstant;
 import com.example.movie_service.converter.MovieSearchResultConverter;
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.exception.ResourceNotFoundException;
@@ -17,11 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.movie_service.constant.MovieConstant.MOVIE_FOUND;
-import static com.example.movie_service.constant.MovieConstant.MOVIE_NOT_FOUND;
+import static com.example.movie_service.constant.MovieConstant.*;
 
 /**
  * Implementation of MovieService interface
@@ -32,7 +28,6 @@ public class MovieServiceImpl implements MovieService {
     private final CustomMovieRepository movieRepository; // Should I make this final?
     private final PersonRepository personRepository;
     private final ValidationService validationService;
-    private final ResponseConstants responseConstants;
     private final MovieSearchResultConverter movieSearchResultConverter;
     private final ConversionService conversionService;
 
@@ -42,13 +37,11 @@ public class MovieServiceImpl implements MovieService {
      */
     @Autowired
     public MovieServiceImpl (CustomMovieRepository movieRepository, PersonRepository personRepository,
-                            ValidationService validationService, ResponseConstants responseConstants,
-                             MovieSearchResultConverter movieSearchResultConverter,
+                            ValidationService validationService, MovieSearchResultConverter movieSearchResultConverter,
                              ConversionService conversionService) {
         this.movieRepository = movieRepository;
         this.personRepository = personRepository;
         this.validationService = validationService;
-        this.responseConstants = responseConstants;
         this.movieSearchResultConverter = movieSearchResultConverter;
         this.conversionService = conversionService;
     }
@@ -77,12 +70,15 @@ public class MovieServiceImpl implements MovieService {
         List<MovieSearchResultDTO> mappedResults = movieSearchResultConverter.convertList(movieList);
 
         // Prepare the response's code and message
-        ResponseConstants.ResponseCodeAndMessage responseCodeAndMessage = responseConstants.getSuccess().get(
-                mappedResults.isEmpty() ? MOVIE_NOT_FOUND : MOVIE_FOUND);
+        CustomResponse<List<MovieSearchResultDTO>> customResponse;
 
-        // Prepare the custom response
-        CustomResponse<List<MovieSearchResultDTO>> customResponse = new CustomResponse<>(
-                responseCodeAndMessage.getCode(), responseCodeAndMessage.getMessage(), mappedResults);
+        // If no movie is found, return a custom response with movie not found code and message inside
+        if (mappedResults.isEmpty()){
+            customResponse = new CustomResponse<>(MOVIE_NOT_FOUND_CODE, MOVIE_NOT_FOUND_MESSAGE, null);
+        } else{
+            customResponse = new CustomResponse<>(MOVIE_FOUND_CODE, MOVIE_FOUND_MESSAGE, mappedResults);
+        }
+
 
         return new ResponseEntity<>(customResponse, HttpStatus.OK);
     }
@@ -106,7 +102,7 @@ public class MovieServiceImpl implements MovieService {
     public List<MovieSearchResultDTO> searchMovieByPersonId(String personId, Integer limit, Integer page, String orderBy, String direction) {
         // Validate if personId exists in database
         if (!personRepository.existsById(personId)){
-            throw new ResourceNotFoundException("personId");
+            throw new ResourceNotFoundException(PERSON_ID_NOT_FOUND_CODE, PERSON_ID_NOT_FOUND_MESSAGE);
         }
 
         return movieRepository.searchMoviesByPersonId(personId, limit, page, orderBy, direction);

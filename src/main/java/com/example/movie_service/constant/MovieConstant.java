@@ -1,5 +1,8 @@
 package com.example.movie_service.constant;
 
+import java.util.HashMap;
+import java.util.Map;
+
 // This is helpful because when you write test, you can use those reference too.
 public class MovieConstant {
 
@@ -44,4 +47,16 @@ public class MovieConstant {
     public static final int MOVIE_NOT_FOUND_WITH_PERSON_ID_CODE = 20004;
     public static final String MOVIE_NOT_FOUND_WITH_PERSON_ID_MESSAGE = "No movies found with the given personId";
 
+
+    // MISS PARAMETER MAP
+    public static final String TITLE = "title";
+    public static final Map<String, Integer> MISSING_PARAM_ERROR_CODE = new HashMap<>();
+    static{
+        MISSING_PARAM_ERROR_CODE.put(TITLE, MISSING_TITLE_CODE);
+
+    }
+    public static final Map<String, String> MISSING_PARAM_ERROR_MESSAGE = new HashMap<>();
+    static{
+        MISSING_PARAM_ERROR_MESSAGE.put(TITLE, MISSING_TITLE_MESSAGE);
+    }
 }

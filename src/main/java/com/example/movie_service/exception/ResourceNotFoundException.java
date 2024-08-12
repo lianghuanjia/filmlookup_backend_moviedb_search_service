@@ -1,14 +1,10 @@
 package com.example.movie_service.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Data
 @AllArgsConstructor
 public class ResourceNotFoundException extends RuntimeException{
-    private String notFoundResource;
+    private int errorCode;
+    private String errorMessage;
 }

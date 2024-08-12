@@ -84,34 +84,4 @@ public class MovieController {
 //
 //    }
 
-
-
-
-
-    /**
-     * Validates common request parameters.
-     *
-     * @param limit     the number of results to return per page
-     * @param page      the page number to return
-     * @param orderBy   the field to order the results by
-     * @param direction the direction to order the results
-     */
-    private void validateParameters(Integer limit, Integer page, String orderBy, String direction) {
-        if (limit != null && (limit != 10 && limit != 20 && limit != 30)) {
-            System.out.println("Invalid limit");
-            throw new ValidationException("invalid_limit");
-        }
-
-        if (page != null && page < 1) {
-            throw new ValidationException("invalid_page");
-        }
-
-        if (orderBy != null && !orderBy.equals("rating") && !orderBy.equals("title") && !orderBy.equals("releaseTime")) {
-            throw new ValidationException("invalid_orderBy");
-        }
-
-        if (direction != null && !direction.equals("asc") && !direction.equals("desc")) {
-            throw new ValidationException("invalid_direction");
-        }
-    }
 }

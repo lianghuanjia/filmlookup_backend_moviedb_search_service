@@ -23,6 +23,6 @@ public class ValidationException extends RuntimeException {
      *                  code: 40001
      *                  message: "Invalid year"
      */
-    private String validation_error_type;
-
+    private int errorCode;
+    private String errorMessage;
 }
