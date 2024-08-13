@@ -22,11 +22,17 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
     public List<MovieSearchResultDTO> searchMovies(String title, String releasedYear, String director, String genre, Integer limit,
                                        Integer page, String orderBy, String direction) {
         String sqlQuery = buildSqlQuery(releasedYear, director, genre, orderBy, direction);
+
         // Create bare-bones native SQL Query
         Query query = entityManager.createNativeQuery(sqlQuery, MOVIE_SEARCH_RESULT_DTO_MAPPING);
+
         // Set the query's parameters based on the function's parameters
         setQueryParameters(query, title, releasedYear, director, genre, limit, page);
 
+        // Get the result(s) from entityManager.getResultList(). Each result will be mapped to MovieSearchResultDTO.
+        // Since the MOVIE_SEARCH_RESULT_DTO_MAPPING's target class is MovieSearchResultDTO, I am sure the result will
+        // be MovieSearchResultDTO class, so I use @SuppressWarnings("unchecked")  here
+        @SuppressWarnings("unchecked")
         List<MovieSearchResultDTO> results = query.getResultList();
 
         return results;
