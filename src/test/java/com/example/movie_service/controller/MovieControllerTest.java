@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,6 +31,12 @@ import java.util.List;
 @WebMvcTest(MovieController.class)
 public class MovieControllerTest {
 
+    /**
+     * Why here use @MockBean instead of @Spy:
+     *      @Spy creates a partial mock of an actual instance. However, in a @WebMvcTest context, Spring
+     *      Boot automatically tries to create a mock of the service (or controller dependencies) using @MockBean,
+     *      not @Spy.
+     */
     @MockBean
     private MovieService movieService;
 

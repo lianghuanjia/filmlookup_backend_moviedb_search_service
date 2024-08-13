@@ -1,38 +1,34 @@
 package com.example.movie_service.service;
 
-import com.example.movie_service.config.ResponseConstants;
 import com.example.movie_service.converter.MovieSearchResultConverter;
-import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.repository.CustomMovieRepository;
 import com.example.movie_service.repository.PersonRepository;
-import com.example.movie_service.response.CustomResponse;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.QueryTimeoutException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-//@ExtendWith(MockitoExtension.class)
-//@Import(TestConfig.class )
+@ExtendWith(MockitoExtension.class)
 public class MovieServiceTest {
 
-    @Autowired
-    private MovieServiceImpl movieServiceImpl;
+    @Spy
+    private CustomMovieRepository movieRepository; // Should I make this final?
+
+    @Spy
+    private ValidationService validationService;
+
+    @InjectMocks
+    private MovieServiceImpl movieServiceImpl; // Should this be MovieService or MovieServiceImpl?
 
     private String title;
     private String releasedYear;
@@ -42,7 +38,6 @@ public class MovieServiceTest {
     private Integer page;
     private String orderBy;
     private String direction;
-    private String invalidReleasedYear;
 
 
     @BeforeEach
@@ -55,47 +50,130 @@ public class MovieServiceTest {
         page = 0;
         orderBy = "orderBy";
         direction = "direction";
-        invalidReleasedYear = "2030";
     }
-
-//    @Test
-//    public void searchWithNullTitle(){
-//        assertThrows(ValidationException.class, () ->
-//        {movieServiceImpl.searchMovies(null, releasedYear, director, genre, limit, page, orderBy, direction);}
-//        );
-//
-////        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> responseEntity = movieServiceImpl.searchMovies(
-////                null, releasedYear, director, genre, limit, page, orderBy, direction);
-//
-////        // Make sure it returns a response entity
-////        assertNotNull(responseEntity);
-////
-////        // Make sure it's 400 HTTP CODE
-////        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-////        CustomResponse<List<MovieSearchResultDTO>> customResponse = responseEntity.getBody();
-////        assertEquals(customResponse.getCode(), 40006);
-////        assertEquals(customResponse.getMessage(), "Missing title");
-//
-//    }
 
     @Test
-    public void searchWithInvalidYear(){
-        assertThrows(ValidationException.class, () ->
-                {movieServiceImpl.searchMovies(title, invalidReleasedYear, director, genre, limit, page, orderBy, direction);}
-        );
+    public void searchWithNullTitle() {
+        title = null;
 
-//        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> responseEntity = movieServiceImpl.searchMovies(
-//                null, releasedYear, director, genre, limit, page, orderBy, direction);
+        // Output I expect
+        /**
+         * movieServiceImpl -> searchMovies (what I want to test)
+         *      -> validateSearchMoviesParameters
+         *          since underneath it uses validationService, and this service is not what we are testing right now, we need to mock its behavior
+         */
+//        when(validationService.validateTitle(any())).thenThrow(ValidationException.class);
 
-//        // Make sure it returns a response entity
-//        assertNotNull(responseEntity);
-//
-//        // Make sure it's 400 HTTP CODE
-//        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-//        CustomResponse<List<MovieSearchResultDTO>> customResponse = responseEntity.getBody();
-//        assertEquals(customResponse.getCode(), 40006);
-//        assertEquals(customResponse.getMessage(), "Missing title");
+        doThrow(ValidationException.class).when(validationService).validateTitle(any());
 
+        assertThrows(ValidationException.class, () -> {
+            movieServiceImpl.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+        });
     }
+
+    @Test
+    public void searchWithInvalidYear() {
+        releasedYear = "2039";
+
+        doNothing().when(validationService).validateTitle(any());
+        doThrow(ValidationException.class).when(validationService).validateReleasedYear(any());
+
+        assertThrows(ValidationException.class, () -> {
+           movieServiceImpl.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+        }, "searchMovies did not throw a ValidationException");
+    }
+
+    @Test
+    public void searchWithInvalidLimit(){
+        limit = 15;
+
+        doNothing().when(validationService).validateTitle(any());
+        doNothing().when(validationService).validateReleasedYear(any());
+        doThrow(ValidationException.class).when(validationService).validateLimit(any());
+
+        assertThrows(ValidationException.class, () -> {
+            movieServiceImpl.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+        }, "searchMovies did not throw a ValidationException");
+    }
+
+    @Test
+    public void searchWithInvalidPage(){
+        page = -1;
+
+        doNothing().when(validationService).validateTitle(any());
+        doNothing().when(validationService).validateReleasedYear(any());
+        doNothing().when(validationService).validateLimit(any());
+        doThrow(ValidationException.class).when(validationService).validatePage(any());
+
+        assertThrows(ValidationException.class, () -> {
+            movieServiceImpl.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+        }, "searchMovies did not throw a ValidationException");
+    }
+
+    @Test
+    public void searchWithInvalidOrderBy(){
+        orderBy = "time";
+
+        doNothing().when(validationService).validateTitle(any());
+        doNothing().when(validationService).validateReleasedYear(any());
+        doNothing().when(validationService).validateLimit(any());
+        doNothing().when(validationService).validatePage(any());
+        doThrow(ValidationException.class).when(validationService).validateOrderBy(any());
+
+        assertThrows(ValidationException.class, () -> {
+            movieServiceImpl.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+        }, "searchMovies did not throw a ValidationException");
+    }
+
+    @Test
+    public void searchWithInvalidDirection(){
+        direction = "north";
+
+        doNothing().when(validationService).validateTitle(any());
+        doNothing().when(validationService).validateReleasedYear(any());
+        doNothing().when(validationService).validateLimit(any());
+        doNothing().when(validationService).validatePage(any());
+        doNothing().when(validationService).validateOrderBy(any());
+        doThrow(ValidationException.class).when(validationService).validateDirection(any());
+
+        assertThrows(ValidationException.class, () -> {
+            movieServiceImpl.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+        }, "searchMovies did not throw a ValidationException");
+    }
+
+
+    @Test
+    public void searchMovieTimeout() {
+        doNothing().when(validationService).validateTitle(any());
+        doNothing().when(validationService).validateReleasedYear(any());
+        doNothing().when(validationService).validateLimit(any());
+        doNothing().when(validationService).validatePage(any());
+        doNothing().when(validationService).validateOrderBy(any());
+        doNothing().when(validationService).validateDirection(any());
+        doThrow(QueryTimeoutException.class).when(movieRepository).searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+
+        assertThrows(QueryTimeoutException.class, ()->{
+            movieServiceImpl.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+
+        }, "searchMovies did not throw a QueryTimeoutException");
+    }
+
+    @Test
+    public void searchMovieThrowPersistenceException() {
+        doNothing().when(validationService).validateTitle(any());
+        doNothing().when(validationService).validateReleasedYear(any());
+        doNothing().when(validationService).validateLimit(any());
+        doNothing().when(validationService).validatePage(any());
+        doNothing().when(validationService).validateOrderBy(any());
+        doNothing().when(validationService).validateDirection(any());
+        doThrow(PersistenceException.class).when(movieRepository).searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+
+        assertThrows(PersistenceException.class, ()->{
+            movieServiceImpl.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+
+        }, "searchMovies did not throw a PersistenceException");
+    }
+
+
 
 }
