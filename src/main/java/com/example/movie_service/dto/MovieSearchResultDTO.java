@@ -1,8 +1,5 @@
 package com.example.movie_service.dto;
 
-import jakarta.persistence.ColumnResult;
-import jakarta.persistence.ConstructorResult;
-import jakarta.persistence.SqlResultSetMapping;
 import lombok.*;
 
 

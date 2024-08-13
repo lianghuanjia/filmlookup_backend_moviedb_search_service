@@ -64,19 +64,19 @@ public class MovieServiceImpl implements MovieService {
 
         // Get search results from repository layer
         // If the query times out, it's possible there will be QueryTimeoutException or PersistenceException
-        List<Object[]> movieList = movieRepository.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+        List<MovieSearchResultDTO> movieList = movieRepository.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
 
-        // Convert the search results to a List of DTO
-        List<MovieSearchResultDTO> mappedResults = movieSearchResultConverter.convertList(movieList);
+//        // Convert the search results to a List of DTO
+//        List<MovieSearchResultDTO> mappedResults = movieSearchResultConverter.convertList(movieList);
 
         // Prepare the response's code and message
         CustomResponse<List<MovieSearchResultDTO>> customResponse;
 
         // If no movie is found, return a custom response with movie not found code and message inside
-        if (mappedResults.isEmpty()){
+        if (movieList.isEmpty()){
             customResponse = new CustomResponse<>(MOVIE_NOT_FOUND_CODE, MOVIE_NOT_FOUND_MESSAGE, null);
         } else{
-            customResponse = new CustomResponse<>(MOVIE_FOUND_CODE, MOVIE_FOUND_MESSAGE, mappedResults);
+            customResponse = new CustomResponse<>(MOVIE_FOUND_CODE, MOVIE_FOUND_MESSAGE, movieList);
         }
 
 

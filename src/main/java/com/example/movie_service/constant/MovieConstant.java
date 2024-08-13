@@ -48,6 +48,8 @@ public class MovieConstant {
     public static final String MOVIE_NOT_FOUND_WITH_PERSON_ID_MESSAGE = "No movies found with the given personId";
 
 
+    public static final String MOVIE_SEARCH_RESULT_DTO_MAPPING = "MovieSearchResultDTOMapping";
+
     // MISS PARAMETER MAP
     public static final String TITLE = "title";
     public static final Map<String, Integer> MISSING_PARAM_ERROR_CODE = new HashMap<>();

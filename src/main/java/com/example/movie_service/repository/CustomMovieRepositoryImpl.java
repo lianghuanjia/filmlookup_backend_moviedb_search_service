@@ -10,6 +10,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.example.movie_service.constant.MovieConstant.MOVIE_SEARCH_RESULT_DTO_MAPPING;
+
 @Repository
 public class CustomMovieRepositoryImpl implements CustomMovieRepository {
 
@@ -17,15 +19,15 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
     private EntityManager entityManager;
 
     @Override
-    public List<Object[]> searchMovies(String title, String releasedYear, String director, String genre, Integer limit,
+    public List<MovieSearchResultDTO> searchMovies(String title, String releasedYear, String director, String genre, Integer limit,
                                        Integer page, String orderBy, String direction) {
         String sqlQuery = buildSqlQuery(releasedYear, director, genre, orderBy, direction);
         // Create bare-bones native SQL Query
-        Query query = entityManager.createNativeQuery(sqlQuery);
+        Query query = entityManager.createNativeQuery(sqlQuery, MOVIE_SEARCH_RESULT_DTO_MAPPING);
         // Set the query's parameters based on the function's parameters
         setQueryParameters(query, title, releasedYear, director, genre, limit, page);
 
-        List<Object[]> results = query.getResultList();
+        List<MovieSearchResultDTO> results = query.getResultList();
 
         return results;
     }
