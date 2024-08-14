@@ -1,9 +1,11 @@
 package com.example.movie_service.service;
 
 import com.example.movie_service.converter.MovieSearchResultConverter;
+import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.repository.CustomMovieRepository;
 import com.example.movie_service.repository.PersonRepository;
+import com.example.movie_service.response.CustomResponse;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.QueryTimeoutException;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +15,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
+import java.util.Arrays;
+import java.util.List;
+
+import static com.example.movie_service.constant.MovieConstant.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -172,6 +180,65 @@ public class MovieServiceTest {
             movieServiceImpl.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
 
         }, "searchMovies did not throw a PersistenceException");
+    }
+
+    @Test
+    public void searchMovieReturnListOfMovieSearchResultDTO() {
+        // Setup mock data
+        List<MovieSearchResultDTO> mockMovies = Arrays.asList(
+                new MovieSearchResultDTO("1", "Inception", "2010", "Christopher Nolan", "path/to/backdrop", "path/to/poster")
+        );
+
+        // Mock the repository call
+        when(movieRepository.searchMovies(anyString(), anyString(), anyString(), anyString(), anyInt(), anyInt(), anyString(), anyString()))
+                .thenReturn(mockMovies);
+
+        // Ensure validation service calls do nothing (if necessary)
+        doNothing().when(validationService).validateTitle(any());
+        doNothing().when(validationService).validateReleasedYear(any());
+        doNothing().when(validationService).validateLimit(any());
+        doNothing().when(validationService).validatePage(any());
+        doNothing().when(validationService).validateOrderBy(any());
+        doNothing().when(validationService).validateDirection(any());
+
+        // Call the actual method under test
+        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> actualResponseEntity = movieServiceImpl.searchMovies(
+                title, releasedYear, director, genre, limit, page, orderBy, direction
+        );
+
+        // Verify the results
+        assertNotNull(actualResponseEntity.getBody().getData());
+        assertEquals(1, actualResponseEntity.getBody().getData().size());
+        assertEquals("Inception", actualResponseEntity.getBody().getData().get(0).getTitle());
+    }
+
+
+    @Test
+    public void searchMovieWithNoResult() {
+        List<MovieSearchResultDTO> mockMovies = Arrays.asList();
+
+        // Mock the repository call
+        when(movieRepository.searchMovies(anyString(), anyString(), anyString(), anyString(), anyInt(), anyInt(), anyString(), anyString()))
+                .thenReturn(mockMovies);
+
+        // Ensure validation service calls do nothing (if necessary)
+        doNothing().when(validationService).validateTitle(any());
+        doNothing().when(validationService).validateReleasedYear(any());
+        doNothing().when(validationService).validateLimit(any());
+        doNothing().when(validationService).validatePage(any());
+        doNothing().when(validationService).validateOrderBy(any());
+        doNothing().when(validationService).validateDirection(any());
+
+
+        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> actualResponseEntity = movieServiceImpl.searchMovies(
+                title, releasedYear, director, genre, limit, page, orderBy, direction
+        );
+
+        assertNull(actualResponseEntity.getBody().getData());
+        assertEquals(actualResponseEntity.getStatusCode(), HttpStatus.OK);
+        assertEquals(actualResponseEntity.getBody().getCode(), MOVIE_NOT_FOUND_CODE);
+        assertEquals(actualResponseEntity.getBody().getMessage(), MOVIE_NOT_FOUND_MESSAGE);
+
     }
 
 
