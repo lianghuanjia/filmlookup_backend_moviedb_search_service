@@ -98,15 +98,15 @@ public class MovieServiceImpl implements MovieService {
      * @param personId the ID of the movie to search for
      * @return the movie that matches the given ID
      */
-    @Override
-    public List<MovieSearchResultDTO> searchMovieByPersonId(String personId, Integer limit, Integer page, String orderBy, String direction) {
-        // Validate if personId exists in database
-        if (!personRepository.existsById(personId)){
-            throw new ResourceNotFoundException(PERSON_ID_NOT_FOUND_CODE, PERSON_ID_NOT_FOUND_MESSAGE);
-        }
-
-        return movieRepository.searchMoviesByPersonId(personId, limit, page, orderBy, direction);
-    }
+//    @Override
+//    public List<MovieSearchResultDTO> searchMovieByPersonId(String personId, Integer limit, Integer page, String orderBy, String direction) {
+//        // Validate if personId exists in database
+//        if (!personRepository.existsById(personId)){
+//            throw new ResourceNotFoundException(PERSON_ID_NOT_FOUND_CODE, PERSON_ID_NOT_FOUND_MESSAGE);
+//        }
+//
+//        return movieRepository.searchMoviesByPersonId(personId, limit, page, orderBy, direction);
+//    }
 
 
 //    /**

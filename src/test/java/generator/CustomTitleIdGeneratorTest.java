@@ -1,4 +1,4 @@
-package com.example.movie_service;
+package generator;
 
 import com.example.movie_service.generator.CustomTitleIdGenerator;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;

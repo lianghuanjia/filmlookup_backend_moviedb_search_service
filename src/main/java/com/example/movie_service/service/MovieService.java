@@ -26,5 +26,5 @@ public interface MovieService {
      * @param personId the ID of the movie to search for
      * @return the movie that matches the given ID
      */
-    List<MovieSearchResultDTO> searchMovieByPersonId(String personId, Integer limit, Integer page, String orderBy, String direction);
+//    List<MovieSearchResultDTO> searchMovieByPersonId(String personId, Integer limit, Integer page, String orderBy, String direction);
 }

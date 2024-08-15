@@ -38,24 +38,6 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         return results;
     }
 
-    private String getQueryWithParameters(String sqlQuery, String title, String releasedYear, String director, String genre, int limit, int page) {
-        sqlQuery = sqlQuery.replace(":title", "'%" + title + "%'");
-        sqlQuery = sqlQuery.replace(":limit", Integer.toString(limit));
-        sqlQuery = sqlQuery.replace(":offset", Integer.toString((page) * limit));  // Corrected offset calculation
-
-        if (releasedYear != null && !releasedYear.isEmpty()) {
-            sqlQuery = sqlQuery.replace(":releasedYear", "'%" + releasedYear + "%'");
-        }
-        if (director != null && !director.isEmpty()) {
-            sqlQuery = sqlQuery.replace(":director", "'%" + director + "%'");
-        }
-        if (genre != null && !genre.isEmpty()) {
-            sqlQuery = sqlQuery.replace(":genre", "'%" + genre + "%'");
-        }
-
-        return sqlQuery;
-    }
-
     private String buildSqlQuery(String releasedYear, String director, String genre, String orderBy, String direction) {
         StringBuilder queryBuilder = new StringBuilder(
                 "SELECT m.movie_id AS id, " +
@@ -119,54 +101,44 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
     }
 
 
-    @Override
-    public List<MovieSearchResultDTO> searchMoviesByPersonId(String personId, Integer limit, Integer page, String orderBy, String direction) {
-        // JPQL Query to find movies by person ID with sorting
-        String jpqlQuery = "SELECT DISTINCT m FROM Movie m " +
-                "JOIN FETCH m.movieCrews mc " +
-                "WHERE mc.person.id = :personId " +
-                "ORDER BY m." + orderBy + " " + direction;
-
-        // Create the query and set the parameter
-        TypedQuery<Movie> query = entityManager.createQuery(jpqlQuery, Movie.class);
-        query.setParameter("personId", personId);
-
-        // Apply pagination
-        query.setFirstResult(page * limit);
-        query.setMaxResults(limit);
-
-        // Execute the query and get the results
-        List<Movie> movies = query.getResultList();
-
-        // Map the results to MovieSearchResultDTO
-        return movies.stream()
-                .map(movie -> {
-                    // Extract director names from movieCrews
-                    String directors = movie.getMovieCrews().stream()
-                            .filter(crew -> "director".equalsIgnoreCase(crew.getJob()))
-                            .map(crew -> crew.getPerson().getName())
-                            .collect(Collectors.joining(", "));
-
-                    return new MovieSearchResultDTO(
-                            movie.getId(),
-                            movie.getTitle(),
-                            movie.getReleaseTime(),
-                            directors,
-                            movie.getBackdropPath(),
-                            movie.getPosterPath()
-                    );
-                })
-                .collect(Collectors.toList());
-    }
-
-
-    private void printMappedDtoResults(List<MovieSearchResultDTO> dtoList) {
-        System.out.println("Mapped DTO Results:");
-        for (MovieSearchResultDTO dto : dtoList) {
-            System.out.println(dto.toString());
-            System.out.println("------------");
-        }
-    }
-
+//    @Override
+//    public List<MovieSearchResultDTO> searchMoviesByPersonId(String personId, Integer limit, Integer page, String orderBy, String direction) {
+//        // JPQL Query to find movies by person ID with sorting
+//        String jpqlQuery = "SELECT DISTINCT m FROM Movie m " +
+//                "JOIN FETCH m.movieCrews mc " +
+//                "WHERE mc.person.id = :personId " +
+//                "ORDER BY m." + orderBy + " " + direction;
+//
+//        // Create the query and set the parameter
+//        TypedQuery<Movie> query = entityManager.createQuery(jpqlQuery, Movie.class);
+//        query.setParameter("personId", personId);
+//
+//        // Apply pagination
+//        query.setFirstResult(page * limit);
+//        query.setMaxResults(limit);
+//
+//        // Execute the query and get the results
+//        List<Movie> movies = query.getResultList();
+//
+//        // Map the results to MovieSearchResultDTO
+//        return movies.stream()
+//                .map(movie -> {
+//                    // Extract director names from movieCrews
+//                    String directors = movie.getMovieCrews().stream()
+//                            .filter(crew -> "director".equalsIgnoreCase(crew.getJob()))
+//                            .map(crew -> crew.getPerson().getName())
+//                            .collect(Collectors.joining(", "));
+//
+//                    return new MovieSearchResultDTO(
+//                            movie.getId(),
+//                            movie.getTitle(),
+//                            movie.getReleaseTime(),
+//                            directors,
+//                            movie.getBackdropPath(),
+//                            movie.getPosterPath()
+//                    );
+//                })
+//                .collect(Collectors.toList());
+//    }
 
 }
