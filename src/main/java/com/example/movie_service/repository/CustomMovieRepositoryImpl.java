@@ -35,8 +35,6 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         // be MovieSearchResultDTO class, so I use @SuppressWarnings("unchecked")  here
         @SuppressWarnings("unchecked")
         List<MovieSearchResultDTO> results = query.getResultList();
-        System.out.println("In repo");
-        System.out.println(results.size());
         return results;
     }
 

@@ -34,8 +34,8 @@ public class MovieController {
      * @param genre             the genre of the movie (optional)
      * @param limit             the number of results to return per page (default is 10)
      * @param page              the page number to return (default is 0)
-     * @param orderBy           the field to order the results by (default is "title")
-     * @param direction         the direction to order the results (default is "asc")
+     * @param orderBy           the field to order the results by (default is "title", can also be "releaseTime", "rating")
+     * @param direction         the direction to order the results (default is "asc", can also be "desc")
      * @return a ResponseEntity containing a CustomResponse with the list of movies found
      */
     @GetMapping("/movies")

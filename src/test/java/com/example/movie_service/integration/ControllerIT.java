@@ -3,6 +3,7 @@ package com.example.movie_service.integration;
 
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.response.CustomResponse;
+import lombok.ToString;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,8 @@ import java.net.URI;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+
+import static com.example.movie_service.constant.MovieConstant.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -36,6 +39,12 @@ public class ControllerIT {
 
 
     private static final String SQL_VERSION = "mysql:8.0.39";
+    private static final String EXISTED_MOVIE_TITLE = "Knight";
+    private static final String NON_EXISTED_MOVIE_TITLE = "Miss Jerry";
+    private static final String TITLE = "title";
+    private static final String RELEASED_YEAR = "releasedYear";
+    private static final String ORDER_BY = "orderBy";
+    private static final String DIRECTION = "direction";
 
     @SuppressWarnings({"resource"})
     // "resource":
@@ -78,6 +87,9 @@ public class ControllerIT {
 
     private static final String protocolAndHost = "http://localhost:";
     private String searchMoviePath;
+    // Define the response type using ParameterizedTypeReference
+    private final ParameterizedTypeReference<CustomResponse<List<MovieSearchResultDTO>>> responseType =
+            new ParameterizedTypeReference<CustomResponse<List<MovieSearchResultDTO>>>() {};
 
     @BeforeEach
     public void setUp(){
@@ -107,25 +119,20 @@ public class ControllerIT {
     void testSearchMoviesMovieFound() {
         // Define URI with query param
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam("title", "Knight")
+                .queryParam(TITLE, EXISTED_MOVIE_TITLE)
                 .build().toUri();
-
-        // Define the response type using ParameterizedTypeReference
-        ParameterizedTypeReference<CustomResponse<List<MovieSearchResultDTO>>> responseType =
-                new ParameterizedTypeReference<CustomResponse<List<MovieSearchResultDTO>>>() {};
-
 
         // Perform a GET request to the controller
         ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
-        System.out.println(results.getStatusCode());
         // Assert
         assertTrue(results.getStatusCode().is2xxSuccessful());
         CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is 20001, representing movies found
-        assertEquals(customResponse.getCode(), 20001);
+        assertEquals(customResponse.getCode(), MOVIE_FOUND_CODE);
+        assertEquals(customResponse.getMessage(), MOVIE_FOUND_MESSAGE);
         List<MovieSearchResultDTO> movieList = customResponse.getData();
         // Assert there are 3 movies
         assertEquals(movieList.size(), 3);
@@ -138,7 +145,183 @@ public class ControllerIT {
     @Test
     void testSearchMoviesNotFound() {
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam("title", "Miss Jerry")
+                .queryParam(TITLE, NON_EXISTED_MOVIE_TITLE)
                 .build().toUri();
+
+        // Perform a GET request to the controller
+        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+                (uri, HttpMethod.GET, null, responseType);
+
+        // Assert the status code is OK, and we have a customResponse
+        assertTrue(results.getStatusCode().is2xxSuccessful());
+        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        assertNotNull(customResponse);
+
+        // Assert the code and message are MOVIE_NOT_FOUND
+        assertEquals(customResponse.getCode(), MOVIE_NOT_FOUND_CODE);
+        assertEquals(customResponse.getMessage(), MOVIE_NOT_FOUND_MESSAGE);
+
+        // Assert the MovieSearchResultDTO List is empty
+        assertTrue(customResponse.getData().isEmpty());
     }
+
+    @Test
+    void SearchMoviesNoTitle() {
+        URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
+                .build().toUri();
+
+        // Perform a GET request to the controller
+        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+                (uri, HttpMethod.GET, null, responseType);
+
+        // Assert the status code is OK, and we have a customResponse
+        assertTrue(results.getStatusCode().is4xxClientError());
+        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        assertNotNull(customResponse);
+
+        // Assert the code and message are MOVIE_NOT_FOUND
+        assertEquals(customResponse.getCode(), MISSING_TITLE_CODE);
+        assertEquals(customResponse.getMessage(), MISSING_TITLE_MESSAGE);
+
+        // Assert the MovieSearchResultDTO List is empty
+        assertNull(customResponse.getData());
+    }
+
+    @Test
+    void testSearchMoviesValidYear() {
+        String validYear = "2012";
+        // Define URI with query param
+        URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
+                .queryParam(TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(RELEASED_YEAR, validYear)
+                .build().toUri();
+
+        // Perform a GET request to the controller
+        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+                (uri, HttpMethod.GET, null, responseType);
+
+        // Assert
+        assertTrue(results.getStatusCode().is2xxSuccessful());
+        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        assertNotNull(customResponse);
+        // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
+        assertEquals(customResponse.getCode(), MOVIE_FOUND_CODE);
+        assertEquals(customResponse.getMessage(), MOVIE_FOUND_MESSAGE);
+        List<MovieSearchResultDTO> movieList = customResponse.getData();
+        // Assert there are 2 movies with release time in 2012.
+        assertEquals(movieList.size(), 2);
+        // Assert 1st movie is The Dark Knight Rises, and the second one is The Dark Knight Rises Again,
+        // because we didn't put orderBy and direction in the query param, so it sets to default with
+        // orderBy = "title", direction = "asc".
+        assertEquals(movieList.get(0).getTitle(), "The Dark Knight Rises");
+        assertEquals(movieList.get(1).getTitle(), "The Dark Knight Rises Again");
+    }
+
+
+    @Test
+    void SearchMoviesInvalidReleasedYear() {
+        String invalidYear = "2025";
+        URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
+                .queryParam(TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(RELEASED_YEAR, invalidYear)
+                .build().toUri();
+
+        // Perform a GET request to the controller
+        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+                (uri, HttpMethod.GET, null, responseType);
+
+        // Assert the status code is BAD_REQUEST, and we have a customResponse
+        assertTrue(results.getStatusCode().is4xxClientError());
+        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        assertNotNull(customResponse);
+
+        // Assert the code and message are INVALID_YEAR
+        assertEquals(customResponse.getCode(), INVALID_YEAR_CODE);
+        assertEquals(customResponse.getMessage(), INVALID_YEAR_MESSAGE);
+
+        // Assert the data in customResponse is null
+        assertNull(customResponse.getData());
+    }
+
+    @Test
+    void searchMoviesValidWithReleaseTimeOrderByAndDescDirection() {
+        String direction = "desc";
+        String orderBy = "releaseTime";
+        // Define URI with query param
+        URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
+                .queryParam(TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY, orderBy)
+                .queryParam(DIRECTION, direction)
+                .build().toUri();
+
+        // Perform a GET request to the controller
+        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+                (uri, HttpMethod.GET, null, responseType);
+
+        // Assert
+        assertTrue(results.getStatusCode().is2xxSuccessful());
+        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        assertNotNull(customResponse);
+        // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
+        assertEquals(customResponse.getCode(), MOVIE_FOUND_CODE);
+        assertEquals(customResponse.getMessage(), MOVIE_FOUND_MESSAGE);
+        List<MovieSearchResultDTO> movieList = customResponse.getData();
+        // Assert there are 3 movies
+        assertEquals(movieList.size(), 3);
+        // Assert 1st movie is The Dark Knight Rises Again, since it has the latest release time
+        assertEquals(movieList.get(0).getTitle(), "The Dark Knight Rises Again");
+        assertEquals(movieList.get(1).getTitle(), "The Dark Knight Rises");
+        assertEquals(movieList.get(2).getTitle(), "The Dark Knight");
+    }
+
+    @Test
+    void SearchMoviesInvalidOrderBy() {
+        String invalidOrderBy = "director";
+        URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
+                .queryParam(TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY, invalidOrderBy)
+                .build().toUri();
+
+        // Perform a GET request to the controller
+        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+                (uri, HttpMethod.GET, null, responseType);
+
+        // Assert the status code is BAD_REQUEST, and we have a customResponse
+        assertTrue(results.getStatusCode().is4xxClientError());
+        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        assertNotNull(customResponse);
+
+        // Assert the code and message are INVALID_ORDER_BY
+        assertEquals(customResponse.getCode(), INVALID_ORDER_BY_CODE);
+        assertEquals(customResponse.getMessage(), INVALID_ORDER_BY_MESSAGE);
+
+        // Assert the data in customResponse is null
+        assertNull(customResponse.getData());
+    }
+
+    @Test
+    void SearchMoviesInvalidDirection() {
+        String invalidDirection = "up";
+        URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
+                .queryParam(TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(DIRECTION, invalidDirection)
+                .build().toUri();
+
+        // Perform a GET request to the controller
+        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+                (uri, HttpMethod.GET, null, responseType);
+
+        // Assert the status code is BAD_REQUEST, and we have a customResponse
+        assertTrue(results.getStatusCode().is4xxClientError());
+        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        assertNotNull(customResponse);
+
+        // Assert the code and message are INVALID_YEAR
+        assertEquals(customResponse.getCode(), INVALID_DIRECTION_CODE);
+        assertEquals(customResponse.getMessage(), INVALID_DIRECTION_MESSAGE);
+
+        // Assert the data in customResponse is null
+        assertNull(customResponse.getData());
+    }
+
 }

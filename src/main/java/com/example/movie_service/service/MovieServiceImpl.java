@@ -66,13 +66,15 @@ public class MovieServiceImpl implements MovieService {
 
 //        // Convert the search results to a List of DTO
 //        List<MovieSearchResultDTO> mappedResults = movieSearchResultConverter.convertList(movieList);
-        System.out.println("Movies found: " + movieList.size());
+//        System.out.println("Movies found: " + movieList.size());
         // Prepare the response's code and message
         CustomResponse<List<MovieSearchResultDTO>> customResponse;
 
-        // If no movie is found, return a custom response with movie not found code and message inside
+        // If no movie is found, return a custom response with movie not found code and message inside, with the empty
+        // movieList. Before I put null in the data. This is not good because it might cause NullPointerExceptions. It
+        // also simplifies the handling of responses, as clients don't need to check for both 'null' and empty conditions.
         if (movieList.isEmpty()){
-            customResponse = new CustomResponse<>(MOVIE_NOT_FOUND_CODE, MOVIE_NOT_FOUND_MESSAGE, null);
+            customResponse = new CustomResponse<>(MOVIE_NOT_FOUND_CODE, MOVIE_NOT_FOUND_MESSAGE, movieList);
         } else{
             customResponse = new CustomResponse<>(MOVIE_FOUND_CODE, MOVIE_FOUND_MESSAGE, movieList);
         }
