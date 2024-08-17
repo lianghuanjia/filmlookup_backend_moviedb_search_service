@@ -1,41 +1,41 @@
 package com.example.movie_service.integration;
 import com.example.movie_service.dto.MovieSearchResultDTO;
-import com.example.movie_service.entity.Genre;
-import com.example.movie_service.entity.Movie;
-import com.example.movie_service.entity.MovieCrew;
-import com.example.movie_service.entity.Person;
 import com.example.movie_service.repository.CustomMovieRepositoryImpl;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import org.junit.Before;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.HashSet;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
+@ActiveProfiles("test") // Explicitly specify to use the configuration in the application-test.properties
 @Testcontainers
-@DataJpaTest
+// disables the web layer, making this configuration more suitable for testing repositories.
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CustomRepositoryImplIT {
 
-    private static String SQL_VERSION = "mysql:8.0.39";
+    private static final String SQL_VERSION = "mysql:8.0.39";
 
+    @SuppressWarnings({"resource"})
+    // Since I use @Container here, JUnit will manage the lifecycle of the test
+    // container, it also closes the container at the appropriate time, so we don't need to manually handle closing,
+    // so we can ignore the warning from the 'MySQLContainer<SELF>' used without 'try'-with-resources statement
+    // The try-with-resources  automatically close resources when they are no longer needed. JUnit here does the job
+    // for us, so we don't need to use try-with-resources
     @Container
     public static MySQLContainer<?> mysqlContainer = new MySQLContainer<>(SQL_VERSION)
             .withDatabaseName("testDB")
@@ -43,105 +43,43 @@ public class CustomRepositoryImplIT {
             .withPassword("testPassword")
             .withReuse(true);
 
-    // Set up EntityManager
-    @PersistenceContext
-    private EntityManager entityManager;
-
-
-    // Set up the test class
-    @Autowired
-    private CustomMovieRepositoryImpl customMovieRepositoryImpl;
-
     @DynamicPropertySource
     static void setUpProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", mysqlContainer::getJdbcUrl);
         registry.add("spring.datasource.username", mysqlContainer::getUsername);
         registry.add("spring.datasource.password", mysqlContainer::getPassword);
-        registry.add("spring.jpa.hibernate.ddl-auto", () -> "update");
+        registry.add("spring.datasource.driver-class-name", mysqlContainer::getDriverClassName);
     }
+
+    // Set up the test class
+    @Autowired
+    private CustomMovieRepositoryImpl customMovieRepositoryImpl;
+
+    @Autowired
+    private DataInitializerService dataInitializerService;
+
+    @Autowired
+    private DataSource dataSource;
 
     @BeforeEach
-    public void beforeEach() {
-        checkDatabaseEmpty();
-        initializeData();
+    public void beforeEach() throws SQLException {
+        // Log the JDBC URL to ensure it's pointing to the Testcontainers instance
+        dataInitializerService.checkDatabaseEmpty();
+        dataInitializerService.initializeData();
     }
 
+    @AfterEach
     @Transactional
-    public void checkDatabaseEmpty() {
-        // Check if the database is empty
-        long movieCount = (long) entityManager.createQuery("SELECT COUNT(m) FROM Movie m").getSingleResult();
-        long genreCount = (long) entityManager.createQuery("SELECT COUNT(g) FROM Genre g").getSingleResult();
-        long personCount = (long) entityManager.createQuery("SELECT COUNT(p) FROM Person p").getSingleResult();
-        long movieCrewCount = (long) entityManager.createQuery("SELECT COUNT(mc) FROM MovieCrew mc").getSingleResult();
+    public void cleanUp() {
+        dataInitializerService.clearDatabase();  // Custom method to clear all data
+    }
 
-        if (movieCount > 0 || genreCount > 0 || personCount > 0 || movieCrewCount > 0) {
-            throw new IllegalStateException("Database is not empty before the test runs.");
+    @Test
+    public void testDatabaseConnection() throws SQLException {
+        // Log the JDBC URL to ensure it's pointing to the Testcontainers instance
+        try (Connection connection = dataSource.getConnection()) {
+            System.out.println("Connected to database: " + connection.getMetaData().getURL());
         }
-
-        entityManager.clear();
-    }
-
-    @Transactional
-    public void initializeData() {
-        // Set up a Genre
-        Genre genre = new Genre();
-//        genre.setId(1); Do not set an ID before you save/persist it. That's the only problem here. Hibernate looks at
-//        the Entity you've passed in and assumes that because it has its PK populated that it is already in the database.
-        genre.setName("Action");
-        entityManager.persist(genre);
-
-        // Set up a director Person
-        Person director = new Person();
-        director.setName("Christopher Nolan");
-        entityManager.persist(director);
-
-        // Set up a Movie 1
-        Movie movie1 = new Movie();
-        movie1.setTitle("The Dark Knight");
-        movie1.setReleaseTime("2008-05-08");
-        entityManager.persist(movie1);
-
-        // Set up a Movie 2
-        Movie movie2 = new Movie();
-        movie2.setTitle("The Dark Knight Rises");
-        movie2.setReleaseTime("2012-03-09");
-        entityManager.persist(movie2);
-
-        // Add the genre to the movie
-        Set<Genre> genres = new HashSet<>();
-        genres.add(genre);
-        movie1.setGenres(genres);
-        movie2.setGenres(genres);
-        entityManager.persist(movie1);
-        entityManager.persist(movie2);
-
-        // Set up MovieCrew
-        MovieCrew movieCrew1 = new MovieCrew(movie1, director, "director");
-        entityManager.persist(movieCrew1);
-        MovieCrew movieCrew2 = new MovieCrew(movie2, director, "director");
-        entityManager.persist(movieCrew2);
-
-        // Set up a Movie 3
-        Movie movie3 = new Movie();
-        movie3.setTitle("The Dark Knight Rises Again");
-        movie3.setReleaseTime("2012-08-09");
-        entityManager.persist(movie3);
-
-        // Set up Movie 3 genre, director, and movie crew
-        Genre genre2 = new Genre();
-        genre2.setName("Love");
-        entityManager.persist(genre2);
-        Set<Genre> genreSet2 = new HashSet<>();
-        genreSet2.add(genre2);
-        movie3.setGenres(genreSet2);
-        entityManager.persist(movie3);
-
-        Person director2 = new Person();
-        director2.setName("Third director");
-        entityManager.persist(director2);
-
-        MovieCrew movieCrew3 = new MovieCrew(movie3, director2, "director");
-        entityManager.persist(movieCrew3);
     }
 
     @Test

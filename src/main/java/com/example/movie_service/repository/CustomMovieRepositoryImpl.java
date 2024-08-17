@@ -21,6 +21,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
     @Override
     public List<MovieSearchResultDTO> searchMovies(String title, String releasedYear, String director, String genre, Integer limit,
                                        Integer page, String orderBy, String direction) {
+
         String sqlQuery = buildSqlQuery(releasedYear, director, genre, orderBy, direction);
 
         // Create bare-bones native SQL Query
@@ -34,7 +35,8 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         // be MovieSearchResultDTO class, so I use @SuppressWarnings("unchecked")  here
         @SuppressWarnings("unchecked")
         List<MovieSearchResultDTO> results = query.getResultList();
-
+        System.out.println("In repo");
+        System.out.println(results.size());
         return results;
     }
 

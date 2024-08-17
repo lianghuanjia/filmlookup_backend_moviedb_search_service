@@ -57,8 +57,6 @@ public class MovieServiceImpl implements MovieService {
                                                                                     String orderBy, String direction)
             throws QueryTimeoutException, PersistenceException, ValidationException
             {
-        // Proceed with logic assuming `title` is non-null
-
         // Validate parameters:
         validateSearchMoviesParameters(title, releasedYear, limit, page, orderBy, direction);
 
@@ -68,7 +66,7 @@ public class MovieServiceImpl implements MovieService {
 
 //        // Convert the search results to a List of DTO
 //        List<MovieSearchResultDTO> mappedResults = movieSearchResultConverter.convertList(movieList);
-
+        System.out.println("Movies found: " + movieList.size());
         // Prepare the response's code and message
         CustomResponse<List<MovieSearchResultDTO>> customResponse;
 
