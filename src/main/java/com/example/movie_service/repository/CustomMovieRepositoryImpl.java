@@ -45,12 +45,14 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
                         "m.releaseTime AS releaseTime, " +
                         "GROUP_CONCAT(DISTINCT p.name ORDER BY p.name SEPARATOR ', ') AS directors, " +
                         "m.backdrop_path AS backdropPath, " +
-                        "m.poster_path AS posterPath " +
+                        "m.poster_path AS posterPath, " +
+                        "mr.averageRating AS rating " +
                         "FROM movie m " +
                         "LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id " +
                         "LEFT JOIN person p ON mc.person_id = p.person_id AND mc.job = 'director' " +
                         "LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id " +
                         "LEFT JOIN genre g ON mg.genre_id = g.id " +
+                        "LEFT JOIN movie_rating mr ON m.movie_id = mr.movie_id " +
                         "WHERE m.primaryTitle LIKE :title "
         );
 

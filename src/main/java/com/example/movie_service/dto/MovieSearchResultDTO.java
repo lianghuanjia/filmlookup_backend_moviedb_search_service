@@ -13,4 +13,5 @@ public class MovieSearchResultDTO {
     private String directors;
     private String backdropPath;
     private String posterPath;
+    private Double rating;
 }

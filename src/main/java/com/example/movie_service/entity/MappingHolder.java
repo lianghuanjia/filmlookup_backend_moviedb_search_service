@@ -17,6 +17,7 @@ import static com.example.movie_service.constant.MovieConstant.MOVIE_SEARCH_RESU
                         @ColumnResult(name="directors", type = String.class),
                         @ColumnResult(name="backdropPath", type = String.class),
                         @ColumnResult(name="posterPath", type = String.class),
+                        @ColumnResult(name="rating", type = Double.class),
                 }
         )
 

@@ -1,8 +1,6 @@
 package com.example.movie_service.service;
 
-import com.example.movie_service.converter.MovieSearchResultConverter;
 import com.example.movie_service.dto.MovieSearchResultDTO;
-import com.example.movie_service.exception.ResourceNotFoundException;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.repository.CustomMovieRepository;
 import com.example.movie_service.repository.PersonRepository;
@@ -28,8 +26,8 @@ public class MovieServiceImpl implements MovieService {
     private final CustomMovieRepository movieRepository; // Should I make this final?
     private final PersonRepository personRepository;
     private final ValidationService validationService;
-    private final MovieSearchResultConverter movieSearchResultConverter;
-    private final ConversionService conversionService;
+//    private final MovieSearchResultConverter movieSearchResultConverter;
+//    private final ConversionService conversionService;
 
     /**
      * Constructor with dependencies injection.
@@ -37,13 +35,10 @@ public class MovieServiceImpl implements MovieService {
      */
     @Autowired
     public MovieServiceImpl (CustomMovieRepository movieRepository, PersonRepository personRepository,
-                            ValidationService validationService, MovieSearchResultConverter movieSearchResultConverter,
-                             ConversionService conversionService) {
+                            ValidationService validationService) {
         this.movieRepository = movieRepository;
         this.personRepository = personRepository;
         this.validationService = validationService;
-        this.movieSearchResultConverter = movieSearchResultConverter;
-        this.conversionService = conversionService;
     }
 
     /**
