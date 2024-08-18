@@ -3,7 +3,6 @@ package com.example.movie_service.integration;
 
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.response.CustomResponse;
-import lombok.ToString;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +28,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 import static com.example.movie_service.constant.MovieConstant.*;
+import static com.example.movie_service.constants.TestConstant.*;
+import static com.example.movie_service.constants.TestConstant.ORDER_BY_TITLE;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -37,16 +37,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ControllerIT {
 
-
-    private static final String SQL_VERSION = "mysql:8.0.39";
-    private static final String EXISTED_MOVIE_TITLE = "Knight";
-    private static final String NON_EXISTED_MOVIE_TITLE = "Miss Jerry";
-    private static final String TITLE = "title";
-    private static final String RELEASED_YEAR = "releasedYear";
-    private static final String ORDER_BY = "orderBy";
-    private static final String DIRECTION = "direction";
-    private static final String RATING = "rating";
-    private static final String DESC = "desc";
 
     @SuppressWarnings({"resource"})
     // "resource":
@@ -121,7 +111,7 @@ public class ControllerIT {
     void testSearchMoviesMovieFound() {
         // Define URI with query param
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam(TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE)
                 .build().toUri();
 
         // Perform a GET request to the controller
@@ -147,7 +137,7 @@ public class ControllerIT {
     @Test
     void testSearchMoviesNotFound() {
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam(TITLE, NON_EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY_TITLE, NON_EXISTED_MOVIE_TITLE)
                 .build().toUri();
 
         // Perform a GET request to the controller
@@ -194,7 +184,7 @@ public class ControllerIT {
         String validYear = "2012";
         // Define URI with query param
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam(TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE)
                 .queryParam(RELEASED_YEAR, validYear)
                 .build().toUri();
 
@@ -222,7 +212,7 @@ public class ControllerIT {
     @Test
     void searchMovieWithOrderByRatingAndAsc() {
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam(TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE)
                 .queryParam(ORDER_BY, RATING)
                 .build().toUri();
 
@@ -250,7 +240,7 @@ public class ControllerIT {
     @Test
     void searchMovieWithOrderByRatingAndDesc() {
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam(TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE)
                 .queryParam(ORDER_BY, RATING)
                 .queryParam(DIRECTION, DESC)
                 .build().toUri();
@@ -280,7 +270,7 @@ public class ControllerIT {
     void SearchMoviesInvalidReleasedYear() {
         String invalidYear = "2025";
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam(TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE)
                 .queryParam(RELEASED_YEAR, invalidYear)
                 .build().toUri();
 
@@ -307,7 +297,7 @@ public class ControllerIT {
         String orderBy = "releaseTime";
         // Define URI with query param
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam(TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE)
                 .queryParam(ORDER_BY, orderBy)
                 .queryParam(DIRECTION, direction)
                 .build().toUri();
@@ -336,7 +326,7 @@ public class ControllerIT {
     void SearchMoviesInvalidOrderBy() {
         String invalidOrderBy = "director";
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam(TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE)
                 .queryParam(ORDER_BY, invalidOrderBy)
                 .build().toUri();
 
@@ -361,7 +351,7 @@ public class ControllerIT {
     void SearchMoviesInvalidDirection() {
         String invalidDirection = "up";
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam(TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE)
                 .queryParam(DIRECTION, invalidDirection)
                 .build().toUri();
 
