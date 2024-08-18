@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
+import static com.example.movie_service.constants.TestConstant.SQL_VERSION;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test") // Explicitly specify to use the configuration in the application-test.properties
@@ -27,8 +28,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CustomRepositoryImplIT {
-
-    private static final String SQL_VERSION = "mysql:8.0.39";
 
     @SuppressWarnings({"resource"})
     // Since I use @Container here, JUnit will manage the lifecycle of the test

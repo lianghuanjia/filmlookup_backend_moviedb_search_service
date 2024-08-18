@@ -267,6 +267,33 @@ public class ControllerIT {
     }
 
     @Test
+    public void TestPageOneOrderByRatingAsc(){
+        dataInitializerService.insertMovieData();
+        URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
+                .queryParam(TITLE, TITLE_STARTS_WITH_MOVIE)
+                .queryParam(ORDER_BY, RATING)
+                .queryParam(DIRECTION, ASC)
+                .queryParam(PAGE, 1)
+                .build().toUri();
+
+        // Perform a GET request to the controller
+        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+                (uri, HttpMethod.GET, null, responseType);
+
+        assertTrue(results.getStatusCode().is2xxSuccessful());
+        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        assertNotNull(customResponse);
+        // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
+        assertEquals(customResponse.getCode(), MOVIE_FOUND_CODE);
+        assertEquals(customResponse.getMessage(), MOVIE_FOUND_MESSAGE);
+        List<MovieSearchResultDTO> movieList = customResponse.getData();
+
+        MovieSearchResultDTO movie11 = movieList.get(0);
+        assertEquals(movie11.getTitle(), MOVIE_11_TITLE);
+        assertEquals(movie11.getRating(), MOVIE_11_RATING);
+    }
+
+    @Test
     void SearchMoviesInvalidReleasedYear() {
         String invalidYear = "2025";
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)

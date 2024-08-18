@@ -4,11 +4,13 @@ import com.example.movie_service.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import static com.example.movie_service.constants.TestConstant.*;
 
 @Service
 public class DataInitializerService {
@@ -43,7 +45,26 @@ public class DataInitializerService {
         entityManager.flush();
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional()
+    public void insertMovieData() {
+        List<String> action_list = List.of(ACTION_GENRE);
+        List<String> action_crime_list = List.of(ACTION_GENRE, CRIME_GENRE);
+        initializeOneMovieData(MOVIE_1_TITLE, MOVIE_1_RELEASE_TIME, action_list, DIRECTOR_1, MOVIE_1_RATING, NUM_OF_VOTES_10);
+        initializeOneMovieData(MOVIE_2_TITLE, MOVIE_2_RELEASE_TIME, action_list, DIRECTOR_1, MOVIE_2_RATING, NUM_OF_VOTES_15);
+        initializeOneMovieData(MOVIE_3_TITLE, MOVIE_3_RELEASE_TIME, action_list, DIRECTOR_1, MOVIE_3_RATING, NUM_OF_VOTES_10);
+        initializeOneMovieData(MOVIE_4_TITLE, MOVIE_4_RELEASE_TIME, action_list, DIRECTOR_2, MOVIE_4_RATING, NUM_OF_VOTES_10);
+        initializeOneMovieData(MOVIE_5_TITLE, MOVIE_5_RELEASE_TIME, action_list, DIRECTOR_2, MOVIE_5_RATING, NUM_OF_VOTES_10);
+        initializeOneMovieData(MOVIE_6_TITLE, MOVIE_6_RELEASE_TIME, action_list, DIRECTOR_2, MOVIE_6_RATING, NUM_OF_VOTES_10);
+        initializeOneMovieData(MOVIE_7_TITLE, MOVIE_7_RELEASE_TIME, action_list, DIRECTOR_2, MOVIE_7_RATING, NUM_OF_VOTES_10);
+        initializeOneMovieData(MOVIE_8_TITLE, MOVIE_8_RELEASE_TIME, action_list, DIRECTOR_3, MOVIE_8_RATING, NUM_OF_VOTES_10);
+        initializeOneMovieData(MOVIE_9_TITLE, MOVIE_9_RELEASE_TIME, action_crime_list, DIRECTOR_3, MOVIE_9_RATING, NUM_OF_VOTES_10);
+        initializeOneMovieData(MOVIE_10_TITLE, MOVIE_10_RELEASE_TIME, action_crime_list, DIRECTOR_3, MOVIE_10_RATING, NUM_OF_VOTES_10);
+        initializeOneMovieData(MOVIE_11_TITLE, MOVIE_11_RELEASE_TIME, action_crime_list, DIRECTOR_3, MOVIE_11_RATING, NUM_OF_VOTES_10);
+        initializeOneMovieData(MOVIE_12_TITLE, MOVIE_12_RELEASE_TIME, action_crime_list, DIRECTOR_4, MOVIE_12_RATING, NUM_OF_VOTES_10);
+        initializeOneMovieData(MOVIE_13_TITLE, MOVIE_13_RELEASE_TIME, action_crime_list, DIRECTOR_4, MOVIE_13_RATING, NUM_OF_VOTES_10);
+    }
+
+    @Transactional()
     public void initializeData() {
         // Set up a Genre
         Genre genre = new Genre();
@@ -125,5 +146,90 @@ public class DataInitializerService {
         movieRating3.setAverageRating(8.5);
         movieRating3.setNumVotes(10);
         entityManager.persist(movieRating3);
+    }
+
+    @Transactional
+    public void initializeOneMovieData(String title, String releaseTime, List<String> genreNames, String directorName,
+                                    Double averageRating, Integer numOfVotes) {
+        // Set up genres
+        // For each genre name, initialize a Genre, and add it to a Genre set
+        Set<Genre> genres = new HashSet<>();
+        // For each genre, add it as a Genre entity into the database
+        for (String genreName: genreNames) {
+            genres.add(createAndPersistGenre(genreName));
+        }
+
+        // Set up director Person
+        Person director = createAndPersistDirector(directorName);
+
+        // Set up movie
+        Movie movie = createAndPersistMovie(title, releaseTime, genres);
+
+        // Set up MovieCrew
+        createAndPersistMovieCrew(movie, director);
+
+        // Set up rating
+        createAndPersistMovieRating(movie, averageRating, numOfVotes);
+    }
+
+    private void createAndPersistMovieCrew(Movie movie, Person director) {
+        MovieCrew movieCrew = new MovieCrew(movie, director, DIRECTOR_ROLE);
+        entityManager.persist(movieCrew);
+    }
+
+    private Movie createAndPersistMovie(String title, String releaseTime, Set<Genre> genres) {
+        Movie movie = new Movie();
+        movie.setTitle(title);
+        movie.setReleaseTime(releaseTime);
+        movie.setGenres(genres);
+        entityManager.persist(movie);
+        return movie;
+    }
+
+    private void createAndPersistMovieRating(Movie movie, Double averageRating, Integer numOfVotes) {
+        MovieRating movieRating = new MovieRating();
+        movieRating.setAverageRating(averageRating);
+        movieRating.setNumVotes(numOfVotes);
+        movieRating.setMovie(movie);
+        entityManager.persist(movieRating);
+    }
+
+    private Person createAndPersistDirector(String directorName) {
+        // Check if a director with the same name already exists
+        Person existingDirector = entityManager.createQuery("SELECT p FROM Person p WHERE p.name = :name", Person.class)
+                .setParameter("name", directorName)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
+
+        // If the director already exists, return it
+        if (existingDirector != null) {
+            return existingDirector;
+        }
+
+        // Otherwise, create and persist a new director
+        Person director = new Person();
+        director.setName(directorName);
+        entityManager.persist(director);
+        return director;
+    }
+
+    private Genre createAndPersistGenre(String genreName) {
+        // Check if a genre with the same name already exists
+        Genre existingGenre = entityManager.createQuery("SELECT g FROM Genre g WHERE g.name = :name", Genre.class)
+                .setParameter("name", genreName)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
+
+        // If the genre already exists, return it
+        if (existingGenre != null) {
+            return existingGenre;
+        }
+
+        Genre newGenre = new Genre();
+        newGenre.setName(genreName);
+        entityManager.persist(newGenre);
+        return newGenre;
     }
 }
