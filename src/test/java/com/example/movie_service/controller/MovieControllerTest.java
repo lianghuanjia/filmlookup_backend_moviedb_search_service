@@ -48,7 +48,7 @@ public class MovieControllerTest {
         List<MovieSearchResultDTO> mockMovieList = new ArrayList<>();
 
         mockMovieList.add(new MovieSearchResultDTO("tt1", "Movie Title", "2023",
-                "Director1", "BackdropPath1", "PosterPath1"));
+                "Director1", "BackdropPath1", "PosterPath1", 9.0));
         CustomResponse<List<MovieSearchResultDTO>> customResponse = new CustomResponse<>(20001,
                 "Movie(s) found", mockMovieList);
 

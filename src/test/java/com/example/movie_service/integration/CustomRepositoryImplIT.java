@@ -138,6 +138,22 @@ public class CustomRepositoryImplIT {
     }
 
     @Test
+    public void searchMovieTestDescAndOrderByRating(){
+        List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
+                "Dark Knight", null, null, null, 10, 0,
+                "rating", "desc");
+
+        assertNotNull(searchResults);
+        assertEquals(searchResults.size(), 3);
+        MovieSearchResultDTO firstResult = searchResults.get(0);
+        MovieSearchResultDTO secondResult = searchResults.get(1);
+        MovieSearchResultDTO thirdResult = searchResults.get(2);
+        assertEquals(firstResult.getTitle(), "The Dark Knight");
+        assertEquals(secondResult.getTitle(), "The Dark Knight Rises");
+        assertEquals(thirdResult.getTitle(), "The Dark Knight Rises Again");
+    }
+
+    @Test
     public void searchMovieByTitleAndDirector(){
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
                 "Dark Knight", null, "Nolan", null, 10, 0,

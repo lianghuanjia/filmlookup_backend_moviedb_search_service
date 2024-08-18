@@ -36,6 +36,7 @@ public class CustomRepositoryImplTest {
     private Integer page;
     private String orderBy;
     private String direction;
+    private Double rating;
 
 
     @BeforeEach
@@ -48,6 +49,7 @@ public class CustomRepositoryImplTest {
         page = 0;
         orderBy = "orderBy";
         direction = "direction";
+        rating = 9.0;
     }
 
     @Test
@@ -59,7 +61,7 @@ public class CustomRepositoryImplTest {
         // Mock the behavior
         List<MovieSearchResultDTO> movieList = new ArrayList<>();
         MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(id, title, releasedYear, director,
-                backdropPath, posterPath);
+                backdropPath, posterPath, rating);
         movieList.add(resultDTO);
 
         // Use argument matchers for dynamic parameters
@@ -93,7 +95,7 @@ public class CustomRepositoryImplTest {
         // Mock the behavior
         List<MovieSearchResultDTO> movieList = new ArrayList<>();
         MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(id, title, releasedYear, director,
-                backdropPath, posterPath);
+                backdropPath, posterPath, rating);
         movieList.add(resultDTO);
 
         // Use argument matchers for dynamic parameters
@@ -127,7 +129,7 @@ public class CustomRepositoryImplTest {
         // Mock the behavior
         List<MovieSearchResultDTO> movieList = new ArrayList<>();
         MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(id, title, releasedYear, director,
-                backdropPath, posterPath);
+                backdropPath, posterPath, rating);
         movieList.add(resultDTO);
 
         // Use argument matchers for dynamic parameters

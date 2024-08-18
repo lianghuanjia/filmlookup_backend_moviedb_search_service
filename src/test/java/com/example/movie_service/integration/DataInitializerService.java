@@ -1,9 +1,6 @@
 package com.example.movie_service.integration;
 
-import com.example.movie_service.entity.Genre;
-import com.example.movie_service.entity.Movie;
-import com.example.movie_service.entity.MovieCrew;
-import com.example.movie_service.entity.Person;
+import com.example.movie_service.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
@@ -34,7 +31,12 @@ public class DataInitializerService {
 
     @Transactional
     public void clearDatabase() {
+        // When delete table, need to delete the children table first, and then parent. Otherwise, it's going to throw
+        // ConstraintViolationException. For example, we need to delete MovieCrew and MovieRating first, and then delete
+        // Movie, because they have foreign key movie_id referring to the Movie's movie_id. We can't delete the Movie
+        // before deleting the MovieCrew and MovieRating.
         entityManager.createQuery("DELETE FROM MovieCrew").executeUpdate();
+        entityManager.createQuery("DELETE FROM MovieRating").executeUpdate();
         entityManager.createQuery("DELETE FROM Movie").executeUpdate();
         entityManager.createQuery("DELETE FROM Person").executeUpdate();
         entityManager.createQuery("DELETE FROM Genre").executeUpdate();
@@ -102,5 +104,26 @@ public class DataInitializerService {
 
         MovieCrew movieCrew3 = new MovieCrew(movie3, director2, "director");
         entityManager.persist(movieCrew3);
+
+        // Set up each movie1's rating
+        MovieRating movieRating1 = new MovieRating();
+        movieRating1.setMovie(movie1);
+        movieRating1.setAverageRating(9.5);
+        movieRating1.setNumVotes(10);
+        entityManager.persist(movieRating1);
+
+        // Set up each movie2's rating
+        MovieRating movieRating2 = new MovieRating();
+        movieRating2.setMovie(movie2);
+        movieRating2.setAverageRating(9.0);
+        movieRating2.setNumVotes(10);
+        entityManager.persist(movieRating2);
+
+        // Set up each movie3's rating
+        MovieRating movieRating3 = new MovieRating();
+        movieRating3.setMovie(movie3);
+        movieRating3.setAverageRating(8.5);
+        movieRating3.setNumVotes(10);
+        entityManager.persist(movieRating3);
     }
 }

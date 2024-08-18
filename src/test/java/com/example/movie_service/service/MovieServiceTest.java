@@ -1,6 +1,6 @@
 package com.example.movie_service.service;
 
-import com.example.movie_service.converter.MovieSearchResultConverter;
+
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.repository.CustomMovieRepository;
@@ -186,7 +186,7 @@ public class MovieServiceTest {
     public void searchMovieReturnListOfMovieSearchResultDTO() {
         // Setup mock data
         List<MovieSearchResultDTO> mockMovies = Arrays.asList(
-                new MovieSearchResultDTO("1", "Inception", "2010", "Christopher Nolan", "path/to/backdrop", "path/to/poster")
+                new MovieSearchResultDTO("1", "Inception", "2010", "Christopher Nolan", "path/to/backdrop", "path/to/poster", 9.0)
         );
 
         // Mock the repository call

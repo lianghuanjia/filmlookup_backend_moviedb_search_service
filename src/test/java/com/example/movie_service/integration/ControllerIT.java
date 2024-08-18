@@ -45,6 +45,8 @@ public class ControllerIT {
     private static final String RELEASED_YEAR = "releasedYear";
     private static final String ORDER_BY = "orderBy";
     private static final String DIRECTION = "direction";
+    private static final String RATING = "rating";
+    private static final String DESC = "desc";
 
     @SuppressWarnings({"resource"})
     // "resource":
@@ -217,6 +219,62 @@ public class ControllerIT {
         assertEquals(movieList.get(1).getTitle(), "The Dark Knight Rises Again");
     }
 
+    @Test
+    void searchMovieWithOrderByRatingAndAsc() {
+        URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
+                .queryParam(TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY, RATING)
+                .build().toUri();
+
+        // Perform a GET request to the controller
+        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+                (uri, HttpMethod.GET, null, responseType);
+
+        // Assert
+        assertTrue(results.getStatusCode().is2xxSuccessful());
+        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        assertNotNull(customResponse);
+        // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
+        assertEquals(customResponse.getCode(), MOVIE_FOUND_CODE);
+        assertEquals(customResponse.getMessage(), MOVIE_FOUND_MESSAGE);
+        List<MovieSearchResultDTO> movieList = customResponse.getData();
+
+        // Assert movieList has 3 movies
+        assertEquals(movieList.size(), 3);
+
+        // Assert first movie's rating < second movie's rating < third movie's rating
+        assertTrue(movieList.get(0).getRating() < movieList.get(1).getRating()
+                && movieList.get(1).getRating() < movieList.get(2).getRating());
+    }
+
+    @Test
+    void searchMovieWithOrderByRatingAndDesc() {
+        URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
+                .queryParam(TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY, RATING)
+                .queryParam(DIRECTION, DESC)
+                .build().toUri();
+
+        // Perform a GET request to the controller
+        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+                (uri, HttpMethod.GET, null, responseType);
+
+        // Assert
+        assertTrue(results.getStatusCode().is2xxSuccessful());
+        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        assertNotNull(customResponse);
+        // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
+        assertEquals(customResponse.getCode(), MOVIE_FOUND_CODE);
+        assertEquals(customResponse.getMessage(), MOVIE_FOUND_MESSAGE);
+        List<MovieSearchResultDTO> movieList = customResponse.getData();
+
+        // Assert movieList has 3 movies
+        assertEquals(movieList.size(), 3);
+
+        // Assert first movie's rating > second movie's rating > third movie's rating
+        assertTrue(movieList.get(0).getRating() > movieList.get(1).getRating()
+                && movieList.get(1).getRating() > movieList.get(2).getRating());
+    }
 
     @Test
     void SearchMoviesInvalidReleasedYear() {
