@@ -1,12 +1,12 @@
 package com.example.movie_service.integration;
 import com.example.movie_service.dto.MovieSearchResultDTO;
+import com.example.movie_service.helperTool.DataInitializerService;
 import com.example.movie_service.repository.CustomMovieRepositoryImpl;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;

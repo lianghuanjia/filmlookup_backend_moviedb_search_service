@@ -2,7 +2,7 @@ package com.example.movie_service.integration;
 
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.exception.ValidationException;
-import com.example.movie_service.repository.CustomMovieRepositoryImpl;
+import com.example.movie_service.helperTool.DataInitializerService;
 import com.example.movie_service.response.CustomResponse;
 import com.example.movie_service.service.MovieServiceImpl;
 import org.junit.jupiter.api.AfterEach;
@@ -70,16 +70,16 @@ public class MovieServiceImplIT {
                 (EXISTED_MOVIE_TITLE, null, null, null, 10, 0, ORDER_BY_TITLE, ASC);
 
         // Verify the response
-        assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
-        assertEquals(responseEntity.getBody().getCode(), MOVIE_FOUND_CODE);
-        assertEquals(responseEntity.getBody().getMessage(), MOVIE_FOUND_MESSAGE);
+        assertEquals(MOVIE_FOUND_CODE, responseEntity.getBody().getCode());
+        assertEquals(MOVIE_FOUND_MESSAGE, responseEntity.getBody().getMessage());
         List<MovieSearchResultDTO> moviesList = responseEntity.getBody().getData();
         // Verify the movies
-        assertEquals(moviesList.size(), 3);
-        assertEquals(moviesList.get(0).getTitle(), THE_DARK_KNIGHT);
-        assertEquals(moviesList.get(1).getTitle(), THE_DARK_KNIGHT_RISES);
-        assertEquals(moviesList.get(2).getTitle(), THE_DARK_KNIGHT_RISES_AGAIN);
+        assertEquals(3, moviesList.size());
+        assertEquals(THE_DARK_KNIGHT, moviesList.get(0).getTitle());
+        assertEquals(THE_DARK_KNIGHT_RISES, moviesList.get(1).getTitle());
+        assertEquals(THE_DARK_KNIGHT_RISES_AGAIN, moviesList.get(2).getTitle());
     }
 
     @Test
@@ -88,68 +88,68 @@ public class MovieServiceImplIT {
                 (NON_EXISTED_MOVIE_TITLE, null, null, null, 10, 0, ORDER_BY_TITLE, ASC);
 
         // Verify the response
-        assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
-        assertEquals(responseEntity.getBody().getCode(), MOVIE_NOT_FOUND_CODE);
-        assertEquals(responseEntity.getBody().getMessage(), MOVIE_NOT_FOUND_MESSAGE);
+        assertEquals(MOVIE_NOT_FOUND_CODE, responseEntity.getBody().getCode());
+        assertEquals(MOVIE_NOT_FOUND_MESSAGE, responseEntity.getBody().getMessage());
         List<MovieSearchResultDTO> moviesList = responseEntity.getBody().getData();
         // Verify the movies
-        assertEquals(moviesList.size(), 0);
+        assertTrue(moviesList.isEmpty());
     }
 
     @Test
     void missingTitle() {
         ValidationException exception = assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(
                 EMPTY_STRING, YEAR_2012, DIRECTOR_NOLAN, null, 10, 0, ORDER_BY_TITLE, ASC));
-        assertEquals(exception.getErrorCode(), MISSING_TITLE_CODE);
-        assertEquals(exception.getErrorMessage(), MISSING_TITLE_MESSAGE);
+        assertEquals(MISSING_TITLE_CODE, exception.getErrorCode());
+        assertEquals(MISSING_TITLE_MESSAGE, exception.getErrorMessage());
     }
 
     @Test
     void nullTitle() {
         ValidationException exception = assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(
                 null, YEAR_2012, DIRECTOR_NOLAN, null, 10, 0, ORDER_BY_TITLE, ASC));
-        assertEquals(exception.getErrorCode(), MISSING_TITLE_CODE);
-        assertEquals(exception.getErrorMessage(), MISSING_TITLE_MESSAGE);
+        assertEquals(MISSING_TITLE_CODE, exception.getErrorCode());
+        assertEquals(MISSING_TITLE_MESSAGE, exception.getErrorMessage());
     }
 
     @Test
     void invalidYear() {
         ValidationException exception = assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(
                 EXISTED_MOVIE_TITLE, INVALID_YEAR_2030, DIRECTOR_NOLAN, null, 10, 0, ORDER_BY_TITLE, ASC));
-        assertEquals(exception.getErrorCode(), INVALID_YEAR_CODE);
-        assertEquals(exception.getErrorMessage(), INVALID_YEAR_MESSAGE);
+        assertEquals(INVALID_YEAR_CODE, exception.getErrorCode());
+        assertEquals(INVALID_YEAR_MESSAGE, exception.getErrorMessage());
     }
 
     @Test
     void invalidLimit() {
         ValidationException exception = assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(
                 EXISTED_MOVIE_TITLE, YEAR_2012, DIRECTOR_NOLAN, null, 5, 0, ORDER_BY_TITLE, ASC));
-            assertEquals(exception.getErrorCode(), INVALID_LIMIT_CODE);
-        assertEquals(exception.getErrorMessage(), INVALID_LIMIT_MESSAGE);
+            assertEquals(INVALID_LIMIT_CODE, exception.getErrorCode());
+        assertEquals(INVALID_LIMIT_MESSAGE, exception.getErrorMessage());
     }
 
     @Test
     void invalidOrderBy() {
         ValidationException exception = assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(
                 EXISTED_MOVIE_TITLE, YEAR_2012, DIRECTOR_NOLAN, null, 10, 0, "director", ASC));
-        assertEquals(exception.getErrorCode(), INVALID_ORDER_BY_CODE);
-        assertEquals(exception.getErrorMessage(), INVALID_ORDER_BY_MESSAGE);
+        assertEquals(INVALID_ORDER_BY_CODE, exception.getErrorCode());
+        assertEquals(INVALID_ORDER_BY_MESSAGE, exception.getErrorMessage());
     }
 
     @Test
     void invalidPage() {
         ValidationException exception = assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(
                 EXISTED_MOVIE_TITLE, YEAR_2012, DIRECTOR_NOLAN, null, 10, -1, ORDER_BY_TITLE, ASC));
-        assertEquals(exception.getErrorCode(), INVALID_PAGE_CODE);
-        assertEquals(exception.getErrorMessage(), INVALID_PAGE_MESSAGE);
+        assertEquals(INVALID_PAGE_CODE, exception.getErrorCode());
+        assertEquals(INVALID_PAGE_MESSAGE, exception.getErrorMessage());
     }
 
     @Test
     void invalidDirection() {
         ValidationException exception = assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(
                 EXISTED_MOVIE_TITLE, YEAR_2012, DIRECTOR_NOLAN, null, 10, 0, ORDER_BY_TITLE, "up"));
-        assertEquals(exception.getErrorCode(), INVALID_DIRECTION_CODE);
-        assertEquals(exception.getErrorMessage(), INVALID_DIRECTION_MESSAGE);
+        assertEquals(INVALID_DIRECTION_CODE, exception.getErrorCode());
+        assertEquals(INVALID_DIRECTION_MESSAGE, exception.getErrorMessage());
     }
 }

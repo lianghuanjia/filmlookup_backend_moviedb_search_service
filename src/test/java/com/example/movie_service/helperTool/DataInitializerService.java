@@ -1,4 +1,4 @@
-package com.example.movie_service.integration;
+package com.example.movie_service.helperTool;
 
 import com.example.movie_service.entity.*;
 import jakarta.persistence.EntityManager;

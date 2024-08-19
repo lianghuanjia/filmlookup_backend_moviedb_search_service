@@ -4,6 +4,7 @@ import com.example.movie_service.entity.Genre;
 import com.example.movie_service.entity.Movie;
 import com.example.movie_service.entity.MovieCrew;
 import com.example.movie_service.entity.MovieRating;
+import com.example.movie_service.helperTool.DataInitializerService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;

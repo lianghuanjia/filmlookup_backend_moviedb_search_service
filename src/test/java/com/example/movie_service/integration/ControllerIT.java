@@ -2,6 +2,7 @@ package com.example.movie_service.integration;
 
 
 import com.example.movie_service.dto.MovieSearchResultDTO;
+import com.example.movie_service.helperTool.DataInitializerService;
 import com.example.movie_service.response.CustomResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -81,7 +82,7 @@ public class ControllerIT {
     private String searchMoviePath;
     // Define the response type using ParameterizedTypeReference
     private final ParameterizedTypeReference<CustomResponse<List<MovieSearchResultDTO>>> responseType =
-            new ParameterizedTypeReference<CustomResponse<List<MovieSearchResultDTO>>>() {};
+            new ParameterizedTypeReference<>() {};
 
     @BeforeEach
     public void setUp(){
@@ -99,10 +100,14 @@ public class ControllerIT {
     }
 
     @Test
-    public void testDatabaseConnection() throws SQLException {
+    void testDatabaseConnection() throws SQLException {
         // Log the JDBC URL to ensure it's pointing to the Testcontainers instance
         try (Connection connection = dataSource.getConnection()) {
-            System.out.println("Connected to database: " + connection.getMetaData().getURL());
+            String jdbcUrl = connection.getMetaData().getURL();
+            System.out.println("Connected to database: " + jdbcUrl);
+
+            // Assert the connection is not null
+            assertNotNull(connection);
         }
     }
 
@@ -123,15 +128,15 @@ public class ControllerIT {
         CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is 20001, representing movies found
-        assertEquals(customResponse.getCode(), MOVIE_FOUND_CODE);
-        assertEquals(customResponse.getMessage(), MOVIE_FOUND_MESSAGE);
+        assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
+        assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
         List<MovieSearchResultDTO> movieList = customResponse.getData();
         // Assert there are 3 movies
-        assertEquals(movieList.size(), 3);
+        assertEquals(3, movieList.size());
         // Assert 1st movie is The Dark Knight
-        assertEquals(movieList.get(0).getTitle(), "The Dark Knight");
-        assertEquals(movieList.get(1).getTitle(), "The Dark Knight Rises");
-        assertEquals(movieList.get(2).getTitle(), "The Dark Knight Rises Again");
+        assertEquals(THE_DARK_KNIGHT, movieList.get(0).getTitle());
+        assertEquals(THE_DARK_KNIGHT_RISES, movieList.get(1).getTitle());
+        assertEquals(THE_DARK_KNIGHT_RISES_AGAIN, movieList.get(2).getTitle());
     }
 
     @Test
@@ -150,8 +155,8 @@ public class ControllerIT {
         assertNotNull(customResponse);
 
         // Assert the code and message are MOVIE_NOT_FOUND
-        assertEquals(customResponse.getCode(), MOVIE_NOT_FOUND_CODE);
-        assertEquals(customResponse.getMessage(), MOVIE_NOT_FOUND_MESSAGE);
+        assertEquals(MOVIE_NOT_FOUND_CODE, customResponse.getCode());
+        assertEquals(MOVIE_NOT_FOUND_MESSAGE, customResponse.getMessage());
 
         // Assert the MovieSearchResultDTO List is empty
         assertTrue(customResponse.getData().isEmpty());
@@ -172,8 +177,8 @@ public class ControllerIT {
         assertNotNull(customResponse);
 
         // Assert the code and message are MOVIE_NOT_FOUND
-        assertEquals(customResponse.getCode(), MISSING_TITLE_CODE);
-        assertEquals(customResponse.getMessage(), MISSING_TITLE_MESSAGE);
+        assertEquals(MISSING_TITLE_CODE, customResponse.getCode());
+        assertEquals(MISSING_TITLE_MESSAGE, customResponse.getMessage());
 
         // Assert the MovieSearchResultDTO List is empty
         assertNull(customResponse.getData());
@@ -197,16 +202,16 @@ public class ControllerIT {
         CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
-        assertEquals(customResponse.getCode(), MOVIE_FOUND_CODE);
-        assertEquals(customResponse.getMessage(), MOVIE_FOUND_MESSAGE);
+        assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
+        assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
         List<MovieSearchResultDTO> movieList = customResponse.getData();
         // Assert there are 2 movies with release time in 2012.
-        assertEquals(movieList.size(), 2);
+        assertEquals(2, movieList.size());
         // Assert 1st movie is The Dark Knight Rises, and the second one is The Dark Knight Rises Again,
         // because we didn't put orderBy and direction in the query param, so it sets to default with
         // orderBy = "title", direction = "asc".
-        assertEquals(movieList.get(0).getTitle(), "The Dark Knight Rises");
-        assertEquals(movieList.get(1).getTitle(), "The Dark Knight Rises Again");
+        assertEquals(THE_DARK_KNIGHT_RISES, movieList.get(0).getTitle());
+        assertEquals(THE_DARK_KNIGHT_RISES_AGAIN, movieList.get(1).getTitle());
     }
 
     @Test
@@ -225,12 +230,12 @@ public class ControllerIT {
         CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
-        assertEquals(customResponse.getCode(), MOVIE_FOUND_CODE);
-        assertEquals(customResponse.getMessage(), MOVIE_FOUND_MESSAGE);
+        assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
+        assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
         List<MovieSearchResultDTO> movieList = customResponse.getData();
 
         // Assert movieList has 3 movies
-        assertEquals(movieList.size(), 3);
+        assertEquals(3, movieList.size());
 
         // Assert first movie's rating < second movie's rating < third movie's rating
         assertTrue(movieList.get(0).getRating() < movieList.get(1).getRating()
@@ -254,12 +259,12 @@ public class ControllerIT {
         CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
-        assertEquals(customResponse.getCode(), MOVIE_FOUND_CODE);
-        assertEquals(customResponse.getMessage(), MOVIE_FOUND_MESSAGE);
+        assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
+        assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
         List<MovieSearchResultDTO> movieList = customResponse.getData();
 
         // Assert movieList has 3 movies
-        assertEquals(movieList.size(), 3);
+        assertEquals(3, movieList.size());
 
         // Assert first movie's rating > second movie's rating > third movie's rating
         assertTrue(movieList.get(0).getRating() > movieList.get(1).getRating()
@@ -267,7 +272,7 @@ public class ControllerIT {
     }
 
     @Test
-    public void TestPageOneOrderByRatingAsc(){
+    void TestPageOneOrderByRatingAsc(){
         dataInitializerService.insertMovieData();
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
                 .queryParam(TITLE, TITLE_STARTS_WITH_MOVIE)
@@ -284,13 +289,13 @@ public class ControllerIT {
         CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
-        assertEquals(customResponse.getCode(), MOVIE_FOUND_CODE);
-        assertEquals(customResponse.getMessage(), MOVIE_FOUND_MESSAGE);
+        assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
+        assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
         List<MovieSearchResultDTO> movieList = customResponse.getData();
 
         MovieSearchResultDTO movie11 = movieList.get(0);
-        assertEquals(movie11.getTitle(), MOVIE_11_TITLE);
-        assertEquals(movie11.getRating(), MOVIE_11_RATING);
+        assertEquals(MOVIE_11_TITLE, movie11.getTitle());
+        assertEquals(MOVIE_11_RATING, movie11.getRating());
     }
 
     @Test
@@ -311,8 +316,8 @@ public class ControllerIT {
         assertNotNull(customResponse);
 
         // Assert the code and message are INVALID_YEAR
-        assertEquals(customResponse.getCode(), INVALID_YEAR_CODE);
-        assertEquals(customResponse.getMessage(), INVALID_YEAR_MESSAGE);
+        assertEquals(INVALID_YEAR_CODE, customResponse.getCode());
+        assertEquals(INVALID_YEAR_MESSAGE, customResponse.getMessage());
 
         // Assert the data in customResponse is null
         assertNull(customResponse.getData());
@@ -320,13 +325,11 @@ public class ControllerIT {
 
     @Test
     void searchMoviesValidWithReleaseTimeOrderByAndDescDirection() {
-        String direction = "desc";
-        String orderBy = "releaseTime";
         // Define URI with query param
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
                 .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE)
-                .queryParam(ORDER_BY, orderBy)
-                .queryParam(DIRECTION, direction)
+                .queryParam(ORDER_BY, ORDER_BY_RELEASE_TIME)
+                .queryParam(DIRECTION, DESC)
                 .build().toUri();
 
         // Perform a GET request to the controller
@@ -338,23 +341,22 @@ public class ControllerIT {
         CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
-        assertEquals(customResponse.getCode(), MOVIE_FOUND_CODE);
-        assertEquals(customResponse.getMessage(), MOVIE_FOUND_MESSAGE);
+        assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
+        assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
         List<MovieSearchResultDTO> movieList = customResponse.getData();
         // Assert there are 3 movies
-        assertEquals(movieList.size(), 3);
+        assertEquals(3, movieList.size());
         // Assert 1st movie is The Dark Knight Rises Again, since it has the latest release time
-        assertEquals(movieList.get(0).getTitle(), "The Dark Knight Rises Again");
-        assertEquals(movieList.get(1).getTitle(), "The Dark Knight Rises");
-        assertEquals(movieList.get(2).getTitle(), "The Dark Knight");
+        assertEquals(THE_DARK_KNIGHT_RISES_AGAIN, movieList.get(0).getTitle());
+        assertEquals(THE_DARK_KNIGHT_RISES, movieList.get(1).getTitle());
+        assertEquals(THE_DARK_KNIGHT, movieList.get(2).getTitle());
     }
 
     @Test
     void SearchMoviesInvalidOrderBy() {
-        String invalidOrderBy = "director";
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
                 .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE)
-                .queryParam(ORDER_BY, invalidOrderBy)
+                .queryParam(ORDER_BY, DIRECTOR_ROLE)
                 .build().toUri();
 
         // Perform a GET request to the controller
@@ -367,8 +369,8 @@ public class ControllerIT {
         assertNotNull(customResponse);
 
         // Assert the code and message are INVALID_ORDER_BY
-        assertEquals(customResponse.getCode(), INVALID_ORDER_BY_CODE);
-        assertEquals(customResponse.getMessage(), INVALID_ORDER_BY_MESSAGE);
+        assertEquals(INVALID_ORDER_BY_CODE, customResponse.getCode());
+        assertEquals(INVALID_ORDER_BY_MESSAGE, customResponse.getMessage());
 
         // Assert the data in customResponse is null
         assertNull(customResponse.getData());
@@ -392,8 +394,8 @@ public class ControllerIT {
         assertNotNull(customResponse);
 
         // Assert the code and message are INVALID_YEAR
-        assertEquals(customResponse.getCode(), INVALID_DIRECTION_CODE);
-        assertEquals(customResponse.getMessage(), INVALID_DIRECTION_MESSAGE);
+        assertEquals(INVALID_DIRECTION_CODE, customResponse.getCode());
+        assertEquals(INVALID_DIRECTION_MESSAGE, customResponse.getMessage());
 
         // Assert the data in customResponse is null
         assertNull(customResponse.getData());
