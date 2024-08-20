@@ -15,12 +15,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 import java.util.Set;
@@ -34,29 +29,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @DirtiesContext
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class InsertMovieTestingDataIntoTestContainerIT {
+class InsertMovieTestingDataIntoTestContainerIT {
 
     @Autowired
     private DataInitializerService dataInitializerService;
 
     @PersistenceContext
     private EntityManager entityManager;
-
-//    @SuppressWarnings({"resource"})
-//    @Container
-//    public static MySQLContainer<?> mysqlContainer = new MySQLContainer<>(SQL_VERSION)
-//            .withDatabaseName("testDB")
-//            .withUsername("testUser")
-//            .withPassword("testPassword")
-//            .withReuse(true);
-//
-//    @DynamicPropertySource
-//    static void setUpProperties(DynamicPropertyRegistry registry) {
-//        registry.add("spring.datasource.url", mysqlContainer::getJdbcUrl);
-//        registry.add("spring.datasource.username", mysqlContainer::getUsername);
-//        registry.add("spring.datasource.password", mysqlContainer::getPassword);
-//        registry.add("spring.datasource.driver-class-name", mysqlContainer::getDriverClassName);
-//    }
 
     // Need @Transactional because I am fetching genres data from a movie, and the fetching is lazy loading.
     // @Transactional ensures that the database session (or Hibernate session) remains open and active for the duration

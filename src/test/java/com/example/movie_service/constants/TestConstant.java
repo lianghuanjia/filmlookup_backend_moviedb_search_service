@@ -10,7 +10,7 @@ public class TestConstant {
     public static final String ORDER_BY_TITLE = "title";
     public static final String RELEASED_YEAR = "releasedYear";
     public static final String ORDER_BY = "orderBy";
-    public static final String ORDER_BY_RELEASE_TIME = "releaseTime";
+    public static final String RELEASE_TIME = "releaseTime";
     public static final String DIRECTION = "direction";
     public static final String RATING = "rating";
     public static final String DESC = "desc";

@@ -11,15 +11,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 import static com.example.movie_service.constants.TestConstant.*;
@@ -32,28 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 // (webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class CustomRepositoryImplIT {
-
-    @SuppressWarnings({"resource"})
-    // Since I use @Container here, JUnit will manage the lifecycle of the test
-    // container, it also closes the container at the appropriate time, so we don't need to manually handle closing,
-    // so we can ignore the warning from the 'MySQLContainer<SELF>' used without 'try'-with-resources statement
-    // The try-with-resources  automatically close resources when they are no longer needed. JUnit here does the job
-    // for us, so we don't need to use try-with-resources
-//    @Container
-//    public static MySQLContainer<?> mysqlContainer = new MySQLContainer<>(SQL_VERSION)
-//            .withDatabaseName("testDB")
-//            .withUsername("testUser")
-//            .withPassword("testPassword")
-//            .withReuse(true);
-//
-//    @DynamicPropertySource
-//    static void setUpProperties(DynamicPropertyRegistry registry) {
-//        registry.add("spring.datasource.url", mysqlContainer::getJdbcUrl);
-//        registry.add("spring.datasource.username", mysqlContainer::getUsername);
-//        registry.add("spring.datasource.password", mysqlContainer::getPassword);
-//        registry.add("spring.datasource.driver-class-name", mysqlContainer::getDriverClassName);
-//    }
+class CustomRepositoryImplIT {
 
     // Set up the test class
     @Autowired
@@ -62,11 +32,8 @@ public class CustomRepositoryImplIT {
     @Autowired
     private DataInitializerService dataInitializerService;
 
-    @Autowired
-    private DataSource dataSource;
-
     @BeforeEach
-    public void beforeEach() throws SQLException {
+    public void beforeEach() {
         // Log the JDBC URL to ensure it's pointing to the Testcontainers instance
         dataInitializerService.checkDatabaseEmpty();
         dataInitializerService.initializeData();
@@ -76,18 +43,6 @@ public class CustomRepositoryImplIT {
     @Transactional
     public void cleanUp() {
         dataInitializerService.clearDatabase();  // Custom method to clear all data
-    }
-
-    @Test
-    void testDatabaseConnection() throws SQLException {
-        // Log the JDBC URL to ensure it's pointing to the Testcontainers instance
-        try (Connection connection = dataSource.getConnection()) {
-            String jdbcUrl = connection.getMetaData().getURL();
-            System.out.println("Connected to database: " + jdbcUrl);
-
-            // Assert the connection is not null
-            assertNotNull(connection);
-        }
     }
 
     @Test

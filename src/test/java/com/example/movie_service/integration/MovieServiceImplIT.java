@@ -16,11 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 
@@ -33,23 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MySQLTestContainerExtension.class)
 @DirtiesContext
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class MovieServiceImplIT {
-
-//    @SuppressWarnings({"resource"})
-//    @Container
-//    public static MySQLContainer<?> mysqlContainer = new MySQLContainer<>(SQL_VERSION)
-//            .withDatabaseName("testDB")
-//            .withUsername("testUser")
-//            .withPassword("testPassword")
-//            .withReuse(true);
-//
-//    @DynamicPropertySource
-//    static void setUpProperties(DynamicPropertyRegistry registry) {
-//        registry.add("spring.datasource.url", mysqlContainer::getJdbcUrl);
-//        registry.add("spring.datasource.username", mysqlContainer::getUsername);
-//        registry.add("spring.datasource.password", mysqlContainer::getPassword);
-//        registry.add("spring.datasource.driver-class-name", mysqlContainer::getDriverClassName);
-//    }
+class MovieServiceImplIT {
 
     @Autowired
     private MovieServiceImpl movieServiceImpl;
