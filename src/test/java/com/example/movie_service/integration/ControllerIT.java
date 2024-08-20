@@ -3,10 +3,12 @@ package com.example.movie_service.integration;
 
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.helperTool.DataInitializerService;
+import com.example.movie_service.junitExtension.MySQLTestContainerExtension;
 import com.example.movie_service.response.CustomResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -14,13 +16,9 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.sql.DataSource;
 import java.net.URI;
@@ -34,7 +32,8 @@ import static com.example.movie_service.constants.TestConstant.ORDER_BY_TITLE;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
-@Testcontainers
+@ExtendWith(MySQLTestContainerExtension.class)
+@DirtiesContext
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ControllerIT {
 
@@ -49,20 +48,20 @@ public class ControllerIT {
     // "unused":
     // The mysqlContainer is used because in the setUp(), the database url has the mysqlContainer database name,
     // so the mysqlContainer is actually used.
-    @Container
-    public static MySQLContainer<?> mysqlContainer = new MySQLContainer<>(SQL_VERSION)
-            .withDatabaseName("testDB")
-            .withUsername("testUser")
-            .withPassword("testPassword")
-            .withReuse(true);
-
-    @DynamicPropertySource
-    static void setUpProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", mysqlContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", mysqlContainer::getUsername);
-        registry.add("spring.datasource.password", mysqlContainer::getPassword);
-        registry.add("spring.datasource.driver-class-name", mysqlContainer::getDriverClassName);
-    }
+//    @Container
+//    public static MySQLContainer<?> mysqlContainer = new MySQLContainer<>(SQL_VERSION)
+//            .withDatabaseName("testDB")
+//            .withUsername("testUser")
+//            .withPassword("testPassword")
+//            .withReuse(true);
+//
+//    @DynamicPropertySource
+//    static void setUpProperties(DynamicPropertyRegistry registry) {
+//        registry.add("spring.datasource.url", mysqlContainer::getJdbcUrl);
+//        registry.add("spring.datasource.username", mysqlContainer::getUsername);
+//        registry.add("spring.datasource.password", mysqlContainer::getPassword);
+//        registry.add("spring.datasource.driver-class-name", mysqlContainer::getDriverClassName);
+//    }
 
 
     @Autowired
@@ -328,7 +327,7 @@ public class ControllerIT {
         // Define URI with query param
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
                 .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE)
-                .queryParam(ORDER_BY, ORDER_BY_RELEASE_TIME)
+                .queryParam(ORDER_BY, RELEASE_TIME)
                 .queryParam(DIRECTION, DESC)
                 .build().toUri();
 

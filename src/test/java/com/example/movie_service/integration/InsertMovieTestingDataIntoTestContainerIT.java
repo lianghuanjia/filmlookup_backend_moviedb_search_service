@@ -5,12 +5,15 @@ import com.example.movie_service.entity.Movie;
 import com.example.movie_service.entity.MovieCrew;
 import com.example.movie_service.entity.MovieRating;
 import com.example.movie_service.helperTool.DataInitializerService;
+import com.example.movie_service.junitExtension.MySQLTestContainerExtension;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -27,10 +30,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @ActiveProfiles("test") // Explicitly specify to use the configuration in the application-test.properties
-@Testcontainers
+@ExtendWith(MySQLTestContainerExtension.class)
+@DirtiesContext
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class MovieTestDataInsertTest {
+public class InsertMovieTestingDataIntoTestContainerIT {
 
     @Autowired
     private DataInitializerService dataInitializerService;
@@ -38,27 +42,28 @@ public class MovieTestDataInsertTest {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Container
-    public static MySQLContainer<?> mysqlContainer = new MySQLContainer<>(SQL_VERSION)
-            .withDatabaseName("testDB")
-            .withUsername("testUser")
-            .withPassword("testPassword")
-            .withReuse(true);
-
-    @DynamicPropertySource
-    static void setUpProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", mysqlContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", mysqlContainer::getUsername);
-        registry.add("spring.datasource.password", mysqlContainer::getPassword);
-        registry.add("spring.datasource.driver-class-name", mysqlContainer::getDriverClassName);
-    }
+//    @SuppressWarnings({"resource"})
+//    @Container
+//    public static MySQLContainer<?> mysqlContainer = new MySQLContainer<>(SQL_VERSION)
+//            .withDatabaseName("testDB")
+//            .withUsername("testUser")
+//            .withPassword("testPassword")
+//            .withReuse(true);
+//
+//    @DynamicPropertySource
+//    static void setUpProperties(DynamicPropertyRegistry registry) {
+//        registry.add("spring.datasource.url", mysqlContainer::getJdbcUrl);
+//        registry.add("spring.datasource.username", mysqlContainer::getUsername);
+//        registry.add("spring.datasource.password", mysqlContainer::getPassword);
+//        registry.add("spring.datasource.driver-class-name", mysqlContainer::getDriverClassName);
+//    }
 
     // Need @Transactional because I am fetching genres data from a movie, and the fetching is lazy loading.
     // @Transactional ensures that the database session (or Hibernate session) remains open and active for the duration
     // of the method's execution.
     @Transactional
     @Test
-    public void testInsertMovieData() {
+    void testInsertMovieData() {
         List<String> action_list = List.of(ACTION_GENRE);
         List<String> action_crime_list = List.of(ACTION_GENRE, CRIME_GENRE);
         dataInitializerService.initializeOneMovieData(MOVIE_1_TITLE, MOVIE_1_RELEASE_TIME, action_list, DIRECTOR_1, MOVIE_1_RATING, NUM_OF_VOTES_10);
@@ -91,7 +96,7 @@ public class MovieTestDataInsertTest {
         assertEquals(NUM_OF_VOTES_10, ratingMovie1.getNumVotes());
 
         // Verify the release year of movie1
-        assertEquals(movie1.getReleaseTime(), MOVIE_1_RELEASE_TIME);
+        assertEquals(MOVIE_1_RELEASE_TIME, movie1.getReleaseTime());
 
         // Verify the genre of the first movie
         Set<Genre> genresMovie1 = movie1.getGenres();
