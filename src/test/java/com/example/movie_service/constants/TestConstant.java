@@ -61,7 +61,6 @@ public class TestConstant {
     // Movie Genres
     public static final String ACTION_GENRE = "Action";
     public static final String CRIME_GENRE = "Crime";
-    public static final String LOVE_GENRE = "Love";
 
     // Directors
     public static final String DIRECTOR_1 = "Director1";

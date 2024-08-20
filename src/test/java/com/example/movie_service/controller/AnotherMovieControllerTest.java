@@ -7,8 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -23,7 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class AnotherMovieControllerTest {
+class AnotherMovieControllerTest {
 
     @Spy
     private MovieService mockMovieService;
@@ -43,18 +41,18 @@ public class AnotherMovieControllerTest {
 
     @BeforeEach
     public void setUp() {
-        String title = "title";
-        String releasedYear = "releasedYear";
-        String director = "director";
-        String genre = "genre";
-        Integer limit = 10;
-        Integer page = 0;
-        String orderBy = "orderBy";
-        String direction = "direction";
+        title = "title";
+        releasedYear = "releasedYear";
+        director = "director";
+        genre = "genre";
+        limit = 10;
+        page = 0;
+        orderBy = "orderBy";
+        direction = "direction";
     }
 
     @Test
-    public void searchMovieReturnOkTest(){
+    void searchMovieReturnOkTest(){
 
         // Set up: define the parameters and what should return
         MovieSearchResultDTO movieSearchResultDTO = new MovieSearchResultDTO();
@@ -73,9 +71,7 @@ public class AnotherMovieControllerTest {
         ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> actual = movieController.searchMovies(title, releasedYear, director,
         genre, limit, page, orderBy, direction);
 
-
         assertEquals(responseEntity, actual);
-
     }
 
 }
