@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class MovieServiceTest {
+class MovieServiceTest {
 
     @Spy
     private CustomMovieRepository movieRepository; // Should I make this final?
@@ -57,24 +57,16 @@ public class MovieServiceTest {
     }
 
     @Test
-    public void searchWithNullTitle() {
+    void searchWithNullTitle() {
         title = null;
-
-        // Output I expect
-        /**
-         * movieServiceImpl -> searchMovies (what I want to test)
-         *      -> validateSearchMoviesParameters
-         *          since underneath it uses validationService, and this service is not what we are testing right now, we need to mock its behavior
-         */
-//        when(validationService.validateTitle(any())).thenThrow(ValidationException.class);
-
+        //since underneath, it uses validationService, and this service is not what we are testing right now, we need to mock its behavior
         doThrow(ValidationException.class).when(validationService).validateTitle(any());
 
         assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction));
     }
 
     @Test
-    public void searchWithInvalidYear() {
+    void searchWithInvalidYear() {
         releasedYear = "2039";
 
         doNothing().when(validationService).validateTitle(any());
@@ -86,20 +78,20 @@ public class MovieServiceTest {
     }
 
     @Test
-    public void searchWithInvalidLimit(){
-        limit = 15;
+    void searchWithInvalidLimit(){
+        Integer invalidLimit = 15;
 
         doNothing().when(validationService).validateTitle(any());
         doNothing().when(validationService).validateReleasedYear(any());
         doThrow(ValidationException.class).when(validationService).validateLimit(any());
 
         assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies
-                (title, releasedYear, director, genre, limit, page, orderBy, direction),
+                (title, releasedYear, director, genre, invalidLimit, page, orderBy, direction),
                 "searchMovies did not throw a ValidationException");
     }
 
     @Test
-    public void searchWithInvalidPage(){
+    void searchWithInvalidPage(){
         page = -1;
 
         doNothing().when(validationService).validateTitle(any());
@@ -113,7 +105,7 @@ public class MovieServiceTest {
     }
 
     @Test
-    public void searchWithInvalidOrderBy(){
+    void searchWithInvalidOrderBy(){
         orderBy = "time";
 
         doNothing().when(validationService).validateTitle(any());
@@ -128,7 +120,7 @@ public class MovieServiceTest {
     }
 
     @Test
-    public void searchWithInvalidDirection(){
+    void searchWithInvalidDirection(){
         direction = "north";
 
         doNothing().when(validationService).validateTitle(any());
@@ -145,7 +137,7 @@ public class MovieServiceTest {
 
 
     @Test
-    public void searchMovieTimeout() {
+    void searchMovieTimeout() {
         doNothing().when(validationService).validateTitle(any());
         doNothing().when(validationService).validateReleasedYear(any());
         doNothing().when(validationService).validateLimit(any());
@@ -160,7 +152,7 @@ public class MovieServiceTest {
     }
 
     @Test
-    public void searchMovieThrowPersistenceException() {
+    void searchMovieThrowPersistenceException() {
         doNothing().when(validationService).validateTitle(any());
         doNothing().when(validationService).validateReleasedYear(any());
         doNothing().when(validationService).validateLimit(any());
@@ -175,7 +167,7 @@ public class MovieServiceTest {
     }
 
     @Test
-    public void searchMovieReturnListOfMovieSearchResultDTO() {
+    void searchMovieReturnListOfMovieSearchResultDTO() {
         // Setup mock data
         List<MovieSearchResultDTO> mockMovies = List.of(
                 new MovieSearchResultDTO("1", "Inception", "2010", "Christopher Nolan", "path/to/backdrop", "path/to/poster", 9.0)
@@ -207,7 +199,7 @@ public class MovieServiceTest {
 
 
     @Test
-    public void searchMovieWithNoResult() {
+    void searchMovieWithNoResult() {
         List<MovieSearchResultDTO> mockMovies = List.of();
 
         // Mock the repository call
@@ -229,9 +221,9 @@ public class MovieServiceTest {
 
         assertNotNull(actualResponseEntity.getBody());
         assertTrue(actualResponseEntity.getBody().getData().isEmpty());
-        assertEquals(actualResponseEntity.getStatusCode(), HttpStatus.OK);
-        assertEquals(actualResponseEntity.getBody().getCode(), MOVIE_NOT_FOUND_CODE);
-        assertEquals(actualResponseEntity.getBody().getMessage(), MOVIE_NOT_FOUND_MESSAGE);
+        assertEquals(HttpStatus.OK, actualResponseEntity.getStatusCode());
+        assertEquals(MOVIE_NOT_FOUND_CODE, actualResponseEntity.getBody().getCode());
+        assertEquals(MOVIE_NOT_FOUND_MESSAGE, actualResponseEntity.getBody().getMessage());
 
     }
 
