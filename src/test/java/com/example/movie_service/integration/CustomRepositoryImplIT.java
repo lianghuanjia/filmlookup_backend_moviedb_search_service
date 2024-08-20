@@ -1,12 +1,15 @@
 package com.example.movie_service.integration;
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.helperTool.DataInitializerService;
+import com.example.movie_service.junitExtension.MySQLTestContainerExtension;
 import com.example.movie_service.repository.CustomMovieRepositoryImpl;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -19,13 +22,15 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-import static com.example.movie_service.constants.TestConstant.SQL_VERSION;
+import static com.example.movie_service.constants.TestConstant.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test") // Explicitly specify to use the configuration in the application-test.properties
-@Testcontainers
-// disables the web layer, making this configuration more suitable for testing repositories.
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+// @Testcontainers
+@ExtendWith(MySQLTestContainerExtension.class)
+@DirtiesContext
+@SpringBootTest
+// (webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class CustomRepositoryImplIT {
 
@@ -35,20 +40,20 @@ public class CustomRepositoryImplIT {
     // so we can ignore the warning from the 'MySQLContainer<SELF>' used without 'try'-with-resources statement
     // The try-with-resources  automatically close resources when they are no longer needed. JUnit here does the job
     // for us, so we don't need to use try-with-resources
-    @Container
-    public static MySQLContainer<?> mysqlContainer = new MySQLContainer<>(SQL_VERSION)
-            .withDatabaseName("testDB")
-            .withUsername("testUser")
-            .withPassword("testPassword")
-            .withReuse(true);
-
-    @DynamicPropertySource
-    static void setUpProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", mysqlContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", mysqlContainer::getUsername);
-        registry.add("spring.datasource.password", mysqlContainer::getPassword);
-        registry.add("spring.datasource.driver-class-name", mysqlContainer::getDriverClassName);
-    }
+//    @Container
+//    public static MySQLContainer<?> mysqlContainer = new MySQLContainer<>(SQL_VERSION)
+//            .withDatabaseName("testDB")
+//            .withUsername("testUser")
+//            .withPassword("testPassword")
+//            .withReuse(true);
+//
+//    @DynamicPropertySource
+//    static void setUpProperties(DynamicPropertyRegistry registry) {
+//        registry.add("spring.datasource.url", mysqlContainer::getJdbcUrl);
+//        registry.add("spring.datasource.username", mysqlContainer::getUsername);
+//        registry.add("spring.datasource.password", mysqlContainer::getPassword);
+//        registry.add("spring.datasource.driver-class-name", mysqlContainer::getDriverClassName);
+//    }
 
     // Set up the test class
     @Autowired
@@ -74,15 +79,19 @@ public class CustomRepositoryImplIT {
     }
 
     @Test
-    public void testDatabaseConnection() throws SQLException {
+    void testDatabaseConnection() throws SQLException {
         // Log the JDBC URL to ensure it's pointing to the Testcontainers instance
         try (Connection connection = dataSource.getConnection()) {
-            System.out.println("Connected to database: " + connection.getMetaData().getURL());
+            String jdbcUrl = connection.getMetaData().getURL();
+            System.out.println("Connected to database: " + jdbcUrl);
+
+            // Assert the connection is not null
+            assertNotNull(connection);
         }
     }
 
     @Test
-    public void searchMovieByTitleOnlyFound(){
+    void searchMovieByTitleOnlyFound(){
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
                 "Dark Knight", null, null, null, 10, 0,
                 "title", "asc");
@@ -90,11 +99,11 @@ public class CustomRepositoryImplIT {
 
         assertNotNull(searchResults);
         MovieSearchResultDTO firstResult = searchResults.get(0);
-        assertEquals(firstResult.getTitle(), "The Dark Knight");
+        assertEquals(THE_DARK_KNIGHT, firstResult.getTitle());
     }
 
     @Test
-    public void searchMovieByTitleNoMovieFound(){
+    void searchMovieByTitleNoMovieFound(){
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
                 "Non-existed Movie", null, null, null, 10, 0,
                 "title", "asc");
@@ -105,66 +114,66 @@ public class CustomRepositoryImplIT {
     }
 
     @Test
-    public void searchMovieTestAsc(){
+    void searchMovieTestAsc(){
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
                 "Dark Knight", null, null, null, 10, 0,
                 "releaseTime", "asc");
 
         assertNotNull(searchResults);
-        assertEquals(searchResults.size(), 3);
+        assertEquals(3, searchResults.size());
         MovieSearchResultDTO firstResult = searchResults.get(0);
         MovieSearchResultDTO secondResult = searchResults.get(1);
         MovieSearchResultDTO thirdResult = searchResults.get(2);
-        assertEquals(firstResult.getTitle(), "The Dark Knight");
-        assertEquals(secondResult.getTitle(), "The Dark Knight Rises");
-        assertEquals(thirdResult.getTitle(), "The Dark Knight Rises Again");
+        assertEquals(THE_DARK_KNIGHT, firstResult.getTitle());
+        assertEquals(THE_DARK_KNIGHT_RISES, secondResult.getTitle());
+        assertEquals(THE_DARK_KNIGHT_RISES_AGAIN, thirdResult.getTitle());
     }
 
     @Test
-    public void searchMovieTestDesc(){
+    void searchMovieTestDesc(){
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
                 "Dark Knight", null, null, null, 10, 0,
                 "releaseTime", "desc");
 
         assertNotNull(searchResults);
-        assertEquals(searchResults.size(), 3);
+        assertEquals(3, searchResults.size());
         MovieSearchResultDTO firstResult = searchResults.get(0);
         MovieSearchResultDTO secondResult = searchResults.get(1);
         MovieSearchResultDTO thirdResult = searchResults.get(2);
-        assertEquals(firstResult.getTitle(), "The Dark Knight Rises Again");
-        assertEquals(secondResult.getTitle(), "The Dark Knight Rises");
-        assertEquals(thirdResult.getTitle(), "The Dark Knight");
+        assertEquals(THE_DARK_KNIGHT_RISES_AGAIN, firstResult.getTitle());
+        assertEquals(THE_DARK_KNIGHT_RISES, secondResult.getTitle());
+        assertEquals(THE_DARK_KNIGHT, thirdResult.getTitle());
     }
 
     @Test
-    public void searchMovieTestDescAndOrderByRating(){
+    void searchMovieTestDescAndOrderByRating(){
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
                 "Dark Knight", null, null, null, 10, 0,
-                "rating", "desc");
+                RATING, DESC);
 
         assertNotNull(searchResults);
-        assertEquals(searchResults.size(), 3);
+        assertEquals(3, searchResults.size());
         MovieSearchResultDTO firstResult = searchResults.get(0);
         MovieSearchResultDTO secondResult = searchResults.get(1);
         MovieSearchResultDTO thirdResult = searchResults.get(2);
-        assertEquals(firstResult.getTitle(), "The Dark Knight");
-        assertEquals(secondResult.getTitle(), "The Dark Knight Rises");
-        assertEquals(thirdResult.getTitle(), "The Dark Knight Rises Again");
+        assertEquals(THE_DARK_KNIGHT, firstResult.getTitle());
+        assertEquals(THE_DARK_KNIGHT_RISES, secondResult.getTitle());
+        assertEquals(THE_DARK_KNIGHT_RISES_AGAIN, thirdResult.getTitle());
     }
 
     @Test
-    public void searchMovieByTitleAndDirector(){
+    void searchMovieByTitleAndDirector(){
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
                 "Dark Knight", null, "Nolan", null, 10, 0,
                 "title", "asc");
 
 
         assertNotNull(searchResults);
-        assertEquals(searchResults.size(), 2);
+        assertEquals(2, searchResults.size());
         MovieSearchResultDTO firstResult = searchResults.get(0);
         MovieSearchResultDTO secondResult = searchResults.get(1);
-        assertEquals(firstResult.getTitle(), "The Dark Knight");
-        assertEquals(secondResult.getTitle(), "The Dark Knight Rises");
+        assertEquals(THE_DARK_KNIGHT, firstResult.getTitle());
+        assertEquals(THE_DARK_KNIGHT_RISES, secondResult.getTitle());
     }
 
 
