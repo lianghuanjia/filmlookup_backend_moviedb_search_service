@@ -54,7 +54,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<CustomResponse<Object>> handleMissingServletRequestParameterException(MissingServletRequestParameterException exception){
         log.error("handleMissingServletRequestParameterException: ", exception);
         String parameterName = exception.getParameterName();
-        CustomResponse<Object> response = new CustomResponse<>(MISSING_PARAM_ERROR_CODE.get(parameterName), MISSING_PARAM_ERROR_MESSAGE.get(parameterName), null);
+        CustomResponse<Object> response = new CustomResponse<>(MISSING_REQUIRED_PARAMETER_CODE,
+                MISSING_REQUIRED_PARAMETER_MESSAGE_PREFIX+parameterName, null);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 

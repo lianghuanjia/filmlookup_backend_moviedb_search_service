@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.movie_service.constant.MovieConstant.MOVIE_FOUND;
+import static com.example.movie_service.constant.MovieConstant.MOVIE_FOUND_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -59,7 +59,7 @@ class AnotherMovieControllerTest {
         List<MovieSearchResultDTO> movieSearchResultDTOList = new ArrayList<>();
         movieSearchResultDTOList.add(movieSearchResultDTO);
 
-        CustomResponse<List<MovieSearchResultDTO>> customResponse = new CustomResponse<>(20001, MOVIE_FOUND, movieSearchResultDTOList);
+        CustomResponse<List<MovieSearchResultDTO>> customResponse = new CustomResponse<>(20001, MOVIE_FOUND_MESSAGE, movieSearchResultDTOList);
 
         ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> responseEntity = new ResponseEntity<>(customResponse, HttpStatus.OK);
 

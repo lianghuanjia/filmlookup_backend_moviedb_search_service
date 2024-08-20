@@ -1,13 +1,12 @@
 package com.example.movie_service.constant;
 
-import java.util.HashMap;
-import java.util.Map;
-
 // This is helpful because when you write test, you can use those reference too.
-public class MovieConstant {
+public final class MovieConstant {
+
+    // Define a private constructor to hide the public one
+    private MovieConstant(){}
 
     // ERROR CODES AND MESSAGES:
-
     public static final int INVALID_YEAR_CODE = 40001;
     public static final String INVALID_YEAR_MESSAGE = "Invalid year";
     public static final int INVALID_LIMIT_CODE = 40002;
@@ -40,25 +39,16 @@ public class MovieConstant {
 
     public static final int MOVIE_NOT_FOUND_CODE = 20002;
     public static final String MOVIE_NOT_FOUND_MESSAGE = "No movies found with the given search parameters";
-    public static final String MOVIE_NOT_FOUND = "MoviesNotFound";
 
     public static final int MOVIE_FOUND_WITH_PERSON_ID_CODE = 20003;
     public static final String MOVIE_FOUND_WITH_PERSON_ID_MESSAGE = "Movie(s) found with personId";
     public static final int MOVIE_NOT_FOUND_WITH_PERSON_ID_CODE = 20004;
     public static final String MOVIE_NOT_FOUND_WITH_PERSON_ID_MESSAGE = "No movies found with the given personId";
 
-
     public static final String MOVIE_SEARCH_RESULT_DTO_MAPPING = "MovieSearchResultDTOMapping";
 
     // MISS PARAMETER MAP
     public static final String TITLE = "title";
-    public static final Map<String, Integer> MISSING_PARAM_ERROR_CODE = new HashMap<>();
-    static{
-        MISSING_PARAM_ERROR_CODE.put(TITLE, MISSING_TITLE_CODE);
-
-    }
-    public static final Map<String, String> MISSING_PARAM_ERROR_MESSAGE = new HashMap<>();
-    static{
-        MISSING_PARAM_ERROR_MESSAGE.put(TITLE, MISSING_TITLE_MESSAGE);
-    }
+    public static final int MISSING_REQUIRED_PARAMETER_CODE = 40000;
+    public static final String MISSING_REQUIRED_PARAMETER_MESSAGE_PREFIX = "Missing required parameter: ";
 }
