@@ -130,8 +130,8 @@ class ControllerIT {
         assertNotNull(customResponse);
 
         // Assert the code and message are MOVIE_NOT_FOUND
-        assertEquals(MISSING_TITLE_CODE, customResponse.getCode());
-        assertEquals(MISSING_TITLE_MESSAGE, customResponse.getMessage());
+        assertEquals(MISSING_REQUIRED_PARAMETER_CODE, customResponse.getCode());
+        assertEquals(MISSING_REQUIRED_PARAMETER_MESSAGE_PREFIX+TITLE, customResponse.getMessage());
 
         // Assert the MovieSearchResultDTO List is empty
         assertNull(customResponse.getData());
