@@ -36,6 +36,8 @@ class CustomRepositoryImplIT {
 
     private MovieSearchParam movieSearchParam;
 
+    private static final String DARK_KNIGHT = "Dark Knight";
+
     @BeforeEach
     public void beforeEach() {
         // Log the JDBC URL to ensure it's pointing to the Testcontainers instance
@@ -56,7 +58,7 @@ class CustomRepositoryImplIT {
 
     @Test
     void searchMovieByTitleOnlyFound(){
-        movieSearchParam = movieSearchParam.toBuilder().title("Dark Knight").build();
+        movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).build();
 
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
                 movieSearchParam);
@@ -80,7 +82,7 @@ class CustomRepositoryImplIT {
 
     @Test
     void searchMovieTestOrderByReleaseTimeAsc(){
-        movieSearchParam = movieSearchParam.toBuilder().title("Dark Knight").orderBy(RELEASE_TIME).build();
+        movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).orderBy(RELEASE_TIME).build();
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
                 movieSearchParam);
 
@@ -96,7 +98,7 @@ class CustomRepositoryImplIT {
 
     @Test
     void searchMovieTestOrderByReleaseTimeDesc(){
-        movieSearchParam = movieSearchParam.toBuilder().title("Dark Knight").orderBy(RELEASE_TIME).direction(DESC).build();
+        movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).orderBy(RELEASE_TIME).direction(DESC).build();
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         assertNotNull(searchResults);
@@ -111,7 +113,7 @@ class CustomRepositoryImplIT {
 
     @Test
     void searchMovieTestDescAndOrderByRating(){
-        movieSearchParam = movieSearchParam.toBuilder().title("Dark Knight").orderBy(RATING).direction(DESC).build();
+        movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).orderBy(RATING).direction(DESC).build();
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         assertNotNull(searchResults);
@@ -126,7 +128,7 @@ class CustomRepositoryImplIT {
 
     @Test
     void searchMovieByTitleAndDirector(){
-        movieSearchParam = movieSearchParam.toBuilder().title("Dark Knight").director("Nolan").build();
+        movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).director("Nolan").build();
 
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
@@ -138,8 +140,4 @@ class CustomRepositoryImplIT {
         assertEquals(THE_DARK_KNIGHT, firstResult.getTitle());
         assertEquals(THE_DARK_KNIGHT_RISES, secondResult.getTitle());
     }
-
-
-
-
 }

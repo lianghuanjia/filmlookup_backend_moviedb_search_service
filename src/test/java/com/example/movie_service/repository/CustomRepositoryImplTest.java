@@ -39,6 +39,10 @@ class CustomRepositoryImplTest {
 
     private MovieSearchParam movieSearchParam;
 
+    private static final String MOVIE_ID = "tt1";
+    private static final String BACKDROP_PATH = "backdropPath";
+    private static final String POSTER_PATH = "posterPath";
+
     @BeforeEach
     public void setUp() {
         title = "title";
@@ -57,14 +61,11 @@ class CustomRepositoryImplTest {
 
     @Test
     void repositoryImplSearchMovies() {
-        String id = "tt1";
-        String backdropPath = "backdropPath";
-        String posterPath = "posterPath";
 
         // Mock the behavior
         List<MovieSearchResultDTO> movieList = new ArrayList<>();
-        MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(id, title, releasedYear, director,
-                backdropPath, posterPath, rating);
+        MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(MOVIE_ID, title, releasedYear, director,
+                BACKDROP_PATH, POSTER_PATH, rating);
         movieList.add(resultDTO);
 
         // Use argument matchers for dynamic parameters
@@ -76,7 +77,7 @@ class CustomRepositoryImplTest {
         List<MovieSearchResultDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         // Verify if the actualResult is the same as we define
-        assertEquals(actualResult.get(0).getId(), id);
+        assertEquals(MOVIE_ID, actualResult.get(0).getId());
         assertEquals(1, actualResult.size());
 
         // Verify all setParameters methods are called given the query parameters we provide
@@ -90,16 +91,13 @@ class CustomRepositoryImplTest {
 
     @Test
     void repositoryImplSearchMoviesWithoutReleasedYear() {
-        String id = "tt1";
-        String backdropPath = "backdropPath";
-        String posterPath = "posterPath";
 
         movieSearchParam = movieSearchParam.toBuilder().releasedYear(null).build();
 
         // Mock the behavior
         List<MovieSearchResultDTO> movieList = new ArrayList<>();
-        MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(id, title, releasedYear, director,
-                backdropPath, posterPath, rating);
+        MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(MOVIE_ID, title, releasedYear, director,
+                BACKDROP_PATH, POSTER_PATH, rating);
         movieList.add(resultDTO);
 
         // Use argument matchers for dynamic parameters
@@ -111,7 +109,7 @@ class CustomRepositoryImplTest {
         List<MovieSearchResultDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         // Verify if the actualResult is the same as we define
-        assertEquals(actualResult.get(0).getId(), id);
+        assertEquals(MOVIE_ID, actualResult.get(0).getId());
         assertEquals(1, actualResult.size());
 
         // Verify all setParameters methods are called given the query parameters we provide
@@ -125,16 +123,13 @@ class CustomRepositoryImplTest {
 
     @Test
     void repositoryImplSearchMoviesWithReleasedYearBeingEmpty() {
-        String id = "tt1";
-        String backdropPath = "backdropPath";
-        String posterPath = "posterPath";
 
         movieSearchParam = movieSearchParam.toBuilder().releasedYear("").build();
 
         // Mock the behavior
         List<MovieSearchResultDTO> movieList = new ArrayList<>();
-        MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(id, title, releasedYear, director,
-                backdropPath, posterPath, rating);
+        MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(MOVIE_ID, title, releasedYear, director,
+                BACKDROP_PATH, POSTER_PATH, rating);
         movieList.add(resultDTO);
 
         // Use argument matchers for dynamic parameters
@@ -146,7 +141,7 @@ class CustomRepositoryImplTest {
         List<MovieSearchResultDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         // Verify if the actualResult is the same as we define
-        assertEquals(actualResult.get(0).getId(), id);
+        assertEquals(MOVIE_ID, actualResult.get(0).getId());
         assertEquals(1, actualResult.size());
 
         // Verify all setParameters methods are called given the query parameters we provide
@@ -160,16 +155,13 @@ class CustomRepositoryImplTest {
 
     @Test
     void repositoryImplSearchMoviesWithDirectorBeingEmpty() {
-        String id = "tt1";
-        String backdropPath = "backdropPath";
-        String posterPath = "posterPath";
 
         movieSearchParam = movieSearchParam.toBuilder().director("").build();
 
         // Mock the behavior
         List<MovieSearchResultDTO> movieList = new ArrayList<>();
-        MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(id, title, releasedYear, director,
-                backdropPath, posterPath, rating);
+        MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(MOVIE_ID, title, releasedYear, director,
+                BACKDROP_PATH, POSTER_PATH, rating);
         movieList.add(resultDTO);
 
         // Use argument matchers for dynamic parameters
@@ -181,7 +173,7 @@ class CustomRepositoryImplTest {
         List<MovieSearchResultDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         // Verify if the actualResult is the same as we define
-        assertEquals(actualResult.get(0).getId(), id);
+        assertEquals(MOVIE_ID, actualResult.get(0).getId());
         assertEquals(1, actualResult.size());
 
         // Verify all setParameters methods are called given the query parameters we provide
@@ -196,16 +188,13 @@ class CustomRepositoryImplTest {
 
     @Test
     void repositoryImplSearchMoviesWithGenreBeingEmpty() {
-        String id = "tt1";
-        String backdropPath = "backdropPath";
-        String posterPath = "posterPath";
 
         movieSearchParam = movieSearchParam.toBuilder().genre("").build();
 
         // Mock the behavior
         List<MovieSearchResultDTO> movieList = new ArrayList<>();
-        MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(id, title, releasedYear, director,
-                backdropPath, posterPath, rating);
+        MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(MOVIE_ID, title, releasedYear, director,
+                BACKDROP_PATH, POSTER_PATH, rating);
         movieList.add(resultDTO);
 
         // Use argument matchers for dynamic parameters
@@ -217,7 +206,7 @@ class CustomRepositoryImplTest {
         List<MovieSearchResultDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         // Verify if the actualResult is the same as we define
-        assertEquals(actualResult.get(0).getId(), id);
+        assertEquals(MOVIE_ID, actualResult.get(0).getId());
         assertEquals(1, actualResult.size());
 
         // Verify all setParameters methods are called given the query parameters we provide
@@ -231,17 +220,14 @@ class CustomRepositoryImplTest {
 
     @Test
     void repositoryImplSearchMoviesWithTitleOnly() {
-        String id = "tt1";
-        String backdropPath = "backdropPath";
-        String posterPath = "posterPath";
 
         movieSearchParam = movieSearchParam.toBuilder().releasedYear(null).director(null).genre(null)
                 .build();
 
         // Mock the behavior
         List<MovieSearchResultDTO> movieList = new ArrayList<>();
-        MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(id, title, releasedYear, director,
-                backdropPath, posterPath, rating);
+        MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(MOVIE_ID, title, releasedYear, director,
+                BACKDROP_PATH, POSTER_PATH, rating);
         movieList.add(resultDTO);
 
         // Use argument matchers for dynamic parameters
@@ -253,7 +239,7 @@ class CustomRepositoryImplTest {
         List<MovieSearchResultDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         // Verify if the actualResult is the same as we define
-        assertEquals(actualResult.get(0).getId(), id);
+        assertEquals(MOVIE_ID, actualResult.get(0).getId());
         assertEquals(1, actualResult.size());
 
         // Verify all setParameters methods are called given the query parameters we provide
