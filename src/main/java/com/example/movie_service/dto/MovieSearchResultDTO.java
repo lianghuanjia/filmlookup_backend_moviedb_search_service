@@ -1,7 +1,5 @@
 package com.example.movie_service.dto;
-
 import lombok.*;
-
 
 @Data
 @NoArgsConstructor

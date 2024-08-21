@@ -1,9 +1,7 @@
 package com.example.movie_service.entity;
 
-import com.example.movie_service.generator.CustomTitleIdGenerator;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.util.Set;
 
@@ -11,8 +9,6 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Table(name="genre")
 public class Genre {
 

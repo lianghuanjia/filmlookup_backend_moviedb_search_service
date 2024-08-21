@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
      * Constructor to inject ResponseConfig dependency
      */
     @Autowired
-    public GlobalExceptionHandler(){}
+    public GlobalExceptionHandler(){ /* TODO document why this constructor is empty */ }
 
     /**
      * Handles ValidationException exceptions
@@ -67,7 +67,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<CustomResponse<Object>> handleGeneralException(Exception exception){
         log.error("handleGeneralException: ", exception);
-//        exception.printStackTrace();
         return new ResponseEntity<>(new CustomResponse<>(INTERNAL_SERVICE_ERROR_CODE, exception.getMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -1,10 +1,8 @@
 package com.example.movie_service.controller;
 
 import com.example.movie_service.dto.MovieSearchResultDTO;
-import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.response.CustomResponse;
 import com.example.movie_service.service.MovieService;
-import org.hibernate.annotations.processing.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
