@@ -30,13 +30,4 @@ public class MovieAkas {
 
     @Column(name = "isOriginalTitle")
     private Boolean isOriginalTitle;
-
-    // Custom constructor for creating a new instance without an ID
-    public MovieAkas(Movie movie, Integer ordering, String title, String region, Boolean isOriginalTitle) {
-        this.id = new MovieAkasId(movie.getId(), ordering);
-        this.movie = movie;
-        this.title = title;
-        this.region = region;
-        this.isOriginalTitle = isOriginalTitle;
-    }
 }

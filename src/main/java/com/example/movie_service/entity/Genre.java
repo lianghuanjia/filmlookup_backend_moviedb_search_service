@@ -41,7 +41,4 @@ public class Genre {
     @ManyToMany(mappedBy = "genres", fetch = FetchType.LAZY)
     private Set<Movie> movies;
 
-    public Genre(String name) {
-        this.name = name;
-    }
 }
