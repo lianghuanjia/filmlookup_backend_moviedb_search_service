@@ -2,9 +2,10 @@ package com.example.movie_service.exception;
 
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 public class ResourceNotFoundException extends RuntimeException{
-    private int errorCode;
-    private String errorMessage;
+    private final int errorCode;
+    private final String errorMessage;
 }

@@ -2,7 +2,6 @@ package com.example.movie_service.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import com.example.movie_service.response.CustomResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;

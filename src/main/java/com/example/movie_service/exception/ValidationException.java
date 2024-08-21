@@ -1,16 +1,18 @@
 package com.example.movie_service.exception;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Custom exception class for validation errors.
  * This exception is thrown when a validation error occurs.
  */
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 public class ValidationException extends RuntimeException {
 
-    private int errorCode;
-    private String errorMessage;
+    private final int errorCode;
+    private final String errorMessage;
 }

@@ -5,7 +5,6 @@ import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.repository.CustomMovieRepository;
 import com.example.movie_service.response.CustomResponse;
 import jakarta.persistence.PersistenceException;
-import org.hibernate.QueryTimeoutException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +44,7 @@ public class MovieServiceImpl implements MovieService {
                                                                                     String director, String genre,
                                                                                     Integer limit, Integer page,
                                                                                     String orderBy, String direction)
-            throws QueryTimeoutException, PersistenceException, ValidationException
+            throws PersistenceException, ValidationException
             {
         // Validate parameters:
         validateSearchMoviesParameters(title, releasedYear, limit, page, orderBy, direction);
