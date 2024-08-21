@@ -54,35 +54,4 @@ public class MovieGenre {
     @JoinColumn(name = "genre_id") // Ensure this matches the actual column name in your database
     private Genre genre;
 
-    /**
-     * Custom constructor for creating a MovieGenre instance using Movie and Genre objects.
-     * This constructor allows the creation of a MovieGenre entity by directly passing
-     * the related Movie and Genre entities, automatically setting up the composite key.
-     *
-     * Unlike the @AllArgsConstructor provided by Lombok, which initializes all fields
-     * (including MovieGenreId) based on the arguments, this constructor constructs the
-     * MovieGenreId internally using the primary keys of the provided Movie and Genre objects.
-     *
-     * @param movie the Movie entity associated with this MovieGenre relationship
-     * @param genre the Genre entity associated with this MovieGenre relationship
-     *
-     * Example usage:
-     * <pre>
-     * {@code
-     * Movie movie = new Movie("tt1234567", "Inception", 2010);
-     * Genre genre = new Genre(1, "Science Fiction");
-     *
-     * MovieGenre movieGenre = new MovieGenre(movie, genre);
-     *
-     * // The id field is automatically created as a new MovieGenreId("tt1234567", 1)
-     * // You can then persist this entity to the database using a repository:
-     * // movieGenreRepository.save(movieGenre);
-     * }
-     * </pre>
-     */
-    public MovieGenre(Movie movie, Genre genre) {
-        this.movie = movie;
-        this.genre = genre;
-        this.id = new MovieGenreId(movie.getId(), genre.getId());
-    }
 }
