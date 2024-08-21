@@ -2,11 +2,9 @@ package com.example.movie_service.customTitleIdGeneratorTest;
 
 import com.example.movie_service.generator.CustomTitleIdGenerator;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.service.ServiceRegistry;
 import org.hibernate.type.Type;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.io.Serializable;
 import java.util.Properties;
@@ -41,7 +39,8 @@ class CustomTitleIdGeneratorTest {
 
         // Assert the prefix is correctly applied
         assertTrue(generatedId.toString().startsWith("MOV"));
-        assertEquals(10, generatedId.toString().length()); // 3 prefix + 7 UUID characters
+        // Total ID has 10 characters: "MOV" 3 characters + 7 UUID characters
+        assertEquals(10, generatedId.toString().length());
     }
 
     @Test
@@ -58,9 +57,9 @@ class CustomTitleIdGeneratorTest {
         // Generate an ID
         Serializable generatedId = idGenerator.generate(mock(SharedSessionContractImplementor.class), new Object());
 
-        // Assert the default prefix "tt" is correctly applied
+        // Assert the default prefix "tt" is correctly applied, and have total length of 9: "tt" + 7 UUID characters
         assertTrue(generatedId.toString().startsWith("tt"));
-        assertEquals(9, generatedId.toString().length()); // 2 prefix + 7 UUID characters
+        assertEquals(9, generatedId.toString().length());
     }
 
     @Test
@@ -69,7 +68,7 @@ class CustomTitleIdGeneratorTest {
         Type typeClass = mock(Type.class);
         Properties properties = new Properties();
 
-        idGenerator.configure(typeClass, new Properties(), null);
+        idGenerator.configure(typeClass, properties, null);
 
         // Generate an ID
         Serializable generatedId = idGenerator.generate(mock(SharedSessionContractImplementor.class), mock(Object.class));
@@ -78,7 +77,7 @@ class CustomTitleIdGeneratorTest {
         assertNotNull(generatedId);
         assertTrue(generatedId instanceof String);
 
-        // Verify that the generated ID has the correct length (prefix + 7 characters)
-        assertEquals(9, generatedId.toString().length()); // "tt" + 7 UUID characters
+        // Verify that the generated ID has the correct length ("tt" + 7 characters)
+        assertEquals(9, generatedId.toString().length());
     }
 }
