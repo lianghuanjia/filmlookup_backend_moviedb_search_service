@@ -20,11 +20,4 @@ public interface MovieService {
      */
     ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovies(String title, String releasedYear, String director, String genre, Integer limit, Integer page, String orderBy, String direction);
 
-    /**
-     * Searches for a movie by its ID.
-     *
-     * @param personId the ID of the movie to search for
-     * @return the movie that matches the given ID
-     */
-//    List<MovieSearchResultDTO> searchMovieByPersonId(String personId, Integer limit, Integer page, String orderBy, String direction);
 }

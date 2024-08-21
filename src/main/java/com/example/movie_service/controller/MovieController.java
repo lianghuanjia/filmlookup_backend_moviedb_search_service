@@ -52,34 +52,4 @@ public class MovieController {
 
     }
 
-//    @GetMapping("/movies/{personId}")
-//    public ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovieByPersonId
-//            (@PathVariable String personId,
-//             @RequestParam(defaultValue = "10") Integer limit,
-//             @RequestParam(defaultValue = "0") Integer page,
-//             @RequestParam(defaultValue = "title") String orderBy,
-//             @RequestParam(defaultValue = "asc") String direction){
-//
-//        // All things below should be in service layer
-//        // Validate the limit, page, orderBy, and direction
-//        validateParameters(limit, page, orderBy, direction);
-//
-//        List<MovieSearchResultDTO> moviesList = movieService.searchMovieByPersonId(personId, limit, page, orderBy, direction);
-//
-//        CustomResponse<List<MovieSearchResultDTO>> customResponse;
-//
-//        if (moviesList != null){
-//            ResponseConfig.ResponseMessage successDetail = responseConfig.getSuccess().get("movies_found_with_personId");
-//            customResponse = new CustomResponse<>(successDetail.getCode(), successDetail.getMessage(), moviesList);
-//        }
-//        else{
-//            ResponseConfig.ResponseMessage successDetail = responseConfig.getSuccess().get("movies_not_found_with_personId");
-//            customResponse = new CustomResponse<>(successDetail.getCode(), successDetail.getMessage(), null);
-//        }
-//
-//        // Return the response entity
-//        return new ResponseEntity<>(customResponse, HttpStatus.OK);
-//
-//    }
-
 }
