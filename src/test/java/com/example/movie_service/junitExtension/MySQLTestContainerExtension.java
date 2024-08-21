@@ -7,15 +7,18 @@ import org.testcontainers.containers.MySQLContainer;
 import static com.example.movie_service.constants.TestConstant.SQL_VERSION;
 
 public class MySQLTestContainerExtension implements BeforeAllCallback{
+    private static final String testDatabaseName = "testDB";
+    private static final String testUsername = "testUser";
+    private static final String testPassword = "testPassword";
+
 
     @SuppressWarnings({"resource"}) // JUnit 5 will shut down the container after the test, so we don't need to close the MySQLContainer manually
     @Override
     public void beforeAll(ExtensionContext context) {
         MySQLContainer<?> mysqlContainer = new MySQLContainer<>(SQL_VERSION)
-                .withDatabaseName("testDB")
-                .withUsername("testUser")
-                .withPassword("testPassword")
-                .withReuse(true);
+                .withDatabaseName(testDatabaseName)
+                .withUsername(testUsername)
+                .withPassword(testPassword);
 
         mysqlContainer.start();
 
