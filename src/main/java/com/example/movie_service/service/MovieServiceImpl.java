@@ -1,5 +1,6 @@
 package com.example.movie_service.service;
 
+import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.repository.CustomMovieRepository;
@@ -40,12 +41,18 @@ public class MovieServiceImpl implements MovieService {
      * @return a list of movies that match the search criteria
      */
     @Override
-    public ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovies(String title, String releasedYear,
-                                                                                    String director, String genre,
-                                                                                    Integer limit, Integer page,
-                                                                                    String orderBy, String direction)
-            throws PersistenceException, ValidationException
-            {
+    public ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovies(MovieSearchParam movieSearchParam)
+            throws PersistenceException, ValidationException {
+
+        String title = movieSearchParam.getTitle();
+        String releasedYear = movieSearchParam.getReleasedYear();
+        String director = movieSearchParam.getDirector();
+        String genre = movieSearchParam.getGenre();
+        Integer limit = movieSearchParam.getLimit();
+        Integer page = movieSearchParam.getPage();
+        String orderBy = movieSearchParam.getOrderBy();
+        String direction = movieSearchParam.getDirection();
+
         // Validate parameters:
         validateSearchMoviesParameters(title, releasedYear, limit, page, orderBy, direction);
 

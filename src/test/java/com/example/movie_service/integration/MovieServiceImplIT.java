@@ -1,5 +1,6 @@
 package com.example.movie_service.integration;
 
+import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.dataInitService.DataInitializerService;
@@ -36,10 +37,17 @@ class MovieServiceImplIT {
     @Autowired
     private DataInitializerService dataInitializerService;
 
+    private MovieSearchParam movieSearchParam;
+
     @BeforeEach
     public void beforeEach() {
         dataInitializerService.checkDatabaseEmpty();
         dataInitializerService.initializeData();
+
+        // Build the basic valid MovieSearchParam
+        movieSearchParam = MovieSearchParam.builder()
+                .title(EXISTED_MOVIE_TITLE).releasedYear(null).director(null).genre(null).limit(10).page(0)
+                .orderBy(ORDER_BY_TITLE).direction(ASC).build();
     }
 
     @AfterEach
@@ -50,7 +58,7 @@ class MovieServiceImplIT {
     @Test
     void testMoviesFoundWithTitleOnly() {
         ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> responseEntity = movieServiceImpl.searchMovies
-                (EXISTED_MOVIE_TITLE, null, null, null, 10, 0, ORDER_BY_TITLE, ASC);
+                (movieSearchParam);
 
         // Verify the response
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -67,8 +75,11 @@ class MovieServiceImplIT {
 
     @Test
     void noMovieFound() {
+        movieSearchParam = movieSearchParam.toBuilder()
+                .title(NON_EXISTED_MOVIE_TITLE).build();
+
         ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> responseEntity = movieServiceImpl.searchMovies
-                (NON_EXISTED_MOVIE_TITLE, null, null, null, 10, 0, ORDER_BY_TITLE, ASC);
+                (movieSearchParam);
 
         // Verify the response
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -82,56 +93,78 @@ class MovieServiceImplIT {
 
     @Test
     void missingTitle() {
+        MovieSearchParam movieSearchParam = MovieSearchParam.builder()
+                .title(EMPTY_STRING).releasedYear(YEAR_2012).director(DIRECTOR_NOLAN).genre(null).limit(10).page(0)
+                .orderBy(ORDER_BY_TITLE).direction(ASC).build();
+
         ValidationException exception = assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(
-                EMPTY_STRING, YEAR_2012, DIRECTOR_NOLAN, null, 10, 0, ORDER_BY_TITLE, ASC));
+                movieSearchParam));
         assertEquals(MISSING_TITLE_CODE, exception.getErrorCode());
         assertEquals(MISSING_TITLE_MESSAGE, exception.getErrorMessage());
     }
 
     @Test
     void nullTitle() {
+        movieSearchParam = movieSearchParam.toBuilder()
+                .title(null).build();
+
         ValidationException exception = assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(
-                null, YEAR_2012, DIRECTOR_NOLAN, null, 10, 0, ORDER_BY_TITLE, ASC));
+                movieSearchParam));
         assertEquals(MISSING_TITLE_CODE, exception.getErrorCode());
         assertEquals(MISSING_TITLE_MESSAGE, exception.getErrorMessage());
     }
 
     @Test
     void invalidYear() {
+        movieSearchParam = movieSearchParam.toBuilder()
+                .releasedYear(INVALID_YEAR_2030).build();
+
         ValidationException exception = assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(
-                EXISTED_MOVIE_TITLE, INVALID_YEAR_2030, DIRECTOR_NOLAN, null, 10, 0, ORDER_BY_TITLE, ASC));
+                movieSearchParam));
         assertEquals(INVALID_YEAR_CODE, exception.getErrorCode());
         assertEquals(INVALID_YEAR_MESSAGE, exception.getErrorMessage());
     }
 
     @Test
     void invalidLimit() {
+        movieSearchParam = movieSearchParam.toBuilder()
+                .limit(5).build();
+
         ValidationException exception = assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(
-                EXISTED_MOVIE_TITLE, YEAR_2012, DIRECTOR_NOLAN, null, 5, 0, ORDER_BY_TITLE, ASC));
+                movieSearchParam));
             assertEquals(INVALID_LIMIT_CODE, exception.getErrorCode());
         assertEquals(INVALID_LIMIT_MESSAGE, exception.getErrorMessage());
     }
 
     @Test
     void invalidOrderBy() {
+        movieSearchParam = movieSearchParam.toBuilder()
+                .orderBy("director").build();
+
         ValidationException exception = assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(
-                EXISTED_MOVIE_TITLE, YEAR_2012, DIRECTOR_NOLAN, null, 10, 0, "director", ASC));
+                movieSearchParam));
         assertEquals(INVALID_ORDER_BY_CODE, exception.getErrorCode());
         assertEquals(INVALID_ORDER_BY_MESSAGE, exception.getErrorMessage());
     }
 
     @Test
     void invalidPage() {
+        movieSearchParam = movieSearchParam.toBuilder()
+                .page(-1).build();
+
         ValidationException exception = assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(
-                EXISTED_MOVIE_TITLE, YEAR_2012, DIRECTOR_NOLAN, null, 10, -1, ORDER_BY_TITLE, ASC));
+                movieSearchParam));
         assertEquals(INVALID_PAGE_CODE, exception.getErrorCode());
         assertEquals(INVALID_PAGE_MESSAGE, exception.getErrorMessage());
     }
 
     @Test
     void invalidDirection() {
+        movieSearchParam = movieSearchParam.toBuilder()
+                .direction("up").build();
+
         ValidationException exception = assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(
-                EXISTED_MOVIE_TITLE, YEAR_2012, DIRECTOR_NOLAN, null, 10, 0, ORDER_BY_TITLE, "up"));
+                movieSearchParam));
         assertEquals(INVALID_DIRECTION_CODE, exception.getErrorCode());
         assertEquals(INVALID_DIRECTION_MESSAGE, exception.getErrorMessage());
     }

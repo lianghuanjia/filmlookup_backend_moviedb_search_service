@@ -1,6 +1,7 @@
 package com.example.movie_service.service;
 
 
+import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.repository.CustomMovieRepository;
@@ -34,46 +35,37 @@ class MovieServiceTest {
     @InjectMocks
     private MovieServiceImpl movieServiceImpl; // Should this be MovieService or MovieServiceImpl?
 
-    private String title;
-    private String releasedYear;
-    private String director;
-    private String genre;
-    private Integer limit;
-    private Integer page;
-    private String orderBy;
-    private String direction;
-
+    private MovieSearchParam movieSearchParam;
 
     @BeforeEach
     public void setUp() {
-        title = "title";
-        releasedYear = "2020";
-        director = "director";
-        genre = "genre";
-        limit = 10;
-        page = 0;
-        orderBy = "orderBy";
-        direction = "direction";
+
+        // Build the basic valid MovieSearchParam
+         movieSearchParam = MovieSearchParam.builder()
+                .title("title").releasedYear("2020").director("director").genre("genre").limit(10).page(0)
+                .orderBy("orderBy").direction("orderBy").build();
+
     }
 
     @Test
     void searchWithNullTitle() {
-        title = null;
+        movieSearchParam = movieSearchParam.toBuilder().title(null).build();
+
         //since underneath, it uses validationService, and this service is not what we are testing right now, we need to mock its behavior
         doThrow(ValidationException.class).when(validationService).validateTitle(any());
 
-        assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction));
+        assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(movieSearchParam));
     }
 
     @Test
     void searchWithInvalidYear() {
-        releasedYear = "2039";
+        movieSearchParam = movieSearchParam.toBuilder().releasedYear("2039").build();
 
         doNothing().when(validationService).validateTitle(any());
         doThrow(ValidationException.class).when(validationService).validateReleasedYear(any());
 
         assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies
-                (title, releasedYear, director, genre, limit, page, orderBy, direction),
+                (movieSearchParam),
                 "searchMovies did not throw a ValidationException");
     }
 
@@ -81,18 +73,22 @@ class MovieServiceTest {
     void searchWithInvalidLimit(){
         Integer invalidLimit = 15;
 
+        movieSearchParam = movieSearchParam.toBuilder().limit(invalidLimit).build();
+
         doNothing().when(validationService).validateTitle(any());
         doNothing().when(validationService).validateReleasedYear(any());
         doThrow(ValidationException.class).when(validationService).validateLimit(any());
 
         assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies
-                (title, releasedYear, director, genre, invalidLimit, page, orderBy, direction),
+                (movieSearchParam),
                 "searchMovies did not throw a ValidationException");
     }
 
     @Test
     void searchWithInvalidPage(){
-        page = -1;
+        Integer invalidPage = -1;
+
+        movieSearchParam = movieSearchParam.toBuilder().page(invalidPage).build();
 
         doNothing().when(validationService).validateTitle(any());
         doNothing().when(validationService).validateReleasedYear(any());
@@ -100,13 +96,15 @@ class MovieServiceTest {
         doThrow(ValidationException.class).when(validationService).validatePage(any());
 
         assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies
-                (title, releasedYear, director, genre, limit, page, orderBy, direction),
+                (movieSearchParam),
                 "searchMovies did not throw a ValidationException");
     }
 
     @Test
     void searchWithInvalidOrderBy(){
-        orderBy = "time";
+        String invalidOrderBy = "time";
+
+        movieSearchParam = movieSearchParam.toBuilder().orderBy(invalidOrderBy).build();
 
         doNothing().when(validationService).validateTitle(any());
         doNothing().when(validationService).validateReleasedYear(any());
@@ -115,13 +113,15 @@ class MovieServiceTest {
         doThrow(ValidationException.class).when(validationService).validateOrderBy(any());
 
         assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies
-                (title, releasedYear, director, genre, limit, page, orderBy, direction),
+                (movieSearchParam),
                 "searchMovies did not throw a ValidationException");
     }
 
     @Test
     void searchWithInvalidDirection(){
-        direction = "north";
+        String invalidDirection = "north";
+
+        movieSearchParam = movieSearchParam.toBuilder().direction(invalidDirection).build();
 
         doNothing().when(validationService).validateTitle(any());
         doNothing().when(validationService).validateReleasedYear(any());
@@ -131,7 +131,7 @@ class MovieServiceTest {
         doThrow(ValidationException.class).when(validationService).validateDirection(any());
 
         assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies
-                (title, releasedYear, director, genre, limit, page, orderBy, direction),
+                (movieSearchParam),
                 "searchMovies did not throw a ValidationException");
     }
 
@@ -144,10 +144,13 @@ class MovieServiceTest {
         doNothing().when(validationService).validatePage(any());
         doNothing().when(validationService).validateOrderBy(any());
         doNothing().when(validationService).validateDirection(any());
-        doThrow(QueryTimeoutException.class).when(movieRepository).searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+        doThrow(QueryTimeoutException.class).when(movieRepository).searchMovies(movieSearchParam.getTitle(),
+                movieSearchParam.getReleasedYear(), movieSearchParam.getDirector(), movieSearchParam.getGenre(),
+                movieSearchParam.getLimit(), movieSearchParam.getPage(), movieSearchParam.getOrderBy(),
+                movieSearchParam.getDirection());
 
         assertThrows(QueryTimeoutException.class, ()-> movieServiceImpl.searchMovies
-                (title, releasedYear, director, genre, limit, page, orderBy, direction),
+                (movieSearchParam),
                 "searchMovies did not throw a QueryTimeoutException");
     }
 
@@ -159,10 +162,12 @@ class MovieServiceTest {
         doNothing().when(validationService).validatePage(any());
         doNothing().when(validationService).validateOrderBy(any());
         doNothing().when(validationService).validateDirection(any());
-        doThrow(PersistenceException.class).when(movieRepository).searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+        doThrow(PersistenceException.class).when(movieRepository).searchMovies(movieSearchParam.getTitle(),
+                movieSearchParam.getReleasedYear(), movieSearchParam.getDirector(), movieSearchParam.getGenre(),
+                movieSearchParam.getLimit(), movieSearchParam.getPage(), movieSearchParam.getOrderBy(), movieSearchParam.getDirection());
 
         assertThrows(PersistenceException.class, ()-> movieServiceImpl.searchMovies
-                (title, releasedYear, director, genre, limit, page, orderBy, direction),
+                (movieSearchParam),
                 "searchMovies did not throw a PersistenceException");
     }
 
@@ -187,8 +192,7 @@ class MovieServiceTest {
 
         // Call the actual method under test
         ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> actualResponseEntity = movieServiceImpl.searchMovies(
-                title, releasedYear, director, genre, limit, page, orderBy, direction
-        );
+                movieSearchParam);
 
         // Verify the results
         assertNotNull(actualResponseEntity.getBody());
@@ -216,7 +220,7 @@ class MovieServiceTest {
 
 
         ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> actualResponseEntity = movieServiceImpl.searchMovies(
-                title, releasedYear, director, genre, limit, page, orderBy, direction
+                movieSearchParam
         );
 
         assertNotNull(actualResponseEntity.getBody());

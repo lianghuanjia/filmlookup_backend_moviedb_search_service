@@ -1,5 +1,6 @@
 package com.example.movie_service.controller;
 
+import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.response.CustomResponse;
 import com.example.movie_service.service.MovieService;
@@ -47,8 +48,20 @@ public class MovieController {
             @RequestParam(required = false, defaultValue = "title") String orderBy,
             @RequestParam(required = false, defaultValue = "asc") String direction) {
 
+        // Build the MovieSearchRequestParam using the builder pattern
+        MovieSearchParam movieSearchRequestParam = MovieSearchParam.builder()
+                .title(title)
+                .releasedYear(releasedYear)
+                .direction(director)
+                .genre(genre)
+                .limit(limit)
+                .page(page)
+                .orderBy(orderBy)
+                .direction(direction)
+                .build();
+
         // Return the response entity
-        return movieService.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+        return movieService.searchMovies(movieSearchRequestParam);
 
     }
 

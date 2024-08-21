@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
+@Builder(toBuilder = true) // Enable toBuilder for making modifications
 public class MovieSearchParam {
     private String title;
     private String releasedYear;

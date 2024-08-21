@@ -1,15 +1,11 @@
 package com.example.movie_service.controller;
 
+import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.response.CustomResponse;
 import com.example.movie_service.service.MovieService;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -24,16 +20,14 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @ExtendWith(MockitoExtension.class) is for JUnit 5
- * The extension is also used to initialize the mocks.
- */
+import static org.mockito.ArgumentMatchers.any;
+
 @WebMvcTest(MovieController.class)
-public class MovieControllerTest {
+class MovieControllerTest {
 
     /**
      * Why here use @MockBean instead of @Spy:
-     *      @Spy creates a partial mock of an actual instance. However, in a @WebMvcTest context, Spring
+     *      The annotation @Spy creates a partial mock of an actual instance. However, in a @WebMvcTest context, Spring
      *      Boot automatically tries to create a mock of the service (or controller dependencies) using @MockBean,
      *      not @Spy.
      */
@@ -43,8 +37,9 @@ public class MovieControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+
     @Test
-    public void testSearchMovies() throws Exception {
+    void testSearchMovies() throws Exception {
         List<MovieSearchResultDTO> mockMovieList = new ArrayList<>();
 
         mockMovieList.add(new MovieSearchResultDTO("tt1", "Movie Title", "2023",
@@ -52,8 +47,7 @@ public class MovieControllerTest {
         CustomResponse<List<MovieSearchResultDTO>> customResponse = new CustomResponse<>(20001,
                 "Movie(s) found", mockMovieList);
 
-        Mockito.when(movieService.searchMovies(Mockito.anyString(), Mockito.anyString(),Mockito.any(), Mockito.any(),
-                Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString()))
+        Mockito.when(movieService.searchMovies(any(MovieSearchParam.class)))
                 .thenReturn(new ResponseEntity<>(customResponse, HttpStatus.OK));
 
         ResultActions resultActions = mockMvc.perform(

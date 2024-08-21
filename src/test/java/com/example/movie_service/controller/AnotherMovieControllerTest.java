@@ -1,5 +1,6 @@
 package com.example.movie_service.controller;
 
+import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.response.CustomResponse;
 import com.example.movie_service.service.MovieService;
@@ -64,7 +65,7 @@ class AnotherMovieControllerTest {
         ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> responseEntity = new ResponseEntity<>(customResponse, HttpStatus.OK);
 
         // What I expect my function to do, like the correct outcome I expect
-        when(mockMovieService.searchMovies(any(),any(),any(),any(),any(),any(),any(),any()))
+        when(mockMovieService.searchMovies(any(MovieSearchParam.class)))
                 .thenReturn(responseEntity);
 
         // Test my actual function
