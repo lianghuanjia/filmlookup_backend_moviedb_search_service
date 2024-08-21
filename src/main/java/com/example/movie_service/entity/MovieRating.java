@@ -31,7 +31,7 @@ public class MovieRating {
 
     @OneToOne
     @MapsId // When @MapsId is used without a specified field, it defaults to using the primary key of the owning entity
-            // (in this case, MovieRating) and maps it directly to the referenced entity (Movie)'s primary key.
+    // (in this case, MovieRating) and maps it directly to the referenced entity (Movie)'s primary key.
     @JoinColumn(name = "movie_id") // "movie_id" refers to the movie_id column in the movie_rating table
     private Movie movie;
 

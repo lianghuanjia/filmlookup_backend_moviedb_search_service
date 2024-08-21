@@ -51,7 +51,7 @@ class ValidationServiceTest {
 
     @Test
     void validateReleasedYear_ShouldNotThrowException_WhenYearIsValid() {
-        assertDoesNotThrow(() ->validationService.validateReleasedYear(String.valueOf(Year.now().getValue())));
+        assertDoesNotThrow(() -> validationService.validateReleasedYear(String.valueOf(Year.now().getValue())));
     }
 
     @Test
@@ -64,9 +64,9 @@ class ValidationServiceTest {
     @Test
     void validateLimit_ShouldNotThrowException_WhenLimitIsValid() {
         // Parameterized test, also put assert in the test
-        assertDoesNotThrow(()->validationService.validateLimit(10));
-        assertDoesNotThrow(()->validationService.validateLimit(20));
-        assertDoesNotThrow(()->validationService.validateLimit(30));
+        assertDoesNotThrow(() -> validationService.validateLimit(10));
+        assertDoesNotThrow(() -> validationService.validateLimit(20));
+        assertDoesNotThrow(() -> validationService.validateLimit(30));
     }
 
     @Test

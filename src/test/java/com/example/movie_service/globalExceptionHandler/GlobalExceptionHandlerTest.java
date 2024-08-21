@@ -77,7 +77,7 @@ class GlobalExceptionHandlerTest {
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
         assertEquals(MISSING_REQUIRED_PARAMETER_CODE, responseEntity.getBody().getCode());
-        assertEquals(MISSING_REQUIRED_PARAMETER_MESSAGE_PREFIX+missingParameter, responseEntity.getBody().getMessage());
+        assertEquals(MISSING_REQUIRED_PARAMETER_MESSAGE_PREFIX + missingParameter, responseEntity.getBody().getMessage());
         assertNull(responseEntity.getBody().getData());
     }
 

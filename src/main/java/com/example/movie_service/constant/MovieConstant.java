@@ -4,7 +4,8 @@ package com.example.movie_service.constant;
 public final class MovieConstant {
 
     // Define a private constructor to hide the public one
-    private MovieConstant(){}
+    private MovieConstant() {
+    }
 
     // ERROR CODES AND MESSAGES:
     public static final int INVALID_YEAR_CODE = 40001;
@@ -34,7 +35,7 @@ public final class MovieConstant {
 
     // SUCCESS CODE AND MESSAGE
     public static final int MOVIE_FOUND_CODE = 20001;
-    public static final String MOVIE_FOUND_MESSAGE  = "Movie(s) found";
+    public static final String MOVIE_FOUND_MESSAGE = "Movie(s) found";
     public static final String MOVIE_FOUND = "MoviesFound";
 
     public static final int MOVIE_NOT_FOUND_CODE = 20002;

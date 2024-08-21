@@ -27,10 +27,11 @@ public class MovieServiceImpl implements MovieService {
 
     /**
      * Constructor with dependencies injection.
+     *
      * @param movieRepository the repository for accessing movie data
      */
     @Autowired
-    public MovieServiceImpl (CustomMovieRepository movieRepository,
+    public MovieServiceImpl(CustomMovieRepository movieRepository,
                             ValidationService validationService) {
         this.movieRepository = movieRepository;
         this.validationService = validationService;
@@ -38,6 +39,7 @@ public class MovieServiceImpl implements MovieService {
 
     /**
      * Searches for movies based on various criteria.
+     *
      * @return a list of movies that match the search criteria
      */
     @Override
@@ -64,9 +66,9 @@ public class MovieServiceImpl implements MovieService {
         // If no movie is found, return a custom response with movie not found code and message inside, with the empty
         // movieList. Before I put null in the data. This is not good because it might cause NullPointerExceptions. It
         // also simplifies the handling of responses, as clients don't need to check for both 'null' and empty conditions.
-        if (movieList.isEmpty()){
+        if (movieList.isEmpty()) {
             customResponse = new CustomResponse<>(MOVIE_NOT_FOUND_CODE, MOVIE_NOT_FOUND_MESSAGE, movieList);
-        } else{
+        } else {
             customResponse = new CustomResponse<>(MOVIE_FOUND_CODE, MOVIE_FOUND_MESSAGE, movieList);
         }
 

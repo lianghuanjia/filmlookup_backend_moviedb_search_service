@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
 import static com.example.movie_service.constant.MovieConstant.MOVIE_SEARCH_RESULT_DTO_MAPPING;
@@ -76,15 +77,16 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
 
     /**
      * Sets the parameters for a database query based on the provided input criteria.
-     * @param query         The query object to set parameters on.
-     * @param title         The title of the movie to search for. Wildcards (%) are added for partial matching
-     * @param releasedYear  The released year of the movie. Wildcards (%) are added for partial matching. Can be null.
-     * @param director      The director of the movie. Wildcards (%) are added for partial matching. Can be null.
-     * @param genre         The genre of the movie. Wildcards (%) are added for partial matching. Can be null.
-     * @param limit         The maximum number of results to return (for pagination).
-     * @param page          The page number of results to return, used to calculate the offset.
      *
-     * Assumes that the query object is a valid and non-null instance of a query with named parameters.
+     * @param query        The query object to set parameters on.
+     * @param title        The title of the movie to search for. Wildcards (%) are added for partial matching
+     * @param releasedYear The released year of the movie. Wildcards (%) are added for partial matching. Can be null.
+     * @param director     The director of the movie. Wildcards (%) are added for partial matching. Can be null.
+     * @param genre        The genre of the movie. Wildcards (%) are added for partial matching. Can be null.
+     * @param limit        The maximum number of results to return (for pagination).
+     * @param page         The page number of results to return, used to calculate the offset.
+     *                     <p>
+     *                     Assumes that the query object is a valid and non-null instance of a query with named parameters.
      */
     private void setQueryParameters(Query query, String title, String releasedYear, String director, String genre, int limit, int page) {
         query.setParameter("title", "%" + title + "%");

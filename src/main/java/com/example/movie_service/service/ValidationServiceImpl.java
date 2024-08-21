@@ -8,10 +8,10 @@ import java.time.Year;
 import static com.example.movie_service.constant.MovieConstant.*;
 
 @Service
-public class ValidationServiceImpl implements ValidationService{
+public class ValidationServiceImpl implements ValidationService {
     @Override
     public void validateTitle(String title) throws ValidationException {
-        if (title == null || title.isEmpty()){
+        if (title == null || title.isEmpty()) {
             throw new ValidationException(MISSING_TITLE_CODE, MISSING_TITLE_MESSAGE);
         }
     }

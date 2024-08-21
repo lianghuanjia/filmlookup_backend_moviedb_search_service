@@ -30,7 +30,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test") // To load application-test.properties
 @ExtendWith(MySQLTestContainerExtension.class)
-@DirtiesContext // Importantly, this recreates the application context and allows our test classes to interact with a separate MySQL instance, running on a random port.
+@DirtiesContext
+// Importantly, this recreates the application context and allows our test classes to interact with a separate MySQL instance, running on a random port.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ControllerIT {
 
@@ -48,10 +49,11 @@ class ControllerIT {
     private String searchMoviePath;
     // Define the response type using ParameterizedTypeReference
     private final ParameterizedTypeReference<CustomResponse<List<MovieSearchResultDTO>>> responseType =
-            new ParameterizedTypeReference<>() {};
+            new ParameterizedTypeReference<>() {
+            };
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         String baseUrl = protocolAndHost + port + "/v1/api";
         searchMoviePath = baseUrl + "/movies";
 
@@ -131,7 +133,7 @@ class ControllerIT {
 
         // Assert the code and message are MOVIE_NOT_FOUND
         assertEquals(MISSING_REQUIRED_PARAMETER_CODE, customResponse.getCode());
-        assertEquals(MISSING_REQUIRED_PARAMETER_MESSAGE_PREFIX+TITLE, customResponse.getMessage());
+        assertEquals(MISSING_REQUIRED_PARAMETER_MESSAGE_PREFIX + TITLE, customResponse.getMessage());
 
         // Assert the MovieSearchResultDTO List is empty
         assertNull(customResponse.getData());
@@ -225,7 +227,7 @@ class ControllerIT {
     }
 
     @Test
-    void TestPageOneOrderByRatingAsc(){
+    void TestPageOneOrderByRatingAsc() {
         dataInitializerService.insertMovieData();
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
                 .queryParam(TITLE, TITLE_STARTS_WITH_MOVIE)

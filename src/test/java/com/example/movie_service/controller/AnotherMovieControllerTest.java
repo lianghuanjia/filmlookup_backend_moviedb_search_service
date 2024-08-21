@@ -53,7 +53,7 @@ class AnotherMovieControllerTest {
     }
 
     @Test
-    void searchMovieReturnOkTest(){
+    void searchMovieReturnOkTest() {
 
         // Set up: define the parameters and what should return
         MovieSearchResultDTO movieSearchResultDTO = new MovieSearchResultDTO();
@@ -70,7 +70,7 @@ class AnotherMovieControllerTest {
 
         // Test my actual function
         ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> actual = movieController.searchMovies(title, releasedYear, director,
-        genre, limit, page, orderBy, direction);
+                genre, limit, page, orderBy, direction);
 
         assertEquals(responseEntity, actual);
     }

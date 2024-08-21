@@ -26,15 +26,16 @@ public class MovieController {
 
     /**
      * Handles GET requests for searching movies
-     * @param title             the title of the movies (required, the title can also be a substring of some movie titles)
-     * @param releasedYear      the year the movie was released (optional, search by substring, because in the database
-     *                          the releasedYear can be YYYY or YYYY-MM-DD)
-     * @param director          the director of the movie (optional, search by substring)
-     * @param genre             the genre of the movie (optional)
-     * @param limit             the number of results to return per page (default is 10)
-     * @param page              the page number to return (default is 0)
-     * @param orderBy           the field to order the results by (default is "title", can also be "releaseTime", "rating")
-     * @param direction         the direction to order the results (default is "asc", can also be "desc")
+     *
+     * @param title        the title of the movies (required, the title can also be a substring of some movie titles)
+     * @param releasedYear the year the movie was released (optional, search by substring, because in the database
+     *                     the releasedYear can be YYYY or YYYY-MM-DD)
+     * @param director     the director of the movie (optional, search by substring)
+     * @param genre        the genre of the movie (optional)
+     * @param limit        the number of results to return per page (default is 10)
+     * @param page         the page number to return (default is 0)
+     * @param orderBy      the field to order the results by (default is "title", can also be "releaseTime", "rating")
+     * @param direction    the direction to order the results (default is "asc", can also be "desc")
      * @return a ResponseEntity containing a CustomResponse with the list of movies found
      */
     @GetMapping("/movies")

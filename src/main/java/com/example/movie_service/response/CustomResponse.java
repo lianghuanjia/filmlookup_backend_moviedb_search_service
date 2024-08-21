@@ -5,6 +5,7 @@ import lombok.Data;
 
 /**
  * It is the standard response for all endpoints.
+ *
  * @param <T> A generic type of data retrieved from service layer
  */
 @Data

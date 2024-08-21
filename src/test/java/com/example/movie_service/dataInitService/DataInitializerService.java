@@ -150,12 +150,12 @@ public class DataInitializerService {
 
     @Transactional
     public void initializeOneMovieData(String title, String releaseTime, List<String> genreNames, String directorName,
-                                    Double averageRating, Integer numOfVotes) {
+                                       Double averageRating, Integer numOfVotes) {
         // Set up genres
         // For each genre name, initialize a Genre, and add it to a Genre set
         Set<Genre> genres = new HashSet<>();
         // For each genre, add it as a Genre entity into the database
-        for (String genreName: genreNames) {
+        for (String genreName : genreNames) {
             genres.add(createAndPersistGenre(genreName));
         }
 

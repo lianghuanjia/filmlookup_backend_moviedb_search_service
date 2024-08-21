@@ -1,4 +1,5 @@
 package com.example.movie_service.integration;
+
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.dataInitService.DataInitializerService;
@@ -57,7 +58,7 @@ class CustomRepositoryImplIT {
     }
 
     @Test
-    void searchMovieByTitleOnlyFound(){
+    void searchMovieByTitleOnlyFound() {
         movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).build();
 
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
@@ -70,7 +71,7 @@ class CustomRepositoryImplIT {
     }
 
     @Test
-    void searchMovieByTitleNoMovieFound(){
+    void searchMovieByTitleNoMovieFound() {
         movieSearchParam = movieSearchParam.toBuilder().title(NON_EXISTED_MOVIE_TITLE).build();
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
                 movieSearchParam);
@@ -81,7 +82,7 @@ class CustomRepositoryImplIT {
     }
 
     @Test
-    void searchMovieTestOrderByReleaseTimeAsc(){
+    void searchMovieTestOrderByReleaseTimeAsc() {
         movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).orderBy(RELEASE_TIME).build();
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
                 movieSearchParam);
@@ -97,7 +98,7 @@ class CustomRepositoryImplIT {
     }
 
     @Test
-    void searchMovieTestOrderByReleaseTimeDesc(){
+    void searchMovieTestOrderByReleaseTimeDesc() {
         movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).orderBy(RELEASE_TIME).direction(DESC).build();
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
@@ -112,7 +113,7 @@ class CustomRepositoryImplIT {
     }
 
     @Test
-    void searchMovieTestDescAndOrderByRating(){
+    void searchMovieTestDescAndOrderByRating() {
         movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).orderBy(RATING).direction(DESC).build();
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
@@ -127,7 +128,7 @@ class CustomRepositoryImplIT {
     }
 
     @Test
-    void searchMovieByTitleAndDirector(){
+    void searchMovieByTitleAndDirector() {
         movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).director("Nolan").build();
 
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(movieSearchParam);

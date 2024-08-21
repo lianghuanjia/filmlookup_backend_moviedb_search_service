@@ -11,13 +11,13 @@ import java.math.BigDecimal;
 @Entity
 @Getter
 @Setter
-@Table(name="person")
+@Table(name = "person")
 public class Person {
 
     @Id
     @GenericGenerator(name = "custom-name-id", type = CustomTitleIdGenerator.class)
     @GeneratedValue(generator = "custom-name-id")
-    @Column(name="person_id")
+    @Column(name = "person_id")
     private String id;
 
     @Column(name = "name")

@@ -132,7 +132,7 @@ class MovieServiceImplIT {
 
         ValidationException exception = assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(
                 movieSearchParam));
-            assertEquals(INVALID_LIMIT_CODE, exception.getErrorCode());
+        assertEquals(INVALID_LIMIT_CODE, exception.getErrorCode());
         assertEquals(INVALID_LIMIT_MESSAGE, exception.getErrorMessage());
     }
 

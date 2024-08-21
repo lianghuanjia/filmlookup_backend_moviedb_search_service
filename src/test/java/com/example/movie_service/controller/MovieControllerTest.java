@@ -27,9 +27,9 @@ class MovieControllerTest {
 
     /**
      * Why here use @MockBean instead of @Spy:
-     *      The annotation @Spy creates a partial mock of an actual instance. However, in a @WebMvcTest context, Spring
-     *      Boot automatically tries to create a mock of the service (or controller dependencies) using @MockBean,
-     *      not @Spy.
+     * The annotation @Spy creates a partial mock of an actual instance. However, in a @WebMvcTest context, Spring
+     * Boot automatically tries to create a mock of the service (or controller dependencies) using @MockBean,
+     * not @Spy.
      */
     @MockBean
     private MovieService movieService;
@@ -51,16 +51,16 @@ class MovieControllerTest {
                 .thenReturn(new ResponseEntity<>(customResponse, HttpStatus.OK));
 
         ResultActions resultActions = mockMvc.perform(
-                    MockMvcRequestBuilders.get("/v1/api/movies")
-                    .param("title", "someTitle")
-                    .param("releasedYear", "2023")
-                    .param("director", "Some Director")
-                    .param("genre", "Action")
-                    .param("limit", "10")
-                    .param("page", "0")
-                    .param("orderBy", "title")
-                    .param("direction", "asc")
-                    .contentType(MediaType.APPLICATION_JSON));
+                MockMvcRequestBuilders.get("/v1/api/movies")
+                        .param("title", "someTitle")
+                        .param("releasedYear", "2023")
+                        .param("director", "Some Director")
+                        .param("genre", "Action")
+                        .param("limit", "10")
+                        .param("page", "0")
+                        .param("orderBy", "title")
+                        .param("direction", "asc")
+                        .contentType(MediaType.APPLICATION_JSON));
 
         resultActions.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.code").value(20001))
