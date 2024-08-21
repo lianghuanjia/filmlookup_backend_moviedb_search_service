@@ -1,14 +1,11 @@
 package com.example.movie_service.repository;
 
 import com.example.movie_service.dto.MovieSearchResultDTO;
-import com.example.movie_service.entity.Movie;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import jakarta.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.example.movie_service.constant.MovieConstant.MOVIE_SEARCH_RESULT_DTO_MAPPING;
 
@@ -101,46 +98,5 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
             query.setParameter("genre", "%" + genre + "%");
         }
     }
-
-
-//    @Override
-//    public List<MovieSearchResultDTO> searchMoviesByPersonId(String personId, Integer limit, Integer page, String orderBy, String direction) {
-//        // JPQL Query to find movies by person ID with sorting
-//        String jpqlQuery = "SELECT DISTINCT m FROM Movie m " +
-//                "JOIN FETCH m.movieCrews mc " +
-//                "WHERE mc.person.id = :personId " +
-//                "ORDER BY m." + orderBy + " " + direction;
-//
-//        // Create the query and set the parameter
-//        TypedQuery<Movie> query = entityManager.createQuery(jpqlQuery, Movie.class);
-//        query.setParameter("personId", personId);
-//
-//        // Apply pagination
-//        query.setFirstResult(page * limit);
-//        query.setMaxResults(limit);
-//
-//        // Execute the query and get the results
-//        List<Movie> movies = query.getResultList();
-//
-//        // Map the results to MovieSearchResultDTO
-//        return movies.stream()
-//                .map(movie -> {
-//                    // Extract director names from movieCrews
-//                    String directors = movie.getMovieCrews().stream()
-//                            .filter(crew -> "director".equalsIgnoreCase(crew.getJob()))
-//                            .map(crew -> crew.getPerson().getName())
-//                            .collect(Collectors.joining(", "));
-//
-//                    return new MovieSearchResultDTO(
-//                            movie.getId(),
-//                            movie.getTitle(),
-//                            movie.getReleaseTime(),
-//                            directors,
-//                            movie.getBackdropPath(),
-//                            movie.getPosterPath()
-//                    );
-//                })
-//                .collect(Collectors.toList());
-//    }
 
 }
