@@ -2,7 +2,7 @@ package com.example.movie_service.integration;
 
 
 import com.example.movie_service.dto.MovieSearchResultDTO;
-import com.example.movie_service.helperTool.DataInitializerService;
+import com.example.movie_service.dataInitService.DataInitializerService;
 import com.example.movie_service.junitExtension.MySQLTestContainerExtension;
 import com.example.movie_service.response.CustomResponse;
 import org.junit.jupiter.api.AfterEach;

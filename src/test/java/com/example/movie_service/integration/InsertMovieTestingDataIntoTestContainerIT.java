@@ -4,7 +4,7 @@ import com.example.movie_service.entity.Genre;
 import com.example.movie_service.entity.Movie;
 import com.example.movie_service.entity.MovieCrew;
 import com.example.movie_service.entity.MovieRating;
-import com.example.movie_service.helperTool.DataInitializerService;
+import com.example.movie_service.dataInitService.DataInitializerService;
 import com.example.movie_service.junitExtension.MySQLTestContainerExtension;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

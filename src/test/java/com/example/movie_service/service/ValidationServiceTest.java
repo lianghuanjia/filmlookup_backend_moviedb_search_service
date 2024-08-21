@@ -33,7 +33,12 @@ class ValidationServiceTest {
 
     @Test
     void validateTitle_ShouldNotThrowException_WhenTitleIsValid() {
-        validationService.validateTitle("Inception");
+        assertDoesNotThrow(() -> validationService.validateTitle("Inception"));
+    }
+
+    @Test
+    void validateReleasedYear_ShouldNotThrowException_WhenYearIsNull() {
+        assertDoesNotThrow(() -> validationService.validateReleasedYear(null));
     }
 
     @Test
