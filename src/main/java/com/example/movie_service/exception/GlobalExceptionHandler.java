@@ -15,13 +15,6 @@ import static com.example.movie_service.constant.MovieConstant.*;
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
-    /**
-     * Constructor to inject ResponseConfig dependency
-     */
-    @Autowired
-    public GlobalExceptionHandler(){ /* TODO document why this constructor is empty */ }
-
     /**
      * Handles ValidationException exceptions
      * @param exception the ValidationException
