@@ -1,4 +1,5 @@
 package com.example.movie_service.integration;
+import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.dataInitService.DataInitializerService;
 import com.example.movie_service.junitExtension.MySQLTestContainerExtension;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+
 import java.util.List;
 
 import static com.example.movie_service.constants.TestConstant.*;
@@ -32,11 +34,18 @@ class CustomRepositoryImplIT {
     @Autowired
     private DataInitializerService dataInitializerService;
 
+    private MovieSearchParam movieSearchParam;
+
     @BeforeEach
     public void beforeEach() {
         // Log the JDBC URL to ensure it's pointing to the Testcontainers instance
         dataInitializerService.checkDatabaseEmpty();
         dataInitializerService.initializeData();
+
+        // Build the basic valid MovieSearchParam
+        movieSearchParam = MovieSearchParam.builder()
+                .title(EXISTED_MOVIE_TITLE).releasedYear(null).director(null).genre(null).limit(10).page(0)
+                .orderBy(ORDER_BY_TITLE).direction(ASC).build();
     }
 
     @AfterEach
@@ -47,9 +56,10 @@ class CustomRepositoryImplIT {
 
     @Test
     void searchMovieByTitleOnlyFound(){
+        movieSearchParam = movieSearchParam.toBuilder().title("Dark Knight").build();
+
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
-                "Dark Knight", null, null, null, 10, 0,
-                "title", "asc");
+                movieSearchParam);
 
 
         assertNotNull(searchResults);
@@ -59,9 +69,9 @@ class CustomRepositoryImplIT {
 
     @Test
     void searchMovieByTitleNoMovieFound(){
+        movieSearchParam = movieSearchParam.toBuilder().title(NON_EXISTED_MOVIE_TITLE).build();
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
-                "Non-existed Movie", null, null, null, 10, 0,
-                "title", "asc");
+                movieSearchParam);
 
 
         assertNotNull(searchResults);
@@ -69,10 +79,10 @@ class CustomRepositoryImplIT {
     }
 
     @Test
-    void searchMovieTestAsc(){
+    void searchMovieTestOrderByReleaseTimeAsc(){
+        movieSearchParam = movieSearchParam.toBuilder().title("Dark Knight").orderBy(RELEASE_TIME).build();
         List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
-                "Dark Knight", null, null, null, 10, 0,
-                "releaseTime", "asc");
+                movieSearchParam);
 
         assertNotNull(searchResults);
         assertEquals(3, searchResults.size());
@@ -85,10 +95,9 @@ class CustomRepositoryImplIT {
     }
 
     @Test
-    void searchMovieTestDesc(){
-        List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
-                "Dark Knight", null, null, null, 10, 0,
-                "releaseTime", "desc");
+    void searchMovieTestOrderByReleaseTimeDesc(){
+        movieSearchParam = movieSearchParam.toBuilder().title("Dark Knight").orderBy(RELEASE_TIME).direction(DESC).build();
+        List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         assertNotNull(searchResults);
         assertEquals(3, searchResults.size());
@@ -102,9 +111,8 @@ class CustomRepositoryImplIT {
 
     @Test
     void searchMovieTestDescAndOrderByRating(){
-        List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
-                "Dark Knight", null, null, null, 10, 0,
-                RATING, DESC);
+        movieSearchParam = movieSearchParam.toBuilder().title("Dark Knight").orderBy(RATING).direction(DESC).build();
+        List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         assertNotNull(searchResults);
         assertEquals(3, searchResults.size());
@@ -118,9 +126,9 @@ class CustomRepositoryImplIT {
 
     @Test
     void searchMovieByTitleAndDirector(){
-        List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
-                "Dark Knight", null, "Nolan", null, 10, 0,
-                "title", "asc");
+        movieSearchParam = movieSearchParam.toBuilder().title("Dark Knight").director("Nolan").build();
+
+        List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
 
         assertNotNull(searchResults);

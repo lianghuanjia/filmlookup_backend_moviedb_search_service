@@ -46,8 +46,6 @@ public class MovieServiceImpl implements MovieService {
 
         String title = movieSearchParam.getTitle();
         String releasedYear = movieSearchParam.getReleasedYear();
-        String director = movieSearchParam.getDirector();
-        String genre = movieSearchParam.getGenre();
         Integer limit = movieSearchParam.getLimit();
         Integer page = movieSearchParam.getPage();
         String orderBy = movieSearchParam.getOrderBy();
@@ -58,7 +56,7 @@ public class MovieServiceImpl implements MovieService {
 
         // Get search results from repository layer
         // If the query times out, it's possible there will be QueryTimeoutException or PersistenceException
-        List<MovieSearchResultDTO> movieList = movieRepository.searchMovies(title, releasedYear, director, genre, limit, page, orderBy, direction);
+        List<MovieSearchResultDTO> movieList = movieRepository.searchMovies(movieSearchParam);
 
         // Prepare the response's code and message
         CustomResponse<List<MovieSearchResultDTO>> customResponse;

@@ -93,7 +93,7 @@ class MovieServiceImplIT {
 
     @Test
     void missingTitle() {
-        MovieSearchParam movieSearchParam = MovieSearchParam.builder()
+        movieSearchParam = MovieSearchParam.builder()
                 .title(EMPTY_STRING).releasedYear(YEAR_2012).director(DIRECTOR_NOLAN).genre(null).limit(10).page(0)
                 .orderBy(ORDER_BY_TITLE).direction(ASC).build();
 

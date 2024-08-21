@@ -2,7 +2,6 @@ package com.example.movie_service.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * It is the standard response for all endpoints.

@@ -144,10 +144,7 @@ class MovieServiceTest {
         doNothing().when(validationService).validatePage(any());
         doNothing().when(validationService).validateOrderBy(any());
         doNothing().when(validationService).validateDirection(any());
-        doThrow(QueryTimeoutException.class).when(movieRepository).searchMovies(movieSearchParam.getTitle(),
-                movieSearchParam.getReleasedYear(), movieSearchParam.getDirector(), movieSearchParam.getGenre(),
-                movieSearchParam.getLimit(), movieSearchParam.getPage(), movieSearchParam.getOrderBy(),
-                movieSearchParam.getDirection());
+        doThrow(QueryTimeoutException.class).when(movieRepository).searchMovies(movieSearchParam);
 
         assertThrows(QueryTimeoutException.class, ()-> movieServiceImpl.searchMovies
                 (movieSearchParam),
@@ -162,9 +159,7 @@ class MovieServiceTest {
         doNothing().when(validationService).validatePage(any());
         doNothing().when(validationService).validateOrderBy(any());
         doNothing().when(validationService).validateDirection(any());
-        doThrow(PersistenceException.class).when(movieRepository).searchMovies(movieSearchParam.getTitle(),
-                movieSearchParam.getReleasedYear(), movieSearchParam.getDirector(), movieSearchParam.getGenre(),
-                movieSearchParam.getLimit(), movieSearchParam.getPage(), movieSearchParam.getOrderBy(), movieSearchParam.getDirection());
+        doThrow(PersistenceException.class).when(movieRepository).searchMovies(movieSearchParam);
 
         assertThrows(PersistenceException.class, ()-> movieServiceImpl.searchMovies
                 (movieSearchParam),
@@ -179,7 +174,7 @@ class MovieServiceTest {
         );
 
         // Mock the repository call
-        when(movieRepository.searchMovies(anyString(), anyString(), anyString(), anyString(), anyInt(), anyInt(), anyString(), anyString()))
+        when(movieRepository.searchMovies(movieSearchParam))
                 .thenReturn(mockMovies);
 
         // Ensure validation service calls do nothing (if necessary)
@@ -207,7 +202,7 @@ class MovieServiceTest {
         List<MovieSearchResultDTO> mockMovies = List.of();
 
         // Mock the repository call
-        when(movieRepository.searchMovies(anyString(), anyString(), anyString(), anyString(), anyInt(), anyInt(), anyString(), anyString()))
+        when(movieRepository.searchMovies(movieSearchParam))
                 .thenReturn(mockMovies);
 
         // Ensure validation service calls do nothing (if necessary)

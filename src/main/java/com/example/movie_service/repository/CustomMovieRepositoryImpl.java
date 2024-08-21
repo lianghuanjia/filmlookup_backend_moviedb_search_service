@@ -1,5 +1,6 @@
 package com.example.movie_service.repository;
 
+import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -16,16 +17,18 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
     private EntityManager entityManager;
 
     @Override
-    public List<MovieSearchResultDTO> searchMovies(String title, String releasedYear, String director, String genre, Integer limit,
-                                       Integer page, String orderBy, String direction) {
-
-        String sqlQuery = buildSqlQuery(releasedYear, director, genre, orderBy, direction);
+    public List<MovieSearchResultDTO> searchMovies(MovieSearchParam movieSearchParam) {
+        // Build string query with optional parameters
+        String sqlQuery = buildSqlQuery(movieSearchParam.getReleasedYear(), movieSearchParam.getDirector(),
+                movieSearchParam.getGenre(), movieSearchParam.getOrderBy(), movieSearchParam.getDirection());
 
         // Create bare-bones native SQL Query
         Query query = entityManager.createNativeQuery(sqlQuery, MOVIE_SEARCH_RESULT_DTO_MAPPING);
 
         // Set the query's parameters based on the function's parameters
-        setQueryParameters(query, title, releasedYear, director, genre, limit, page);
+        setQueryParameters(query, movieSearchParam.getTitle(), movieSearchParam.getReleasedYear(),
+                movieSearchParam.getDirector(), movieSearchParam.getGenre(), movieSearchParam.getLimit(),
+                movieSearchParam.getPage());
 
         // Get the result(s) from entityManager.getResultList(). Each result will be mapped to MovieSearchResultDTO.
         // Since the MOVIE_SEARCH_RESULT_DTO_MAPPING's target class is MovieSearchResultDTO, I am sure the result will
