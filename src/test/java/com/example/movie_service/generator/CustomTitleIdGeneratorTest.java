@@ -1,6 +1,5 @@
-package generator;
+package com.example.movie_service.generator;
 
-import com.example.movie_service.generator.CustomTitleIdGenerator;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.junit.Before;
 import org.junit.Test;
