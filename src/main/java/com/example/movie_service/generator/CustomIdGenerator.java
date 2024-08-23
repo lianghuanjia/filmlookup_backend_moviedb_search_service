@@ -1,6 +1,7 @@
 package com.example.movie_service.generator;
 
 import com.example.movie_service.annotation.CustomIdGeneratorAnnotation;
+import com.example.movie_service.exception.NoCustomIdGeneratorAnnotationFoundInEntityException;
 import jakarta.persistence.TypedQuery;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.generator.BeforeExecutionGenerator;
@@ -16,7 +17,8 @@ public class CustomIdGenerator implements BeforeExecutionGenerator {
 
 
     @Override
-    public Object generate(SharedSessionContractImplementor sharedSessionContractImplementor, Object entity, Object o1, EventType eventType) {
+    public Object generate(SharedSessionContractImplementor sharedSessionContractImplementor, Object entity, Object o1,
+                           EventType eventType) {
 
         Class<?> entityClass = entity.getClass();
 
@@ -25,7 +27,9 @@ public class CustomIdGenerator implements BeforeExecutionGenerator {
         CustomIdGeneratorAnnotation annotation = idField.getAnnotation(CustomIdGeneratorAnnotation.class);
 
         if (annotation == null) {
-            throw new RuntimeException("Entity class " + entity.getClass().getSimpleName() + " does not have @TestIdGeneratorAnnotation");
+            throw new NoCustomIdGeneratorAnnotationFoundInEntityException
+                    ("Entity class " + entity.getClass().getSimpleName() + " does not have @" +
+                            CustomIdGeneratorAnnotation.class.getSimpleName());
         }
 
         String idProperty = idField.getName();
@@ -64,12 +68,12 @@ public class CustomIdGenerator implements BeforeExecutionGenerator {
     }
 
     private Field findIdField(Class<?> clazz) {
-        // Iterate over the fields to find the one annotated with @TestIdGeneratorAnnotation
+        // Iterate over the fields to find the one annotated with the annotation that represents custom id generation
         for (Field field : clazz.getDeclaredFields()) {
             if (field.isAnnotationPresent(CustomIdGeneratorAnnotation.class)) {
                 return field;
             }
         }
-        throw new IllegalArgumentException("No field found with @TestIdGeneratorAnnotation in class " + clazz.getSimpleName());
+        throw new IllegalArgumentException("No field found in class with annotation @" + clazz.getSimpleName());
     }
 }
