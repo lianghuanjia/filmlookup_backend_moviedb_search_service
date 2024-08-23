@@ -1,20 +1,13 @@
 package com.example.movie_service.generator;
 
-import com.example.movie_service.repository.CustomMovieRepository;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.PersistenceUnit;
-import jakarta.persistence.Query;
-import lombok.NoArgsConstructor;
+import com.example.movie_service.annotation.TestIdGeneratorAnnotation;
+import jakarta.persistence.TypedQuery;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.generator.BeforeExecutionGenerator;
 import org.hibernate.generator.EventType;
-import org.hibernate.query.NativeQuery;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.util.EnumSet;
 
 
@@ -23,10 +16,24 @@ public class TestIdGenerator implements BeforeExecutionGenerator {
 
 
     @Override
-    public Object generate(SharedSessionContractImplementor sharedSessionContractImplementor, Object o, Object o1, EventType eventType) {
-        int maxNumericPart = getMaxIdNumericPart(sharedSessionContractImplementor, "movie", "movie_id");
+    public Object generate(SharedSessionContractImplementor sharedSessionContractImplementor, Object entity, Object o1, EventType eventType) {
+
+        Class<?> entityClass = entity.getClass();
+
+        // Find the ID field that has the annotation
+        Field idField = findIdField(entityClass);
+        TestIdGeneratorAnnotation annotation = idField.getAnnotation(TestIdGeneratorAnnotation.class);
+
+        if (annotation == null) {
+            throw new RuntimeException("Entity class " + entity.getClass().getSimpleName() + " does not have @TestIdGeneratorAnnotation");
+        }
+
+        String idProperty = idField.getName();
+        String prefix = annotation.prefix();
+
+        int maxNumericPart = getMaxIdNumericPartForEntity(sharedSessionContractImplementor, entityClass, idProperty);
         int nextIdNumber = maxNumericPart+1;
-        return "tt"+nextIdNumber;
+        return prefix + nextIdNumber;
     }
 
     @Override
@@ -35,27 +42,34 @@ public class TestIdGenerator implements BeforeExecutionGenerator {
     }
 
 
-    private int getMaxIdNumericPart(SharedSessionContractImplementor session, String tableName, String idColumn) {
-        String queryString = "SELECT MAX(CAST(SUBSTRING(m." + idColumn + ", 3) AS UNSIGNED)) FROM " + tableName + " m";
+    public <T> int getMaxIdNumericPartForEntity(SharedSessionContractImplementor session, Class<T> entityClass, String idProperty) {
+        // Construct the JPQL query
+        String queryString = "SELECT MAX(CAST(SUBSTRING(e." + idProperty + ", 3) AS integer)) FROM " + entityClass.getSimpleName() + " e";
 
-        NativeQuery<?> query = session.createNativeQuery(queryString);
+        // Create a TypedQuery for the entity class
+        TypedQuery<Integer> query = session.createQuery(queryString, Integer.class);
 
         try {
             // Execute the query and get the result
-            Object result = query.getSingleResult();
+            Integer result = query.getSingleResult();
 
-            // Check if the result is not null and is a valid number
-            if (result instanceof Number number) {
-                return number.intValue();
-            } else {
-                // If result is null or not a number, return 0 as default
-                return 0;
-            }
+            // If the result is null (no records), return 0
+            return result != null ? result : 0;
         } catch (Exception e) {
             // Handle any exceptions that occur during the query execution
             e.printStackTrace();
             // Return a default value of 0 in case of an error
             throw e;
         }
+    }
+
+    private Field findIdField(Class<?> clazz) {
+        // Iterate over the fields to find the one annotated with @TestIdGeneratorAnnotation
+        for (Field field : clazz.getDeclaredFields()) {
+            if (field.isAnnotationPresent(TestIdGeneratorAnnotation.class)) {
+                return field;
+            }
+        }
+        throw new IllegalArgumentException("No field found with @TestIdGeneratorAnnotation in class " + clazz.getSimpleName());
     }
 }

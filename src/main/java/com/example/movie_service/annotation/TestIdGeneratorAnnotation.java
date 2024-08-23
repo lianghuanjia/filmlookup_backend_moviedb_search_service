@@ -12,4 +12,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @IdGeneratorType(TestIdGenerator.class)
 public @interface TestIdGeneratorAnnotation {
+    Class<?> entityClass();
+    String prefix();
 }
