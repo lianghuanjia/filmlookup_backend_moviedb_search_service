@@ -7,6 +7,10 @@ public final class MovieConstant {
     private MovieConstant() {
     }
 
+    // ID PREFIX:
+    public static final String MOVIE_ID_PREFIX = "tt";
+    public static final String PERSON_ID_PREFIX = "nm";
+
     // ERROR CODES AND MESSAGES:
     public static final int INVALID_YEAR_CODE = 40001;
     public static final String INVALID_YEAR_MESSAGE = "Invalid year";

@@ -1,6 +1,6 @@
 package com.example.movie_service.entity;
 
-import com.example.movie_service.generator.CustomTitleIdGenerator;
+import com.example.movie_service.annotation.CustomIdGeneratorAnnotation;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.util.Set;
+
+import static com.example.movie_service.constant.MovieConstant.MOVIE_ID_PREFIX;
 
 @Entity
 @Data
@@ -22,8 +24,7 @@ public class Movie {
 
     @Id
     @Column(name = "movie_id")
-    @GenericGenerator(name = "custom-title-id", type = CustomTitleIdGenerator.class)
-    @GeneratedValue(generator = "custom-title-id")
+    @CustomIdGeneratorAnnotation(entityClass = Movie.class, prefix = MOVIE_ID_PREFIX)
     private String id;
 
     @Column(name = "primaryTitle") // Ensure this matches the column name exactly

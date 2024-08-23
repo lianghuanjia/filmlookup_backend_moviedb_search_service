@@ -1,6 +1,6 @@
 package com.example.movie_service.generator;
 
-import com.example.movie_service.annotation.TestIdGeneratorAnnotation;
+import com.example.movie_service.annotation.CustomIdGeneratorAnnotation;
 import jakarta.persistence.TypedQuery;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.generator.BeforeExecutionGenerator;
@@ -12,7 +12,7 @@ import java.util.EnumSet;
 
 
 @Component
-public class TestIdGenerator implements BeforeExecutionGenerator {
+public class CustomIdGenerator implements BeforeExecutionGenerator {
 
 
     @Override
@@ -22,7 +22,7 @@ public class TestIdGenerator implements BeforeExecutionGenerator {
 
         // Find the ID field that has the annotation
         Field idField = findIdField(entityClass);
-        TestIdGeneratorAnnotation annotation = idField.getAnnotation(TestIdGeneratorAnnotation.class);
+        CustomIdGeneratorAnnotation annotation = idField.getAnnotation(CustomIdGeneratorAnnotation.class);
 
         if (annotation == null) {
             throw new RuntimeException("Entity class " + entity.getClass().getSimpleName() + " does not have @TestIdGeneratorAnnotation");
@@ -66,7 +66,7 @@ public class TestIdGenerator implements BeforeExecutionGenerator {
     private Field findIdField(Class<?> clazz) {
         // Iterate over the fields to find the one annotated with @TestIdGeneratorAnnotation
         for (Field field : clazz.getDeclaredFields()) {
-            if (field.isAnnotationPresent(TestIdGeneratorAnnotation.class)) {
+            if (field.isAnnotationPresent(CustomIdGeneratorAnnotation.class)) {
                 return field;
             }
         }

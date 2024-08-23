@@ -1,6 +1,6 @@
 package com.example.movie_service.annotation;
 
-import com.example.movie_service.generator.TestIdGenerator;
+import com.example.movie_service.generator.CustomIdGenerator;
 import org.hibernate.annotations.IdGeneratorType;
 
 import java.lang.annotation.ElementType;
@@ -10,8 +10,8 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@IdGeneratorType(TestIdGenerator.class)
-public @interface TestIdGeneratorAnnotation {
+@IdGeneratorType(CustomIdGenerator.class)
+public @interface CustomIdGeneratorAnnotation {
     Class<?> entityClass();
     String prefix();
 }

@@ -1,12 +1,14 @@
 package com.example.movie_service.entity;
 
-import com.example.movie_service.generator.CustomTitleIdGenerator;
+import com.example.movie_service.annotation.CustomIdGeneratorAnnotation;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
+
+import static com.example.movie_service.constant.MovieConstant.PERSON_ID_PREFIX;
 
 @Entity
 @Getter
@@ -15,9 +17,8 @@ import java.math.BigDecimal;
 public class Person {
 
     @Id
-    @GenericGenerator(name = "custom-name-id", type = CustomTitleIdGenerator.class)
-    @GeneratedValue(generator = "custom-name-id")
     @Column(name = "person_id")
+    @CustomIdGeneratorAnnotation(entityClass = Person.class, prefix = PERSON_ID_PREFIX)
     private String id;
 
     @Column(name = "name")
