@@ -17,7 +17,7 @@ public class Person {
 
     @Id
     @Column(name = "person_id")
-    @CustomIdGeneratorAnnotation(entityClass = Person.class, prefix = PERSON_ID_PREFIX)
+    @CustomIdGeneratorAnnotation(prefix = PERSON_ID_PREFIX)
     private String id;
 
     @Column(name = "name")

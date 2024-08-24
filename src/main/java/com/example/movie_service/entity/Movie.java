@@ -23,7 +23,7 @@ public class Movie {
 
     @Id
     @Column(name = "movie_id")
-    @CustomIdGeneratorAnnotation(entityClass = Movie.class, prefix = MOVIE_ID_PREFIX)
+    @CustomIdGeneratorAnnotation(prefix = MOVIE_ID_PREFIX)
     private String id;
 
     @Column(name = "primaryTitle") // Ensure this matches the column name exactly

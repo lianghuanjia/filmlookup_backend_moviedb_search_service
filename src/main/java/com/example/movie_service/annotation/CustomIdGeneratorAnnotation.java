@@ -12,6 +12,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @IdGeneratorType(CustomIdGenerator.class)
 public @interface CustomIdGeneratorAnnotation {
-    Class<?> entityClass();
     String prefix();
 }
