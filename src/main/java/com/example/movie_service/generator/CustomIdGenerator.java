@@ -3,6 +3,7 @@ package com.example.movie_service.generator;
 import com.example.movie_service.annotation.CustomIdGeneratorAnnotation;
 import com.example.movie_service.exception.NoCustomIdGeneratorAnnotationFoundInEntityException;
 import jakarta.persistence.TypedQuery;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.generator.BeforeExecutionGenerator;
 import org.hibernate.generator.EventType;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Field;
 import java.util.EnumSet;
 
-
+@Slf4j
 @Component
 public class CustomIdGenerator implements BeforeExecutionGenerator {
 
@@ -25,12 +26,6 @@ public class CustomIdGenerator implements BeforeExecutionGenerator {
         // Find the ID field that has the annotation
         Field idField = findIdField(entityClass);
         CustomIdGeneratorAnnotation annotation = idField.getAnnotation(CustomIdGeneratorAnnotation.class);
-
-        if (annotation == null) {
-            throw new NoCustomIdGeneratorAnnotationFoundInEntityException
-                    ("Entity class " + entity.getClass().getSimpleName() + " does not have @" +
-                            CustomIdGeneratorAnnotation.class.getSimpleName());
-        }
 
         String idProperty = idField.getName();
         String prefix = annotation.prefix();
@@ -60,8 +55,7 @@ public class CustomIdGenerator implements BeforeExecutionGenerator {
             // If the result is null (no records), return 0
             return result != null ? result : 0;
         } catch (Exception e) {
-            // Handle any exceptions that occur during the query execution
-            e.printStackTrace();
+            log.error("Error executing query to get max ID numeric part for entity: {}", entityClass.getSimpleName(), e);
             // Return a default value of 0 in case of an error
             throw e;
         }
@@ -74,6 +68,6 @@ public class CustomIdGenerator implements BeforeExecutionGenerator {
                 return field;
             }
         }
-        throw new IllegalArgumentException("No field found in class with annotation @" + clazz.getSimpleName());
+        throw new NoCustomIdGeneratorAnnotationFoundInEntityException("Entity class " + clazz.getSimpleName() + " does not have @" + CustomIdGeneratorAnnotation.class.getSimpleName());
     }
 }
