@@ -1,11 +1,11 @@
 package com.example.movie_service.globalExceptionHandler;
 
 import com.example.movie_service.exception.GlobalExceptionHandler;
+import com.example.movie_service.exception.NoCustomIdGeneratorAnnotationFoundInEntityException;
 import com.example.movie_service.exception.ResourceNotFoundException;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.response.CustomResponse;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class GlobalExceptionHandlerTest {
 
@@ -26,13 +27,36 @@ class GlobalExceptionHandlerTest {
     private final String errorMessage = "Error message";
 
     @Test
+    void testHandleNoCustomIdGeneratorAnnotationFoundInEntityException() {
+        // Set up
+        // Mock the exception class
+        NoCustomIdGeneratorAnnotationFoundInEntityException exception = new NoCustomIdGeneratorAnnotationFoundInEntityException(errorMessage);
+
+        // Call the method
+        ResponseEntity<CustomResponse<Object>> responseEntity = globalExceptionHandler.handleNoCustomIdGeneratorAnnotationFoundInEntityException(exception);
+
+        // Assertion
+
+        // Assert the error code inside the exception is always 500:
+        assertEquals(500, exception.getErrorCode());
+        // Assert the HttpStatus is HttpStatus.INTERNAL_SERVER_ERROR
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+
+        // Assert the CustomResponse is not null
+        CustomResponse<Object> customResponse = responseEntity.getBody();
+        assertNotNull(customResponse);
+        assertEquals(exception.getErrorCode(), customResponse.getCode());
+        assertEquals(errorMessage, customResponse.getMessage());
+    }
+
+    @Test
     void testHandleRequestParamValidationException() {
         // Mock the ValidationException
         ValidationException validationException = mock(ValidationException.class);
 
         // Mock the behavior of getErrorCode() and getErrorMessage() in the exception
-        Mockito.when(validationException.getErrorCode()).thenReturn(errorCode);
-        Mockito.when(validationException.getErrorMessage()).thenReturn(errorMessage);
+        when(validationException.getErrorCode()).thenReturn(errorCode);
+        when(validationException.getErrorMessage()).thenReturn(errorMessage);
 
         // Call the method
         ResponseEntity<CustomResponse<Object>> responseEntity = globalExceptionHandler.handleRequestParamValidationException(validationException);
@@ -51,8 +75,8 @@ class GlobalExceptionHandlerTest {
         ResourceNotFoundException resourceNotFoundException = mock(ResourceNotFoundException.class);
 
         // Mock the behavior of the resourceNotFoundException
-        Mockito.when(resourceNotFoundException.getErrorCode()).thenReturn(errorCode);
-        Mockito.when(resourceNotFoundException.getErrorMessage()).thenReturn(errorMessage);
+        when(resourceNotFoundException.getErrorCode()).thenReturn(errorCode);
+        when(resourceNotFoundException.getErrorMessage()).thenReturn(errorMessage);
 
         // Call the method
         ResponseEntity<CustomResponse<Object>> responseEntity = globalExceptionHandler.handleResourceNotFoundException(resourceNotFoundException);
@@ -70,7 +94,7 @@ class GlobalExceptionHandlerTest {
         String missingParameter = "title";
         MissingServletRequestParameterException missingServletRequestParameterException = mock(MissingServletRequestParameterException.class);
 
-        Mockito.when(missingServletRequestParameterException.getParameterName()).thenReturn(missingParameter);
+        when(missingServletRequestParameterException.getParameterName()).thenReturn(missingParameter);
 
         ResponseEntity<CustomResponse<Object>> responseEntity = globalExceptionHandler.handleMissingServletRequestParameterException(missingServletRequestParameterException);
 
@@ -86,7 +110,7 @@ class GlobalExceptionHandlerTest {
         // Mock the exception class
         Exception exception = mock(Exception.class);
 
-        Mockito.when(exception.getMessage()).thenReturn(errorMessage);
+        when(exception.getMessage()).thenReturn(errorMessage);
 
         ResponseEntity<CustomResponse<Object>> responseEntity = globalExceptionHandler.handleGeneralException(exception);
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
