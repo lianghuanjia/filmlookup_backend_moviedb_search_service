@@ -4,14 +4,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * It is the standard response for all endpoints.
- *
- * @param <T> A generic type of data retrieved from service layer
+ * It is the custom response for all endpoints.
+ * @param <T> A generic type that represents the data.
  */
 @Data
 @AllArgsConstructor
 public class CustomResponse<T> {
-    private int code;       // response code (e.g., 20001)
+    // response code (e.g., 20001)
+    private int code;
+
+    // Response message (e.g., "Movie(s) found")
     private String message; // Response message (e.g., "Movie(s) found")
-    private T data;         // Data retrieved from service layer (e.g., a list of Movie entities)
+
+    // Data retrieved from service layer, it can be:
+    //     - A list of MovieSearchResultDTO when movies found
+    //     - An empty list when no movies found
+    //     - Null when there are Exceptions thrown in the endpoints
+    private T data;
 }

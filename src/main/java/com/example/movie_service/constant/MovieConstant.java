@@ -1,6 +1,12 @@
 package com.example.movie_service.constant;
 
-// This is helpful because when you write test, you can use those reference too.
+/**
+ * Put all constants that are used in the movie_service (exclude the test folder) in this file <br>
+ *
+ * Why using constants:
+ * 1. Creating String is expensive. We can create one String here and reuse them elsewhere.
+ * 2. Constants are helpful because when we write test, we can use those reference as expected values.
+ */
 public final class MovieConstant {
 
     // Define a private constructor to hide the public one

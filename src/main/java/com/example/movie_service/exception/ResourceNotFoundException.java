@@ -2,6 +2,9 @@ package com.example.movie_service.exception;
 
 import lombok.*;
 
+/**
+ * This Exception is thrown when a resource is not found
+ */
 @Getter
 @Setter
 @AllArgsConstructor

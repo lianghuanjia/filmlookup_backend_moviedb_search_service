@@ -11,9 +11,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import static com.example.movie_service.constant.MovieConstant.*;
 
+/**
+ * This class handles all the Exceptions
+ */
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
     /**
      * Handles ValidationException exceptions
      *
@@ -29,12 +33,22 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handles NoCustomIdGeneratorAnnotationFoundInEntityException
+     * @param exception An Exception thrown when an Entity is meant to use @CustomIdGeneratorAnnotation but this annotation is not found in the Entity.
+     * @return ResponseEntity with a CustomResponse and INTERNAL_SERVER_ERROR HttpStatus
+     */
     @ExceptionHandler(NoCustomIdGeneratorAnnotationFoundInEntityException.class)
     public ResponseEntity<CustomResponse<Object>> handleNoCustomIdGeneratorAnnotationFoundInEntityException(NoCustomIdGeneratorAnnotationFoundInEntityException exception) {
         CustomResponse<Object> response = new CustomResponse<>(exception.getErrorCode(), exception.getErrorMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    /**
+     * Handles ResourceNotFoundException
+     * @param exception An Exception thrown when a resource is not found
+     * @return ResponseEntity with a CustomResponse and NOT_FOUND HttpStatus
+     */
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<CustomResponse<Object>> handleResourceNotFoundException(ResourceNotFoundException exception) {
         log.error("handleResourceNotFoundException: ", exception);

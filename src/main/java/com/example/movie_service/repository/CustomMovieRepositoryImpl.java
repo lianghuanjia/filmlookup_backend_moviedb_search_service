@@ -11,12 +11,21 @@ import java.util.List;
 
 import static com.example.movie_service.constant.MovieConstant.MOVIE_SEARCH_RESULT_DTO_MAPPING;
 
+/**
+ * Implementation of the Interface of custom movie repository layer
+ */
 @Repository
 public class CustomMovieRepositoryImpl implements CustomMovieRepository {
 
-    @PersistenceContext //This is specific for EntityManager that provides Transaction-Scoped Behavior
+    // @PersistenceContext is specific for EntityManager that provides Transaction-Scoped Behavior
+    @PersistenceContext
     private EntityManager entityManager;
 
+    /**
+     * Search movies that meets the criteria of the parameters inside the movieSearchParam from MySQL database
+     * @param movieSearchParam a class that encapsulates all necessary parameters to search movies
+     * @return A list of MovieSearchResultDTO. Each MovieSearchResultDTO represents one searched movie result
+     */
     @Override
     public List<MovieSearchResultDTO> searchMovies(MovieSearchParam movieSearchParam) {
         // Build string query with optional parameters
@@ -39,6 +48,15 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         return results;
     }
 
+    /**
+     * Use parameters to build a query string
+     * @param releasedYear The released year of a movie. Can be Nullable or an empty String.
+     * @param director The movie's director. Can be Nullable or an empty String.
+     * @param genre The movie's genre. Can be Nullable or an empty String.
+     * @param orderBy The field that order the result. By default, it's "title", it can also be "rating" or "releaseTime".
+     * @param direction The direction of the ordered results. By default, it's "asc". It can also be "desc".
+     * @return A query string
+     */
     private String buildSqlQuery(String releasedYear, String director, String genre, String orderBy, String direction) {
         StringBuilder queryBuilder = new StringBuilder(
                 "SELECT m.movie_id AS id, " +

@@ -1,56 +1,15 @@
-responses:
-  error:
-    InvalidYear:
-      code: 40001
-      message: "Invalid year"
-    InvalidLimit:
-      code: 40002
-      message: "Invalid limit"
-    InvalidPage:
-      code: 40003
-      message: "Invalid page"
-    InvalidOrderBy:
-      code: 40004
-      message: "Invalid orderBy"
-    InvalidDirection:
-      code: 40005
-      message: "Invalid direction"
-    MissingTitle:
-      code: 40006
-      message: "Missing title"
-    Unauthorized:
-      code: 40101
-      message: "Unauthorized request"
-    InvalidCredential:
-      code: 40102
-      message: "Invalid credential"
-    FailedAuthorization:
-      code: 40103
-      message: "Authorization failed"
-    NoPermission:
-      code: 40301
-      message: "No permission to access this endpoint"
-    PersonIdNotFound:
-      code: 40401
-      message: "PersonId not found"
-  success:
-    MoviesFound:
-      code: 20001
-      message: "Movie(s) found"
-    MoviesNotFound:
-      code: 20002
-      message: "No movies found with the given search parameters"
-    MoviesFoundWithPersonId:
-      code: 20003
-      message: "Movie(s) found with personId"
-    MoviesNotFoundWithPersonId:
-      code: 20004
-      message: "No movies found with the given personId"
-
-
 spring:
   jpa:
     hibernate:
+      # The following strategy tells Hibernate not to apply any naming conversion between camelCase and snake_case.
+      # Instead, it will use the exact names you define in your Java code.
+      #
+      # Background:
+      # Spring Boot, by default, uses SpringPhysicalNamingStrategy, which converts camelCase to snake_case. For example:
+      #   - Entity Field Name (camelCase): firstName
+      #   - Database Column Name (snake_case): first_name
+      #
+      # This means if you have an entity class with a field named firstName, by default, Spring Boot will map it to a column named first_name in the database.
+      # With the following strategy, if your entity class has a field named firstName, Hibernate will map it to a column named firstName in the database, without converting it to snake_case.
+      # If we don't use this strategy, when we use hibernate to interact with the database, we name our column firstName, but hibernate will look for column named first_name, which can't find in the database, and then cause error.
       naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-
-

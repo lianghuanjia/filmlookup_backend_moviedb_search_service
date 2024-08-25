@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Controller layer of the movie_service application
+ */
 @Validated
 @RestController
 @RequestMapping("/v1/api")

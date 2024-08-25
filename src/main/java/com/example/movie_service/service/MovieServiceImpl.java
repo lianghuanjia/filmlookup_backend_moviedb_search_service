@@ -76,6 +76,15 @@ public class MovieServiceImpl implements MovieService {
         return new ResponseEntity<>(customResponse, HttpStatus.OK);
     }
 
+    /**
+     * Validate those parameters and make sure they are valid
+     * @param title the searching movie's title
+     * @param releasedYear the released year of the searching movie
+     * @param limit the maximum number of the return results
+     * @param page the page to do the pagination
+     * @param orderBy the field that orders the return results. It can be title/rating/releasedYear
+     * @param direction the direction that orders the results.
+     */
     private void validateSearchMoviesParameters(String title, String releasedYear, Integer limit, Integer page,
                                                 String orderBy, String direction) {
         validationService.validateTitle(title);

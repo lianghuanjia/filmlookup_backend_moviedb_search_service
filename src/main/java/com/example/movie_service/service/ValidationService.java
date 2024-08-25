@@ -1,6 +1,5 @@
 package com.example.movie_service.service;
 
-
 import com.example.movie_service.exception.ValidationException;
 
 public interface ValidationService {
