@@ -40,6 +40,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(NoCustomIdGeneratorAnnotationFoundInEntityException.class)
     public ResponseEntity<CustomResponse<Object>> handleNoCustomIdGeneratorAnnotationFoundInEntityException(NoCustomIdGeneratorAnnotationFoundInEntityException exception) {
+        log.error("handleNoCustomIdGeneratorAnnotationFoundInEntityException: ", exception);
         CustomResponse<Object> response = new CustomResponse<>(exception.getErrorCode(), exception.getErrorMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
