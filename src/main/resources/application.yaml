@@ -1,75 +1,15 @@
-responses:
-  error:
-    invalid_year:
-      status: 400
-      code: 40001
-      message: "Invalid year"
-    invalid_limit:
-      status: 400
-      code: 40002
-      message: "Invalid limit"
-    invalid_page:
-      status: 400
-      code: 40003
-      message: "Invalid page"
-    invalid_orderBy:
-      status: 400
-      code: 40004
-      message: "Invalid orderBy"
-    invalid_direction:
-      status: 400
-      code: 40005
-      message: "Invalid direction"
-    missing_title:
-      status: 400
-      code: 40006
-      message: "Missing title"
-    unauthorized:
-      status: 401
-      code: 40101
-      message: "Unauthorized request"
-    invalid_credential:
-      status: 401
-      code: 40102
-      message: "Invalid credential"
-    failed_authorization:
-      status: 401
-      code: 40103
-      message: "Authorization failed"
-    no_permission:
-      status: 403
-      code: 40301
-      message: "No permission to access this endpoint"
-    personId_not_found:
-      status: 404
-      code: 40401
-      message: "PersonId not found"
-    internal_error:
-      status: 500
-      code: 500
-      message: "Internal service error"
-  success:
-    movies_found:
-      status: 200
-      code: 20001
-      message: "Movie(s) found"
-    movies_not_found:
-      status: 200
-      code: 20002
-      message: "Movie(s) not found"
-    movies_found_with_personId:
-      status: 200
-      code: 20003
-      message: "Movie(s) found with personId"
-    movies_not_found_with_personId:
-      status: 200
-      code: 20004
-      message: "Movie(s) not found with personId"
-
-
 spring:
   jpa:
     hibernate:
+      # The following strategy tells Hibernate not to apply any naming conversion between camelCase and snake_case.
+      # Instead, it will use the exact names you define in your Java code.
+      #
+      # Background:
+      # Spring Boot, by default, uses SpringPhysicalNamingStrategy, which converts camelCase to snake_case. For example:
+      #   - Entity Field Name (camelCase): firstName
+      #   - Database Column Name (snake_case): first_name
+      #
+      # This means if you have an entity class with a field named firstName, by default, Spring Boot will map it to a column named first_name in the database.
+      # With the following strategy, if your entity class has a field named firstName, Hibernate will map it to a column named firstName in the database, without converting it to snake_case.
+      # If we don't use this strategy, when we use hibernate to interact with the database, we name our column firstName, but hibernate will look for column named first_name, which can't find in the database, and then cause error.
       naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-
-

@@ -1,11 +1,7 @@
 package com.example.movie_service.exception;
 
-//import com.example.movie_service.config.ErrorResponseConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.example.movie_service.config.ResponseConfig;
+import lombok.extern.slf4j.Slf4j;
 import com.example.movie_service.response.CustomResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -13,68 +9,80 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.awt.*;
+import static com.example.movie_service.constant.MovieConstant.*;
 
+/**
+ * This class handles all the Exceptions
+ */
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    private ResponseConfig responseConfig;
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
-    /**
-     * Constructor to inject ResponseConfig dependency
-     * @param responseConfig the response configuration. It is a Map of Map that maps the custom response and message
-     *                       in the application.yaml
-     */
-    @Autowired
-    public GlobalExceptionHandler(ResponseConfig responseConfig){
-        this.responseConfig = responseConfig;
-    }
-
     /**
      * Handles ValidationException exceptions
+     *
      * @param exception the ValidationException
      * @return a ResponseEntity with a custom response and BAD_REQUEST status.
-     *           (The custom response has response code, message, and data retrieved from service. The data is null in
-     *           this case since the validationException will be thrown before going into the service)
+     * (The custom response has response code, message, and data retrieved from service. The data is null in
+     * this case since the validationException will be thrown before going into the service)
      */
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<CustomResponse<Object>> handleRequestParamValidationException(ValidationException exception){
-        ResponseConfig.ResponseMessage responseMessage = responseConfig.getError().get(exception.getValidation_error_type());
-        CustomResponse<Object> response = new CustomResponse<>(responseMessage.getCode(), responseMessage.getMessage(), null);
+    public ResponseEntity<CustomResponse<Object>> handleRequestParamValidationException(ValidationException exception) {
+        log.error("handleRequestParamValidationException: ", exception);
+        CustomResponse<Object> response = new CustomResponse<>(exception.getErrorCode(), exception.getErrorMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handles NoCustomIdGeneratorAnnotationFoundInEntityException
+     * @param exception An Exception thrown when an Entity is meant to use @CustomIdGeneratorAnnotation but this annotation is not found in the Entity.
+     * @return ResponseEntity with a CustomResponse and INTERNAL_SERVER_ERROR HttpStatus
+     */
+    @ExceptionHandler(NoCustomIdGeneratorAnnotationFoundInEntityException.class)
+    public ResponseEntity<CustomResponse<Object>> handleNoCustomIdGeneratorAnnotationFoundInEntityException(NoCustomIdGeneratorAnnotationFoundInEntityException exception) {
+        log.error("handleNoCustomIdGeneratorAnnotationFoundInEntityException: ", exception);
+        CustomResponse<Object> response = new CustomResponse<>(exception.getErrorCode(), exception.getErrorMessage(), null);
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * Handles ResourceNotFoundException
+     * @param exception An Exception thrown when a resource is not found
+     * @return ResponseEntity with a CustomResponse and NOT_FOUND HttpStatus
+     */
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<CustomResponse<Object>> handleResourceNotFoundException(ResourceNotFoundException exception){
-        ResponseConfig.ResponseMessage responseMessage = responseConfig.getError().get(exception.getNotFoundResource());
-        CustomResponse<Object> response = new CustomResponse<>(responseMessage.getCode(), responseMessage.getMessage(), null);
+    public ResponseEntity<CustomResponse<Object>> handleResourceNotFoundException(ResourceNotFoundException exception) {
+        log.error("handleResourceNotFoundException: ", exception);
+        CustomResponse<Object> response = new CustomResponse<>(exception.getErrorCode(), exception.getErrorMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     /**
      * Handles MissingServletRequestParameterException exceptions. This Handler will catch this exception when there is
      * missing required parameters in the request.
+     *
      * @param exception the MissingServletRequestParameterException exception
      * @return a ResponseEntity with a custom response and BAD_REQUEST status.
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<CustomResponse<Object>> handleMissingServletRequestParameterException(MissingServletRequestParameterException exception){
+    public ResponseEntity<CustomResponse<Object>> handleMissingServletRequestParameterException(MissingServletRequestParameterException exception) {
+        log.error("handleMissingServletRequestParameterException: ", exception);
         String parameterName = exception.getParameterName();
-        ResponseConfig.ResponseMessage responseMessage = responseConfig.getError().get("missing_"+parameterName);
-        CustomResponse<Object> response = new CustomResponse<>(responseMessage.getCode(),responseMessage.getMessage(), null);
+        CustomResponse<Object> response = new CustomResponse<>(MISSING_REQUIRED_PARAMETER_CODE,
+                MISSING_REQUIRED_PARAMETER_MESSAGE_PREFIX + parameterName, null);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     /**
      * Handles all other exceptions
+     *
      * @param exception the general Exception
      * @return a ResponseEntity with a custom response code, message, and INTERNAL_SERVER_ERROR status.
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<CustomResponse<Object>> handleGeneralException(Exception exception){
-        logger.error("Exception occurred: ", exception);
-        return new ResponseEntity<>(new CustomResponse<>(500, exception.getMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<CustomResponse<Object>> handleGeneralException(Exception exception) {
+        log.error("handleGeneralException: ", exception);
+        return new ResponseEntity<>(new CustomResponse<>(INTERNAL_SERVICE_ERROR_CODE, exception.getMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
