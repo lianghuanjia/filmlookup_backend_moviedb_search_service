@@ -2,12 +2,14 @@ package com.example.movie_service.controller;
 
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.MovieSearchResultDTO;
+import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.response.CustomResponse;
 import com.example.movie_service.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -71,6 +73,11 @@ public class MovieController {
         // Return the response entity
         return movieService.searchMovies(movieSearchRequestParam);
 
+    }
+
+    @GetMapping("movies/{movie_id}")
+    public ResponseEntity<CustomResponse<OneMovieDetailsDTO>> searchMovieByMovieId(@PathVariable("movie_id") String movieId){
+        return movieService.searchOneMovieDetails(movieId);
     }
 
 }
