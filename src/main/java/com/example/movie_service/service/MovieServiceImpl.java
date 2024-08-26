@@ -2,6 +2,7 @@ package com.example.movie_service.service;
 
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.MovieSearchResultDTO;
+import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.repository.CustomMovieRepository;
 import com.example.movie_service.response.CustomResponse;
@@ -74,6 +75,11 @@ public class MovieServiceImpl implements MovieService {
 
 
         return new ResponseEntity<>(customResponse, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<CustomResponse<OneMovieDetailsDTO>> searchOneMovieDetails(String movie_id) {
+        return null;
     }
 
     /**

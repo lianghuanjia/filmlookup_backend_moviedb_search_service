@@ -2,6 +2,7 @@ package com.example.movie_service.service;
 
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.MovieSearchResultDTO;
+import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.response.CustomResponse;
 import org.springframework.http.ResponseEntity;
 
@@ -20,4 +21,5 @@ public interface MovieService {
      */
     ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovies(MovieSearchParam movieSearchParam);
 
+    ResponseEntity<CustomResponse<OneMovieDetailsDTO>> searchOneMovieDetails(String movie_id);
 }
