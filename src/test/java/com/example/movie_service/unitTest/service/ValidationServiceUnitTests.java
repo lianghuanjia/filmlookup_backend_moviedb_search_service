@@ -6,7 +6,18 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Year;
 
-import static com.example.movie_service.constant.MovieConstant.*;
+import static com.example.movie_service.constant.MovieConstant.INVALID_DIRECTION_CODE;
+import static com.example.movie_service.constant.MovieConstant.INVALID_DIRECTION_MESSAGE;
+import static com.example.movie_service.constant.MovieConstant.INVALID_LIMIT_CODE;
+import static com.example.movie_service.constant.MovieConstant.INVALID_LIMIT_MESSAGE;
+import static com.example.movie_service.constant.MovieConstant.INVALID_ORDER_BY_CODE;
+import static com.example.movie_service.constant.MovieConstant.INVALID_ORDER_BY_MESSAGE;
+import static com.example.movie_service.constant.MovieConstant.INVALID_PAGE_CODE;
+import static com.example.movie_service.constant.MovieConstant.INVALID_PAGE_MESSAGE;
+import static com.example.movie_service.constant.MovieConstant.INVALID_YEAR_CODE;
+import static com.example.movie_service.constant.MovieConstant.INVALID_YEAR_MESSAGE;
+import static com.example.movie_service.constant.MovieConstant.MISSING_TITLE_CODE;
+import static com.example.movie_service.constant.MovieConstant.MISSING_TITLE_MESSAGE;
 import static com.example.movie_service.constants.TestConstant.ASC;
 import static com.example.movie_service.constants.TestConstant.DESC;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

@@ -1,4 +1,4 @@
-package com.example.movie_service.unitTest.customIdGeneratorUT;
+package com.example.movie_service.unitTest.customidgenerator;
 
 import com.example.movie_service.annotation.CustomIdGeneratorAnnotation;
 import com.example.movie_service.exception.NoCustomIdGeneratorAnnotationFoundInEntityException;
@@ -134,6 +134,7 @@ class CustomIdGeneratorUnitTests {
         private String id;
     }
 
+    @SuppressWarnings({"unused"})
     // Test class without the annotation
     private static class EntityWithoutCustomIdGeneratorAnnotation {
         private String id;

@@ -1,7 +1,12 @@
 package com.example.movie_service.entity.mappingholder;
 
 import com.example.movie_service.dto.MovieSearchResultDTO;
-import jakarta.persistence.*;
+import jakarta.persistence.ColumnResult;
+import jakarta.persistence.ConstructorResult;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.SqlResultSetMapping;
+
 
 import static com.example.movie_service.constant.MovieConstant.MOVIE_SEARCH_RESULT_DTO_MAPPING;
 
@@ -25,6 +30,8 @@ import static com.example.movie_service.constant.MovieConstant.MOVIE_SEARCH_RESU
         )
 
 )
+
+@SuppressWarnings({"unused"})
 public class MappingHolder {
     @Id
     private int id;

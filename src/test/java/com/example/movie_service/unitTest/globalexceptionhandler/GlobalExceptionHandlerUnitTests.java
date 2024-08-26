@@ -1,4 +1,4 @@
-package com.example.movie_service.unitTest.globalExceptionHandler;
+package com.example.movie_service.unitTest.globalexceptionhandler;
 
 import com.example.movie_service.exception.GlobalExceptionHandler;
 import com.example.movie_service.exception.NoCustomIdGeneratorAnnotationFoundInEntityException;

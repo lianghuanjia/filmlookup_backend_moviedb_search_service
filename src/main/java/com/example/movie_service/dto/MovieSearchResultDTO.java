@@ -1,7 +1,10 @@
 package com.example.movie_service.dto;
 
 import com.example.movie_service.builder.MovieSearchParam;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 
 /**
  * This class is to contain the returning searching movie's values retrieved from database.

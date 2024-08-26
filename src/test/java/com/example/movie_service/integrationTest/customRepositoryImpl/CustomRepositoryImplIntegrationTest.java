@@ -6,7 +6,10 @@ import com.example.movie_service.integrationTest.util.dataInitService.DataInitia
 import com.example.movie_service.integrationTest.util.junitExtension.MySQLTestContainerExtension;
 import com.example.movie_service.repository.CustomMovieRepositoryImpl;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.*;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -17,7 +20,10 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.List;
 
 import static com.example.movie_service.constants.TestConstant.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 @ActiveProfiles("test") // Explicitly specify to use the configuration in the application-test.properties
 @ExtendWith(MySQLTestContainerExtension.class)
