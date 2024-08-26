@@ -78,8 +78,23 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public ResponseEntity<CustomResponse<OneMovieDetailsDTO>> searchOneMovieDetails(String movie_id) {
-        return null;
+    public ResponseEntity<CustomResponse<OneMovieDetailsDTO>> searchOneMovieDetails(String movieId) {
+        // validate movieId
+        validationService.validateMovieId(movieId);
+
+        // Get result from repository layer
+        OneMovieDetailsDTO oneMovieDetailsDTO = movieRepository.searchOneMovieDetails(movieId);
+
+        // Generate custom response:
+        CustomResponse<OneMovieDetailsDTO> customResponse;
+        ResponseEntity<CustomResponse<OneMovieDetailsDTO>> responseEntity;
+        if (oneMovieDetailsDTO != null) {
+            customResponse = new CustomResponse<>(MOVIE_FOUND_CODE, MOVIE_FOUND_MESSAGE, oneMovieDetailsDTO);
+        }else {
+            customResponse = new CustomResponse<>(MOVIE_NOT_FOUND_CODE, MOVIE_NOT_FOUND_MESSAGE, null);
+        }
+        responseEntity = new ResponseEntity<>(customResponse, HttpStatus.OK);
+        return responseEntity;
     }
 
     /**

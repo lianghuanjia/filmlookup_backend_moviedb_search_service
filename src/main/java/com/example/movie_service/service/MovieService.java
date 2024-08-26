@@ -21,5 +21,5 @@ public interface MovieService {
      */
     ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovies(MovieSearchParam movieSearchParam);
 
-    ResponseEntity<CustomResponse<OneMovieDetailsDTO>> searchOneMovieDetails(String movie_id);
+    ResponseEntity<CustomResponse<OneMovieDetailsDTO>> searchOneMovieDetails(String movieId);
 }

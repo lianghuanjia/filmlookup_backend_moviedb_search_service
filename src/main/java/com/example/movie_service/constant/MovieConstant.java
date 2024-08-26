@@ -28,8 +28,10 @@ public final class MovieConstant {
     public static final String INVALID_ORDER_BY_MESSAGE = "Invalid order by";
     public static final int INVALID_DIRECTION_CODE = 40005;
     public static final String INVALID_DIRECTION_MESSAGE = "Invalid direction";
-    public static final int MISSING_TITLE_CODE = 40006;
-    public static final String MISSING_TITLE_MESSAGE = "Missing title";
+    public static final int INVALID_TITLE_CODE = 40006;
+    public static final String INVALID_TITLE_MESSAGE = "Invalid title. Title cannot be null or an empty string";
+    public static final int INVALID_MOVIE_ID_CODE = 40007;
+    public static final String INVALID_MOVIE_ID_MESSAGE = "Invalid movie id. Movie id cannot be null or an empty string";
     public static final int UNAUTHORIZED_CODE = 40101;
     public static final String UNAUTHORIZED_MESSAGE = "Unauthorized request";
     public static final int INVALID_CREDENTIAL_CODE = 40102;

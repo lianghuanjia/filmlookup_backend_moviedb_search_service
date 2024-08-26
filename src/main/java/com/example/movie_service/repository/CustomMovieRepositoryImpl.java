@@ -2,6 +2,7 @@ package com.example.movie_service.repository;
 
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.MovieSearchResultDTO;
+import com.example.movie_service.dto.OneMovieDetailsDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -46,6 +47,11 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         @SuppressWarnings("unchecked")
         List<MovieSearchResultDTO> results = query.getResultList();
         return results;
+    }
+
+    @Override
+    public OneMovieDetailsDTO searchOneMovieDetails(String movieId) {
+        return null;
     }
 
     /**

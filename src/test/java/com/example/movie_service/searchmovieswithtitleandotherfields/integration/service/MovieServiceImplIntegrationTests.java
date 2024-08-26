@@ -99,8 +99,8 @@ class MovieServiceImplIntegrationTests {
 
         ValidationException exception = assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(
                 movieSearchParam));
-        assertEquals(MISSING_TITLE_CODE, exception.getErrorCode());
-        assertEquals(MISSING_TITLE_MESSAGE, exception.getErrorMessage());
+        assertEquals(INVALID_TITLE_CODE, exception.getErrorCode());
+        assertEquals(INVALID_TITLE_MESSAGE, exception.getErrorMessage());
     }
 
     @Test
@@ -110,8 +110,8 @@ class MovieServiceImplIntegrationTests {
 
         ValidationException exception = assertThrows(ValidationException.class, () -> movieServiceImpl.searchMovies(
                 movieSearchParam));
-        assertEquals(MISSING_TITLE_CODE, exception.getErrorCode());
-        assertEquals(MISSING_TITLE_MESSAGE, exception.getErrorMessage());
+        assertEquals(INVALID_TITLE_CODE, exception.getErrorCode());
+        assertEquals(INVALID_TITLE_MESSAGE, exception.getErrorMessage());
     }
 
     @Test
