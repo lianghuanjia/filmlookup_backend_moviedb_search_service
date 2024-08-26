@@ -14,4 +14,6 @@ public interface ValidationService {
     void validateOrderBy(String orderBy) throws ValidationException;
 
     void validateDirection(String direction) throws ValidationException;
+
+    void validateMovieId(String movieId) throws ValidationException;
 }

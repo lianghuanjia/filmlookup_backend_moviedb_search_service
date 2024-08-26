@@ -10,14 +10,16 @@ import static com.example.movie_service.constant.MovieConstant.INVALID_DIRECTION
 import static com.example.movie_service.constant.MovieConstant.INVALID_DIRECTION_MESSAGE;
 import static com.example.movie_service.constant.MovieConstant.INVALID_LIMIT_CODE;
 import static com.example.movie_service.constant.MovieConstant.INVALID_LIMIT_MESSAGE;
+import static com.example.movie_service.constant.MovieConstant.INVALID_MOVIE_ID_CODE;
+import static com.example.movie_service.constant.MovieConstant.INVALID_MOVIE_ID_MESSAGE;
 import static com.example.movie_service.constant.MovieConstant.INVALID_ORDER_BY_CODE;
 import static com.example.movie_service.constant.MovieConstant.INVALID_ORDER_BY_MESSAGE;
 import static com.example.movie_service.constant.MovieConstant.INVALID_PAGE_CODE;
 import static com.example.movie_service.constant.MovieConstant.INVALID_PAGE_MESSAGE;
 import static com.example.movie_service.constant.MovieConstant.INVALID_YEAR_CODE;
 import static com.example.movie_service.constant.MovieConstant.INVALID_YEAR_MESSAGE;
-import static com.example.movie_service.constant.MovieConstant.MISSING_TITLE_CODE;
-import static com.example.movie_service.constant.MovieConstant.MISSING_TITLE_MESSAGE;
+import static com.example.movie_service.constant.MovieConstant.INVALID_TITLE_CODE;
+import static com.example.movie_service.constant.MovieConstant.INVALID_TITLE_MESSAGE;
 import static com.example.movie_service.constants.TestConstant.ASC;
 import static com.example.movie_service.constants.TestConstant.DESC;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -32,15 +34,15 @@ class ValidationServiceUnitTests {
     @Test
     void validateTitle_ShouldThrowException_WhenTitleIsNull() {
         ValidationException exception = assertThrows(ValidationException.class, () -> validationService.validateTitle(null));
-        assertEquals(MISSING_TITLE_CODE, exception.getErrorCode());
-        assertEquals(MISSING_TITLE_MESSAGE, exception.getErrorMessage());
+        assertEquals(INVALID_TITLE_CODE, exception.getErrorCode());
+        assertEquals(INVALID_TITLE_MESSAGE, exception.getErrorMessage());
     }
 
     @Test
     void validateTitle_ShouldThrowException_WhenTitleIsEmpty() {
         ValidationException exception = assertThrows(ValidationException.class, () -> validationService.validateTitle(""));
-        assertEquals(MISSING_TITLE_CODE, exception.getErrorCode());
-        assertEquals(MISSING_TITLE_MESSAGE, exception.getErrorMessage());
+        assertEquals(INVALID_TITLE_CODE, exception.getErrorCode());
+        assertEquals(INVALID_TITLE_MESSAGE, exception.getErrorMessage());
     }
 
     @Test
@@ -119,5 +121,24 @@ class ValidationServiceUnitTests {
     void validateDirection_ShouldNotThrowException_WhenDirectionIsValid() {
         assertDoesNotThrow(() -> validationService.validateDirection(ASC));
         assertDoesNotThrow(() -> validationService.validateDirection(DESC));
+    }
+
+    @Test
+    void validateMovieId_ShouldNotThrowException_WhenMovieIdIsValid() {
+        assertDoesNotThrow(() -> validationService.validateMovieId("tt001"));
+    }
+
+    @Test
+    void validateMovieId_ShouldThrowException_WhenMovieIdIsNull() {
+        ValidationException exception = assertThrows(ValidationException.class, () -> validationService.validateMovieId(null));
+        assertEquals(INVALID_MOVIE_ID_CODE, exception.getErrorCode());
+        assertEquals(INVALID_MOVIE_ID_MESSAGE, exception.getErrorMessage());
+    }
+
+    @Test
+    void validateMovieId_ShouldThrowException_WhenMovieIdIsAnEmptyString() {
+        ValidationException exception = assertThrows(ValidationException.class, () -> validationService.validateMovieId(""));
+        assertEquals(INVALID_MOVIE_ID_CODE, exception.getErrorCode());
+        assertEquals(INVALID_MOVIE_ID_MESSAGE, exception.getErrorMessage());
     }
 }
