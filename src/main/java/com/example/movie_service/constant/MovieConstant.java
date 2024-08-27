@@ -61,6 +61,8 @@ public final class MovieConstant {
     // SQL REQUEST DTO MAPPING
     public static final String MOVIE_SEARCH_RESULT_DTO_MAPPING = "MovieSearchResultDTOMapping";
     public static final String SINGLE_MOVIE_BASIC_DETAILS_DTO_MAPPING = "SingleMovieBasicDetailsDTOMapping";
+    public static final String SINGLE_MOVIE_CREW_MEMBER_DTO_MAPPING = "SingleMovieCrewMemberDTOMapping";
+
     // MISS PARAMETER MAP
     public static final String TITLE = "title";
     public static final int MISSING_REQUIRED_PARAMETER_CODE = 40000;

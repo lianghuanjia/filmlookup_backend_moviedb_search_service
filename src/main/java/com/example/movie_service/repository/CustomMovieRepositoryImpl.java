@@ -10,15 +10,12 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static com.example.movie_service.constant.MovieConstant.MOVIE_SEARCH_RESULT_DTO_MAPPING;
 import static com.example.movie_service.constant.MovieConstant.SINGLE_MOVIE_BASIC_DETAILS_DTO_MAPPING;
+import static com.example.movie_service.constant.MovieConstant.SINGLE_MOVIE_CREW_MEMBER_DTO_MAPPING;
 
 /**
  * Implementation of the Interface of custom movie repository layer
@@ -38,7 +35,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
     @Override
     public List<MovieSearchResultDTO> searchMovies(MovieSearchParam movieSearchParam) {
         // Build string query with optional parameters
-        String sqlQuery = buildSqlQuery(movieSearchParam.getReleasedYear(), movieSearchParam.getDirector(),
+        String sqlQuery = buildQueryStringToSearchMovieWithTitleAndOtherFields(movieSearchParam.getReleasedYear(), movieSearchParam.getDirector(),
                 movieSearchParam.getGenre(), movieSearchParam.getOrderBy(), movieSearchParam.getDirection());
 
         // Create bare-bones native SQL Query
@@ -57,14 +54,35 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         return results;
     }
 
+    /**
+     * Search one movie's detailed information with its id.
+     * @param movieId the movie's id
+     * @return
+     * Note: Since there are a lot of joining, this will be a complicated query, so I will use
+     *       native sql query because compared to HQL, In some cases Hibernate does not generate the most
+     *       efficient statements, so then native SQL can be faster
+     */
     @Override
     public OneMovieDetailsDTO searchOneMovieDetails(String movieId) {
-        // Since there are a lot of joining, this will be a complicated query, so I will use
-        // native sql query because compared to HQL, In some cases Hibernate does not generate the most
-        // efficient statements, so then native SQL can be faster
+        // Get a movie's basic details
+        OneMovieDetailsDTO singleMovieBasicDetails = getOneMovieBasicDetails(movieId);
+        // Get a movie's crew members
+        List<CrewMember> crewMembers = getCrewMembersWithProfilePic(movieId);
+        singleMovieBasicDetails.setCrewMemberList(crewMembers);
 
+        return singleMovieBasicDetails;
+    }
+
+    /**
+     * Get a movie's basic details.
+     * Details including: movie's id, title, releaseTime, budget, revenue, overview, tagline, runtimeMinutes,
+     *                    backdropPath, posterPath, rating, number of votes, this movie's other names, and genres.
+     * @param movieId the movie's id
+     * @return OneMovieDetailsDTO
+     */
+    private OneMovieDetailsDTO getOneMovieBasicDetails(String movieId) {
         // Build a query string.
-        String sqlQueryString = buildSearchOneMovieDetailsQuery();
+        String sqlQueryString = buildQueryStringToSearchOneMovieBasicDetails();
 
         // Create a native SQL Query with mapping
         Query query = entityManager.createNativeQuery(sqlQueryString, SINGLE_MOVIE_BASIC_DETAILS_DTO_MAPPING);
@@ -74,87 +92,55 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         // statement. This prevents any injected SQL from being executed.
         query.setParameter("movieId", movieId);
 
-        // Get result
-        try {
-            OneMovieDetailsDTO result = (OneMovieDetailsDTO) query.getSingleResult();
-
-            List<CrewMember> crewMembers = getCrewMembers(movieId);
-            result.setCrewMemberList(crewMembers);
-            return result;
-        }catch (NoResultException e) {
-            return null;
-        }
+        return (OneMovieDetailsDTO) query.getSingleResult();
     }
 
-    private List<CrewMember> getCrewMembers(String movieId) {
+    /**
+     * Use it to get a movie's crew members that are recorded as director, actor, or actress in the database, and they
+     * have profile picture path in the database.
+     * @param movieId the movie's id
+     * @return a list of CrewMember object
+     */
+    private List<CrewMember> getCrewMembersWithProfilePic(String movieId) {
         String queryString = buildQueryStringToSearchOneMovieCrewMembers();
-        Query query = entityManager.createNativeQuery(queryString);
+        Query query = entityManager.createNativeQuery(queryString, SINGLE_MOVIE_CREW_MEMBER_DTO_MAPPING);
         query.setParameter("movieId", movieId);
         try {
-            List<Object[]> results = query.getResultList();
+            @SuppressWarnings("unchecked")
+            List<CrewMember> results = query.getResultList();
             if(results.isEmpty()) {
                 return Collections.emptyList();
             }
-            return mapQueryResultToMovieCrewList(results);
+            return results;
         }catch (NoResultException e) {
             return Collections.emptyList();
         }
     }
 
-    private List<CrewMember> mapQueryResultToMovieCrewList(List<Object[]> results) {
-        List<CrewMember> crewMemberList = new ArrayList<>();
-        for(Object[] row: results) {
-            String personId = (String) row[0];
-            String personName = (String) row[1];
-            String profilePath = (String) row[2];
-            String job = (String) row[3];
-
-            if (personId != null && job != null) {
-                CrewMember crewMember = new CrewMember(personId, personName, profilePath, job);
-                crewMemberList.add(crewMember);
-            }
-        }
-        return crewMemberList;
-    }
-
-//    private OneMovieDetailsDTO mapQueryResultToOneMovieDetailsDTO(List<Object[]> results) {
-//        OneMovieDetailsDTO movieDetails = new OneMovieDetailsDTO();
-//
-//        for (Object[] row : results) {
-//
-//            if (movieDetails.getId() == null) {
-//                movieDetails.setId((String) row[0]);
-//                movieDetails.setTitle((String) row[1]);
-//                movieDetails.setReleaseTime((String) row[2]);
-//                movieDetails.setBudget(row[3] != null ? ((Number) row[3]).longValue() : null);
-//                movieDetails.setRevenue(row[4] != null ? ((Number) row[4]).longValue() : null);
-//                movieDetails.setOverview((String) row[5]);
-//                movieDetails.setTagline((String) row[6]);
-//                movieDetails.setRuntimeMinutes(row[7] != null ? ((Number) row[7]).intValue() : null);
-//                movieDetails.setBackdropPath((String) row[8]);
-//                movieDetails.setPosterPath((String) row[9]);
-//                movieDetails.setRating(row[10] != null ? ((Number) row[10]).doubleValue() : null);
-//                movieDetails.setNumOfVotes(row[11] != null ? ((Number) row[11]).intValue() : null);
-//                movieDetails.setOtherNames((String) row[12]);
-//                movieDetails.setGenres((String) row[13]);
-//            }
-//        }
-//        return movieDetails;
-//    }
-
+    /**
+     * Build a query string to search a movie's crew members that are director, actor, or actress, and they have
+     * profile picture path in the database.
+     * @return a String.
+     */
     private String buildQueryStringToSearchOneMovieCrewMembers() {
         return "SELECT " +
-                "mc.person_id, " +
+                "mc.person_id AS person_id, " +
                 "p.name AS person_name, " +
                 "p.profile_path AS profilePath, " +
                 "mc.job " +
                 "FROM movie_crew mc " +
-                "INNER JOIN person p ON mc.person_id = p.person_id AND p.profile_path IS NOT NULL " +// Only get people who have profile_path
+                "INNER JOIN person p ON mc.person_id = p.person_id AND p.profile_path IS NOT NULL " + // Only get people who have profile_path
                 "AND mc.job IN ('Director', 'Actor', 'Actress') " + // Only get director(s), actors, actresses
                 "WHERE mc.movie_id = :movieId ";
     }
 
-    private String buildSearchOneMovieDetailsQuery() {
+    /**
+     * Build a query string to search a movie's basic details. Details including id, title, releaseTime, budget, revenue,
+     * overview, tagline, runtimeMinutes, backdropPath, posterPath, rating, number of votes, the movie's other names,
+     * and genres.
+     * @return a string.
+     */
+    private String buildQueryStringToSearchOneMovieBasicDetails() {
         return "SELECT " +
 
                 // Get movie_id, primaryTitle, releasedTime, budget, revenue, overview, tagline, runtimeMinutes, backdropPath,
@@ -205,7 +191,8 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
      * @param direction The direction of the ordered results. By default, it's "asc". It can also be "desc".
      * @return A query string
      */
-    private String buildSqlQuery(String releasedYear, String director, String genre, String orderBy, String direction) {
+    private String buildQueryStringToSearchMovieWithTitleAndOtherFields(String releasedYear, String director, String genre
+                                                                            , String orderBy, String direction) {
         StringBuilder queryBuilder = new StringBuilder(
                 "SELECT m.movie_id AS id, " +
                         "m.primaryTitle AS title, " +

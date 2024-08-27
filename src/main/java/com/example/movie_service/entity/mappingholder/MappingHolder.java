@@ -1,7 +1,9 @@
 package com.example.movie_service.entity.mappingholder;
 
+import com.example.movie_service.dto.CrewMember;
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
+import com.example.movie_service.entity.movie.MovieCrew;
 import jakarta.persistence.ColumnResult;
 import jakarta.persistence.ConstructorResult;
 import jakarta.persistence.Entity;
@@ -11,6 +13,7 @@ import jakarta.persistence.SqlResultSetMapping;
 
 import static com.example.movie_service.constant.MovieConstant.MOVIE_SEARCH_RESULT_DTO_MAPPING;
 import static com.example.movie_service.constant.MovieConstant.SINGLE_MOVIE_BASIC_DETAILS_DTO_MAPPING;
+import static com.example.movie_service.constant.MovieConstant.SINGLE_MOVIE_CREW_MEMBER_DTO_MAPPING;
 
 /**
  * This entity is used to centrally manage the @SqlResultSetMappings
@@ -56,6 +59,19 @@ import static com.example.movie_service.constant.MovieConstant.SINGLE_MOVIE_BASI
                         @ColumnResult(name = "numOfVotes", type = Integer.class),
                         @ColumnResult(name = "otherNames", type = String.class), // If it's a delimited string in the query result
                         @ColumnResult(name = "genres", type = String.class)
+                }
+        )
+)
+
+@SqlResultSetMapping(
+        name = SINGLE_MOVIE_CREW_MEMBER_DTO_MAPPING,
+        classes = @ConstructorResult(
+                targetClass = CrewMember.class,
+                columns = {
+                        @ColumnResult(name = "person_id", type = String.class),
+                        @ColumnResult(name = "person_name", type = String.class),
+                        @ColumnResult(name = "profilePath", type = String.class),
+                        @ColumnResult(name = "job", type = String.class)
                 }
         )
 )
