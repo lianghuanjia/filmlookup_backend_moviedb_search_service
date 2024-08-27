@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -20,9 +21,9 @@ public class OneMovieDetailsDTO {
     private Integer runtimeMinutes;
     private String backdropPath;
     private String posterPath;
-    private List<CrewMember> crewMemberList;
     private Double rating;
     private Integer numOfVotes;
-    private List<String> otherNameList;
-    private List<String> genreList;
+    private String otherNames; // Other names concatenated in one String with , as delimiter
+    private String genres; // All genres concatenated in one String with , as delimiter
+    private List<CrewMember> crewMemberList = new ArrayList<>();
 }

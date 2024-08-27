@@ -4,7 +4,6 @@ import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.CrewMember;
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
-import com.example.movie_service.entity.movie.MovieCrew;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
@@ -12,11 +11,14 @@ import jakarta.persistence.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static com.example.movie_service.constant.MovieConstant.MOVIE_SEARCH_RESULT_DTO_MAPPING;
+import static com.example.movie_service.constant.MovieConstant.SINGLE_MOVIE_BASIC_DETAILS_DTO_MAPPING;
 
 /**
  * Implementation of the Interface of custom movie repository layer
@@ -65,7 +67,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         String sqlQueryString = buildSearchOneMovieDetailsQuery();
 
         // Create a native SQL Query with mapping
-        Query query = entityManager.createNativeQuery(sqlQueryString);
+        Query query = entityManager.createNativeQuery(sqlQueryString, SINGLE_MOVIE_BASIC_DETAILS_DTO_MAPPING);
 
         // Set the movieId into the query. The setParameter also prevents SQL injection, because the input is safely
         // bound to the query as a parameter, and the database treats it as a value rather than part of the SQL
@@ -74,11 +76,8 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
 
         // Get result
         try {
-            List<Object[]> results = query.getResultList();
-            if (results.isEmpty()) {
-                return null;
-            }
-            OneMovieDetailsDTO result = mapQueryResultToOneMovieDetailsDTO(results);
+            OneMovieDetailsDTO result = (OneMovieDetailsDTO) query.getSingleResult();
+
             List<CrewMember> crewMembers = getCrewMembers(movieId);
             result.setCrewMemberList(crewMembers);
             return result;
@@ -94,12 +93,11 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         try {
             List<Object[]> results = query.getResultList();
             if(results.isEmpty()) {
-                return null;
+                return Collections.emptyList();
             }
-            List<CrewMember> CrewMemberList = mapQueryResultToMovieCrewList(results);
-            return CrewMemberList;
+            return mapQueryResultToMovieCrewList(results);
         }catch (NoResultException e) {
-            return null;
+            return Collections.emptyList();
         }
     }
 
@@ -119,130 +117,83 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         return crewMemberList;
     }
 
-    private OneMovieDetailsDTO mapQueryResultToOneMovieDetailsDTO(List<Object[]> results) {
-        OneMovieDetailsDTO movieDetails = new OneMovieDetailsDTO();
-//        List<CrewMember> crewMemberList = new ArrayList<>();
-        Set<String> otherNames = new HashSet<>();
-        Set<String> genres = new HashSet<>();
-
-//        System.out.println(results.size());
+//    private OneMovieDetailsDTO mapQueryResultToOneMovieDetailsDTO(List<Object[]> results) {
+//        OneMovieDetailsDTO movieDetails = new OneMovieDetailsDTO();
 //
-        for (Object[] row : results) {
+//        for (Object[] row : results) {
 //
-//            System.out.print("Row: ");
-//            for (Object column : row) {
-//                System.out.print(column + " | ");
+//            if (movieDetails.getId() == null) {
+//                movieDetails.setId((String) row[0]);
+//                movieDetails.setTitle((String) row[1]);
+//                movieDetails.setReleaseTime((String) row[2]);
+//                movieDetails.setBudget(row[3] != null ? ((Number) row[3]).longValue() : null);
+//                movieDetails.setRevenue(row[4] != null ? ((Number) row[4]).longValue() : null);
+//                movieDetails.setOverview((String) row[5]);
+//                movieDetails.setTagline((String) row[6]);
+//                movieDetails.setRuntimeMinutes(row[7] != null ? ((Number) row[7]).intValue() : null);
+//                movieDetails.setBackdropPath((String) row[8]);
+//                movieDetails.setPosterPath((String) row[9]);
+//                movieDetails.setRating(row[10] != null ? ((Number) row[10]).doubleValue() : null);
+//                movieDetails.setNumOfVotes(row[11] != null ? ((Number) row[11]).intValue() : null);
+//                movieDetails.setOtherNames((String) row[12]);
+//                movieDetails.setGenres((String) row[13]);
 //            }
-//            System.out.println();
-
-            if (movieDetails.getId() == null) {
-                movieDetails.setId((String) row[0]);
-                movieDetails.setTitle((String) row[1]);
-                movieDetails.setReleaseTime((String) row[2]);
-                movieDetails.setBudget(row[3] != null ? ((Number) row[3]).longValue() : null);
-                movieDetails.setRevenue(row[4] != null ? ((Number) row[4]).longValue() : null);
-                movieDetails.setOverview((String) row[5]);
-                movieDetails.setTagline((String) row[6]);
-                movieDetails.setRuntimeMinutes(row[7] != null ? ((Number) row[7]).intValue() : null);
-                movieDetails.setBackdropPath((String) row[8]);
-                movieDetails.setPosterPath((String) row[9]);
-                movieDetails.setRating(row[10] != null ? ((Number) row[10]).doubleValue() : null);
-                movieDetails.setNumOfVotes(row[11] != null ? ((Number) row[11]).intValue() : null);
-            }
-
-//            String personId = (String) row[10];
-//            String personName = (String) row[11];
-//            String profilePath = (String) row[12];
-//            String job = (String) row[13];
-
-//            if (personId != null && job != null) {
-//                CrewMember crewMember = new CrewMember(personId, personName, profilePath, job);
-//                crewMemberList.add(crewMember);
-//            }
-
-            if (row[12] != null) {
-                otherNames.add((String) row[12]);
-            }
-
-            if (row[13] != null) {
-                genres.add((String) row[13]);
-            }
-        }
-
-//        movieDetails.setCrewMemberList(crewMemberList);
-        movieDetails.setOtherNameList(new ArrayList<>(otherNames));
-        movieDetails.setGenreList(new ArrayList<>(genres));
-
-        return movieDetails;
-
-    }
+//        }
+//        return movieDetails;
+//    }
 
     private String buildQueryStringToSearchOneMovieCrewMembers() {
-        StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append("SELECT ");
-        queryBuilder.append("mc.person_id, ");
-        queryBuilder.append("p.name AS person_name, ");
-        queryBuilder.append("p.profile_path AS profilePath, ");
-        queryBuilder.append("mc.job ");
-        queryBuilder.append("FROM movie_crew mc ");
-        queryBuilder.append("INNER JOIN person p ON mc.person_id = p.person_id AND p.profile_path IS NOT NULL ");// Only get people who have profile_path
-        queryBuilder.append("AND mc.job IN ('Director', 'Actor', 'Actress') "); // Only get director(s), actors, actresses
-        queryBuilder.append("WHERE mc.movie_id = :movieId ");
-        return queryBuilder.toString();
+        return "SELECT " +
+                "mc.person_id, " +
+                "p.name AS person_name, " +
+                "p.profile_path AS profilePath, " +
+                "mc.job " +
+                "FROM movie_crew mc " +
+                "INNER JOIN person p ON mc.person_id = p.person_id AND p.profile_path IS NOT NULL " +// Only get people who have profile_path
+                "AND mc.job IN ('Director', 'Actor', 'Actress') " + // Only get director(s), actors, actresses
+                "WHERE mc.movie_id = :movieId ";
     }
 
     private String buildSearchOneMovieDetailsQuery() {
-        StringBuilder queryBuilder = new StringBuilder();
+        return "SELECT " +
 
-        queryBuilder.append("SELECT ");
+                // Get movie_id, primaryTitle, releasedTime, budget, revenue, overview, tagline, runtimeMinutes, backdropPath,
+                // posterPath from the movie table
+                "m.movie_id AS id, " +
+                "m.primaryTitle AS title, " +
+                "m.releaseTime, " +
+                "m.budget, " +
+                "m.revenue, " +
+                "m.overview, " +
+                "m.tagline, " +
+                "m.runtimeMinutes, " +
+                "m.backdrop_path AS backdropPath, " +
+                "m.poster_path AS posterPath, " +
 
-        // Get movie_id, primaryTitle, releasedTime, budget, revenue, overview, tagline, runtimeMinutes, backdropPath,
-        // posterPath from the movie table
-        queryBuilder.append("m.movie_id, ");
-        queryBuilder.append("m.primaryTitle, ");
-        queryBuilder.append("m.releaseTime, ");
-        queryBuilder.append("m.budget, ");
-        queryBuilder.append("m.revenue, ");
-        queryBuilder.append("m.overview, ");
-        queryBuilder.append("m.tagline, ");
-        queryBuilder.append("m.runtimeMinutes, ");
-        queryBuilder.append("m.backdrop_path AS backdropPath, ");
-        queryBuilder.append("m.poster_path AS posterPath, ");
+                // Get average rating and number of votes from movie_rating table
+                "mr.averageRating AS rating, " +
+                "mr.numVotes AS numOfVotes, " +
 
-        // Based on a movie_id, get its related crew member's person_id and job from the movie_crew table, and person's
-        // name and profile_path from the person table
-//        queryBuilder.append("mc.person_id, ");
-//        queryBuilder.append("p.name AS person_name, ");
-//        queryBuilder.append("p.profile_path AS profilePath, ");
-//        queryBuilder.append("mc.job, ");
+                // Get a movie's other unique names from movie_akas table, and get its genres from genre table
+                // GROUP_CONCAT aggregates multiple values into one single string.
+                "GROUP_CONCAT(DISTINCT ma.title) AS otherNames, " +
+                "GROUP_CONCAT(DISTINCT g.name) AS genres " +
+                "FROM movie m " +
 
-        // Get average rating and number of votes from movie_rating table
-        queryBuilder.append("mr.averageRating, ");
-        queryBuilder.append("mr.numVotes, ");
+                // Left join other tables
+                "LEFT JOIN movie_rating mr ON m.movie_id = mr.movie_id " +
+                "LEFT JOIN movie_akas ma ON m.movie_id = ma.movie_id " +
+                "LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id " +
+                "LEFT JOIN genre g ON mg.genre_id = g.id " +
 
-        // Get a movie's other unique names from movie_akas table, and get its genres from genre table
-        // GROUP_CONCAT aggregates multiple values into one single string.
-        queryBuilder.append("GROUP_CONCAT(DISTINCT ma.title) AS otherNames, ");
-        queryBuilder.append("GROUP_CONCAT(DISTINCT g.name) AS genres ");
+                // Set the condition
+                "WHERE m.movie_id = :movieId " +
 
-        queryBuilder.append("FROM movie m ");
-        // Left join other tables
-//        queryBuilder.append("LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id ");
-//        queryBuilder.append("INNER JOIN person p ON mc.person_id = p.person_id AND p.profile_path IS NOT NULL ");// Only get people who have profile_path
-//        queryBuilder.append("AND mc.job IN ('Director', 'Actor', 'Actress') "); // Only get director(s), actors, actresses
-        queryBuilder.append("LEFT JOIN movie_rating mr ON m.movie_id = mr.movie_id ");
-        queryBuilder.append("LEFT JOIN movie_akas ma ON m.movie_id = ma.movie_id ");
-        queryBuilder.append("LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id ");
-        queryBuilder.append("LEFT JOIN genre g ON mg.genre_id = g.id ");
-        // Set the condition
-        queryBuilder.append("WHERE m.movie_id = :movieId ");
-        // GROUP BY m.movie_id: We want to retrieve details for a specific movie using its movie_id. Grouping by movie_id
-        // ensures that all related data (e.g., crew members, ratings, genres, etc.) is associated with that single movie.
-        // GROUP BY mc.person_id, mc.job: Each movie can have multiple crew members, and each crew member can have
-        // different jobs. Grouping by person_id and job ensures that you get a distinct row for each crew member and their job for the given movie_id.
-        queryBuilder.append("GROUP BY m.movie_id"); //get rid of this because exclude movie_crew and person in this query: ", mc.person_id, mc.job"
-
-        return queryBuilder.toString();
+                // GROUP BY m.movie_id: We want to retrieve details for a specific movie using its movie_id. Grouping by movie_id
+                // ensures that all related data (e.g., crew members, ratings, genres, etc.) is associated with that single movie.
+                // GROUP BY mc.person_id, mc.job: Each movie can have multiple crew members, and each crew member can have
+                // different jobs. Grouping by person_id and job ensures that you get a distinct row for each crew member and their job for the given movie_id.
+                "GROUP BY m.movie_id";
     }
 
     /**

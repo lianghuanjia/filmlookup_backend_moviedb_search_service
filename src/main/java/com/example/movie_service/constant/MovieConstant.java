@@ -58,8 +58,9 @@ public final class MovieConstant {
     public static final int MOVIE_NOT_FOUND_WITH_PERSON_ID_CODE = 20004;
     public static final String MOVIE_NOT_FOUND_WITH_PERSON_ID_MESSAGE = "No movies found with the given personId";
 
+    // SQL REQUEST DTO MAPPING
     public static final String MOVIE_SEARCH_RESULT_DTO_MAPPING = "MovieSearchResultDTOMapping";
-
+    public static final String SINGLE_MOVIE_BASIC_DETAILS_DTO_MAPPING = "SingleMovieBasicDetailsDTOMapping";
     // MISS PARAMETER MAP
     public static final String TITLE = "title";
     public static final int MISSING_REQUIRED_PARAMETER_CODE = 40000;
