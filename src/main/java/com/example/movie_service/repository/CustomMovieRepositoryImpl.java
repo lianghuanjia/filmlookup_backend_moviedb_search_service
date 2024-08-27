@@ -89,7 +89,16 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         Set<String> otherNames = new HashSet<>();
         Set<String> genres = new HashSet<>();
 
+        System.out.println(results.size());
+
         for (Object[] row : results) {
+
+            System.out.print("Row: ");
+            for (Object column : row) {
+                System.out.print(column + " | ");
+            }
+            System.out.println();
+
             if (movieDetails.getId() == null) {
                 movieDetails.setId((String) row[0]);
                 movieDetails.setTitle((String) row[1]);
@@ -162,6 +171,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         queryBuilder.append("mr.numVotes, ");
 
         // Get a movie's other unique names from movie_akas table, and get its genres from genre table
+        // GROUP_CONCAT aggregates multiple values into one single string.
         queryBuilder.append("GROUP_CONCAT(DISTINCT ma.title) AS otherNames, ");
         queryBuilder.append("GROUP_CONCAT(DISTINCT g.name) AS genres ");
 
@@ -169,6 +179,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         // Left join other tables
         queryBuilder.append("LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id ");
         queryBuilder.append("INNER JOIN person p ON mc.person_id = p.person_id AND p.profile_path IS NOT NULL ");// Only get people who have profile_path
+        queryBuilder.append("AND mc.job IN ('Director', 'Actor', 'Actress') "); // Only get director(s), actors, actresses
         queryBuilder.append("LEFT JOIN movie_rating mr ON m.movie_id = mr.movie_id ");
         queryBuilder.append("LEFT JOIN movie_akas ma ON m.movie_id = ma.movie_id ");
         queryBuilder.append("LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id ");
