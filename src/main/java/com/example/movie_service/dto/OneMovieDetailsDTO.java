@@ -15,9 +15,11 @@ public class OneMovieDetailsDTO {
     private String releaseTime;
     private Long budget;
     private Long revenue;
+    private String overview;
+    private String tagline;
+    private Integer runtimeMinutes;
     private String backdropPath;
     private String posterPath;
-    private String directors;
     private List<CrewMember> crewMemberList;
     private Double rating;
     private Integer numOfVotes;
