@@ -45,7 +45,7 @@ public class TestConstant {
     public static final String MOVIE_11_TITLE = "Movie11";
     public static final String MOVIE_12_TITLE = "Movie12";
     public static final String MOVIE_13_TITLE = "Movie13";
-    public static final String MOVIE_WITH_TITLE_ONLY = "Movie_with_title_only";
+    public static final String MOVIE_WITH_TITLE_ONLY = "Title_only";
 
     // Movie releaseTime
     public static final String MOVIE_1_RELEASE_TIME = "2023-10-08";
