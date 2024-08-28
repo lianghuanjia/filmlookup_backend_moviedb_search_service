@@ -111,16 +111,15 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         String queryString = buildQueryStringToSearchOneMovieCrewMembers();
         Query query = entityManager.createNativeQuery(queryString, SINGLE_MOVIE_CREW_MEMBER_DTO_MAPPING);
         query.setParameter("movieId", movieId);
-        try {
-            @SuppressWarnings("unchecked")
-            List<CrewMember> results = query.getResultList();
-            if(results.isEmpty()) {
-                return Collections.emptyList();
-            }
-            return results;
-        }catch (NoResultException e) {
+
+        @SuppressWarnings("unchecked")
+        List<CrewMember> results = query.getResultList();
+        // If query.getResultList(); doesn't found results, it will return an empty list, instead of raising
+        // NoResultException like query.getSingleResult() does.
+        if(results.isEmpty()) {
             return Collections.emptyList();
         }
+        return results;
     }
 
     /**

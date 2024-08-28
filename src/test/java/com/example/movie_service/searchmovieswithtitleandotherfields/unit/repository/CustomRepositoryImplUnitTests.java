@@ -344,7 +344,7 @@ class CustomRepositoryImplUnitTests {
         // Mock the behavior of getCrewMembersWithProfilePic
         when(entityManager.createNativeQuery(anyString(), eq(SINGLE_MOVIE_CREW_MEMBER_DTO_MAPPING))).thenReturn(query);
         when(query.setParameter("movieId", movieId)).thenReturn(query);
-        doThrow(NoResultException.class).when(query).getResultList();
+        when(query.getResultList()).thenReturn(Collections.emptyList());
 
         // Act
         OneMovieDetailsDTO actual = customMovieRepositoryImpl.searchOneMovieDetails(movieId);

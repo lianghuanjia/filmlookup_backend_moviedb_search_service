@@ -39,9 +39,7 @@ class ServiceUnitTests {
     @Spy
     private ValidationService validationService;
 
-    // Previously I do the following instead of Mock the CustomMovieRepository interface.
-    //    @Spy
-    //    private CustomMovieRepositoryImpl customMovieRepository;
+    // Previously instead of Mock the CustomMovieRepository interface, I use @Spy on the CustomMovieRepositoryImpl.
     // This cause a problem that when I try to mock customMovieRepository.searchOneMovieDetails(movieId)'s
     // behavior, due to the use of @Spy, it actually executes the customMovieRepository.searchOneMovieDetails(movieId),
     // and invoke its 2 private methods. These 2 methods use entityManager, and I don't have entityManager in
