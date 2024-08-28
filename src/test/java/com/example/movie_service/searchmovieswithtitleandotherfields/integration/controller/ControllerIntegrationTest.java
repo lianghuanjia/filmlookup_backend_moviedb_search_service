@@ -1,10 +1,16 @@
 package com.example.movie_service.searchmovieswithtitleandotherfields.integration.controller;
 
 
+import com.example.movie_service.dto.CrewMember;
 import com.example.movie_service.dto.MovieSearchResultDTO;
+import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.searchmovieswithtitleandotherfields.integration.util.dataInitService.DataInitializerService;
 import com.example.movie_service.searchmovieswithtitleandotherfields.integration.util.junitExtension.MySQLTestContainerExtension;
 import com.example.movie_service.response.CustomResponse;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,12 +21,14 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 
 import static com.example.movie_service.constant.MovieConstant.*;
@@ -33,6 +41,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @DirtiesContext // Importantly, this recreates the application context and allows our test classes to interact with a separate MySQL instance, running on a random port.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ControllerIntegrationTest {
+
+    @PersistenceContext
+    EntityManager entityManager;
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -48,6 +59,10 @@ class ControllerIntegrationTest {
     private String searchMoviePath;
     // Define the response type using ParameterizedTypeReference
     private final ParameterizedTypeReference<CustomResponse<List<MovieSearchResultDTO>>> responseType =
+            new ParameterizedTypeReference<>() {
+            };
+
+    private final ParameterizedTypeReference<CustomResponse<OneMovieDetailsDTO>> oneMovieDetailsResponseType =
             new ParameterizedTypeReference<>() {
             };
 
@@ -353,6 +368,139 @@ class ControllerIntegrationTest {
 
         // Assert the data in customResponse is null
         assertNull(customResponse.getData());
+    }
+
+
+    @Test
+    void SearchOneMovieDetails_MovieFound_CrewMembersFound() {
+        String movie1Id = getMovieIdByMovieTitle(THE_DARK_KNIGHT);
+        assertNotNull(movie1Id);
+
+        URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath+"/"+movie1Id).build().toUri();
+
+        // Perform a GET request to the controller
+        ResponseEntity<CustomResponse<OneMovieDetailsDTO>> responseEntity = restTemplate.exchange
+                (uri, HttpMethod.GET, null, oneMovieDetailsResponseType);
+
+        assertTrue(responseEntity.getStatusCode().is2xxSuccessful());
+        assertNotNull(responseEntity.getBody());
+        CustomResponse<OneMovieDetailsDTO> customResponse = responseEntity.getBody();
+
+        assertNotNull(customResponse);
+        assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
+        assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
+
+        OneMovieDetailsDTO singleMovieDetails = customResponse.getData();
+        assertEquals(movie1Id, singleMovieDetails.getId());
+        assertEquals(THE_DARK_KNIGHT, singleMovieDetails.getTitle());
+        assertEquals(THE_DARK_KNIGHT_RELEASE_TIME, singleMovieDetails.getReleaseTime());
+        assertTrue(singleMovieDetails.getGenres().contains(ACTION_GENRE));
+        assertFalse(singleMovieDetails.getGenres().contains(LOVE_GENRE));
+        List<CrewMember> crewMembers = singleMovieDetails.getCrewMemberList();
+        assertEquals(3, crewMembers.size());
+        assertTrue(crewMembers.stream().anyMatch(crewMember -> ACTOR_1_NAME.equals(crewMember.getName())));
+        assertTrue(crewMembers.stream().anyMatch(crewMember -> ACTRESS_1_NAME.equals(crewMember.getName())));
+        assertTrue(crewMembers.stream().anyMatch(crewMember -> DIRECTOR_NOLAN.equals(crewMember.getName())));
+        assertFalse(crewMembers.stream().anyMatch(crewMember -> COMPOSER_1_NAME.equals(crewMember.getName())));
+    }
+
+    @Test
+    void SearchOneMovieDetails_MovieFound_CrewMembersNotFound() {
+        String movieWithTitleOnlyId = getMovieIdByMovieTitle(MOVIE_WITH_TITLE_ONLY);
+        assertNotNull(movieWithTitleOnlyId);
+
+        URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath+"/"+movieWithTitleOnlyId).build().toUri();
+
+        // Perform a GET request to the controller
+        ResponseEntity<CustomResponse<OneMovieDetailsDTO>> responseEntity = restTemplate.exchange
+                (uri, HttpMethod.GET, null, oneMovieDetailsResponseType);
+
+        assertTrue(responseEntity.getStatusCode().is2xxSuccessful());
+        assertNotNull(responseEntity.getBody());
+        CustomResponse<OneMovieDetailsDTO> customResponse = responseEntity.getBody();
+
+        assertNotNull(customResponse);
+        assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
+        assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
+
+        OneMovieDetailsDTO singleMovieDetails = customResponse.getData();
+        assertEquals(movieWithTitleOnlyId, singleMovieDetails.getId());
+        assertEquals(MOVIE_WITH_TITLE_ONLY, singleMovieDetails.getTitle());
+        assertNull(singleMovieDetails.getRating());
+        assertNull(singleMovieDetails.getReleaseTime());
+        assertNull(singleMovieDetails.getGenres());
+        assertEquals(Collections.emptyList(), singleMovieDetails.getCrewMemberList());
+        assertEquals(0, singleMovieDetails.getCrewMemberList().size());
+    }
+
+    @Test
+    void SearchOneMovieDetails_MovieNotFound() {
+        String movie1Id = "No such Id";
+        URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath+"/"+movie1Id).build().toUri();
+
+        // Perform a GET request to the controller
+        ResponseEntity<CustomResponse<OneMovieDetailsDTO>> responseEntity = restTemplate.exchange
+                (uri, HttpMethod.GET, null, oneMovieDetailsResponseType);
+
+        assertTrue(responseEntity.getStatusCode().is2xxSuccessful());
+        assertNotNull(responseEntity.getBody());
+        CustomResponse<OneMovieDetailsDTO> customResponse = responseEntity.getBody();
+
+        assertNotNull(customResponse);
+        assertEquals(MOVIE_NOT_FOUND_CODE, customResponse.getCode());
+        assertEquals(MOVIE_NOT_FOUND_MESSAGE, customResponse.getMessage());
+        assertNull(customResponse.getData());
+    }
+
+    @Test
+    void SearchOneMovieDetails_MovieIdIsNull() {
+
+        URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath+"/").build().toUri();
+        System.out.println(uri);
+        // Perform a GET request to the controller
+        ResponseEntity<CustomResponse<OneMovieDetailsDTO>> responseEntity = restTemplate.exchange
+                (uri, HttpMethod.GET, null, oneMovieDetailsResponseType);
+
+        assertTrue(responseEntity.getStatusCode().is4xxClientError());
+        assertNotNull(responseEntity.getBody());
+        CustomResponse<OneMovieDetailsDTO> customResponse = responseEntity.getBody();
+
+        assertNotNull(customResponse);
+        assertEquals(HttpStatus.NOT_FOUND.value(), customResponse.getCode());
+        assertNull(customResponse.getData());
+    }
+
+    @Test
+    void SearchOneMovieDetails_MovieIdIsEmptyString() {
+
+        URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath+"/"+"").build().toUri();
+        System.out.println(uri);
+        // Perform a GET request to the controller
+        ResponseEntity<CustomResponse<OneMovieDetailsDTO>> responseEntity = restTemplate.exchange
+                (uri, HttpMethod.GET, null, oneMovieDetailsResponseType);
+
+        assertTrue(responseEntity.getStatusCode().is4xxClientError());
+        assertNotNull(responseEntity.getBody());
+        CustomResponse<OneMovieDetailsDTO> customResponse = responseEntity.getBody();
+
+        assertNotNull(customResponse);
+        assertEquals(HttpStatus.NOT_FOUND.value(), customResponse.getCode());
+        assertNull(customResponse.getData());
+    }
+
+    String getMovieIdByMovieTitle(String title) {
+        String jpql = "SELECT m.id FROM Movie m WHERE m.title = :title";
+
+        // Create the query using EntityManager
+        TypedQuery<String> query = entityManager.createQuery(jpql, String.class);
+        query.setParameter("title", title);
+
+        // Execute the query and get the result
+        try {
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
 }

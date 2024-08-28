@@ -8,6 +8,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import static com.example.movie_service.constant.MovieConstant.*;
 
@@ -54,6 +55,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<CustomResponse<Object>> handleResourceNotFoundException(ResourceNotFoundException exception) {
         log.error("handleResourceNotFoundException: ", exception);
         CustomResponse<Object> response = new CustomResponse<>(exception.getErrorCode(), exception.getErrorMessage(), null);
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<CustomResponse<Object>> handleNoResourceFoundException(NoResourceFoundException exception){
+        log.error("handleNoResourceFoundException: ", exception);
+        CustomResponse<Object> response = new CustomResponse<>(HttpStatus.NOT_FOUND.value(), exception.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
