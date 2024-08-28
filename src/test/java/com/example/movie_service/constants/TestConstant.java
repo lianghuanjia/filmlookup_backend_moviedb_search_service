@@ -4,7 +4,6 @@ public class TestConstant {
     // Test container's MySQL version
     public static final String SQL_VERSION = "mysql:8.0.39";
 
-
     public static final String EXISTED_MOVIE_TITLE = "Knight";
     public static final String NON_EXISTED_MOVIE_TITLE = "Miss Jerry";
     public static final String ORDER_BY_TITLE = "title";
@@ -17,11 +16,15 @@ public class TestConstant {
     public static final String ASC = "asc";
     public static final String PAGE = "page";
     public static final String THE_DARK_KNIGHT = "The Dark Knight";
+    public static final String THE_DARK_KNIGHT_RELEASE_TIME = "2008-05-08";
     public static final String THE_DARK_KNIGHT_RISES = "The Dark Knight Rises";
+    public static final String THE_DARK_KNIGHT_RISES_RELEASE_TIME = "2012-03-09";
     public static final String THE_DARK_KNIGHT_RISES_AGAIN = "The Dark Knight Rises Again";
+    public static final String THE_DARK_KNIGHT_RISES_AGAIN_RELEASE_TIME = "2012-08-09";
     public static final String YEAR_2012 = "2012";
     public static final String INVALID_YEAR_2030 = "2030";
-    public static final String DIRECTOR_NOLAN = "Nolan";
+    public static final String DIRECTOR_NOLAN = "Christopher Nolan";
+    public static final String DIRECTOR_NOLAN_PROFILE_PATH = "NolanProfilePath";
     public static final String EMPTY_STRING = "";
     public static final String DIRECTOR_ROLE = "director";
 
@@ -42,6 +45,7 @@ public class TestConstant {
     public static final String MOVIE_11_TITLE = "Movie11";
     public static final String MOVIE_12_TITLE = "Movie12";
     public static final String MOVIE_13_TITLE = "Movie13";
+    public static final String MOVIE_WITH_TITLE_ONLY = "Movie_with_title_only";
 
     // Movie releaseTime
     public static final String MOVIE_1_RELEASE_TIME = "2023-10-08";
@@ -61,12 +65,30 @@ public class TestConstant {
     // Movie Genres
     public static final String ACTION_GENRE = "Action";
     public static final String CRIME_GENRE = "Crime";
+    public static final String LOVE_GENRE = "Love";
 
     // Directors
     public static final String DIRECTOR_1 = "Director1";
     public static final String DIRECTOR_2 = "Director2";
     public static final String DIRECTOR_3 = "Director3";
     public static final String DIRECTOR_4 = "Director4";
+
+    // Jobs
+    public static final String ACTOR = "actor";
+    public static final String ACTRESS = "actress";
+    public static final String COMPOSER = "composer";
+
+    // Actor1
+    public static final String ACTOR_1_NAME = "Actor1";
+    public static final String ACTOR_1_PROFILE_PATH = "Actor1ProfilePath";
+    // Actress
+    public static final String ACTRESS_1_NAME = "Actress1";
+    public static final String ACTRESS_1_PROFILE_PATH = "Actress1ProfilePath";
+
+    // Composer
+    public static final String COMPOSER_1_NAME = "Composer1";
+    public static final String COMPOSER_1_PROFILE_PATH = "Composer1ProfilePath";
+
 
     // Ratings
     public static final Double MOVIE_1_RATING = 0.1;

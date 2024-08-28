@@ -74,24 +74,25 @@ public class DataInitializerService {
         Genre genre = new Genre();
 //        genre.setId(1); Do not set an ID before you save/persist it. That's the only problem here. Hibernate looks at
 //        the Entity you've passed in and assumes that because it has its PK populated that it is already in the database.
-        genre.setName("Action");
+        genre.setName(ACTION_GENRE);
         entityManager.persist(genre);
 
         // Set up a director Person
         Person director = new Person();
-        director.setName("Christopher Nolan");
+        director.setName(DIRECTOR_NOLAN);
+        director.setProfilePath(DIRECTOR_NOLAN_PROFILE_PATH);
         entityManager.persist(director);
 
         // Set up a Movie 1
         Movie movie1 = new Movie();
-        movie1.setTitle("The Dark Knight");
-        movie1.setReleaseTime("2008-05-08");
+        movie1.setTitle(THE_DARK_KNIGHT);
+        movie1.setReleaseTime(THE_DARK_KNIGHT_RELEASE_TIME);
         entityManager.persist(movie1);
 
         // Set up a Movie 2
         Movie movie2 = new Movie();
-        movie2.setTitle("The Dark Knight Rises");
-        movie2.setReleaseTime("2012-03-09");
+        movie2.setTitle(THE_DARK_KNIGHT_RISES);
+        movie2.setReleaseTime(THE_DARK_KNIGHT_RISES_RELEASE_TIME);
         entityManager.persist(movie2);
 
         // Add the genre to the movie
@@ -103,15 +104,15 @@ public class DataInitializerService {
         entityManager.persist(movie2);
 
         // Set up MovieCrew
-        MovieCrew movieCrew1 = new MovieCrew(movie1, director, "director");
+        MovieCrew movieCrew1 = new MovieCrew(movie1, director, DIRECTOR_ROLE);
         entityManager.persist(movieCrew1);
-        MovieCrew movieCrew2 = new MovieCrew(movie2, director, "director");
+        MovieCrew movieCrew2 = new MovieCrew(movie2, director, DIRECTOR_ROLE);
         entityManager.persist(movieCrew2);
 
         // Set up a Movie 3
         Movie movie3 = new Movie();
-        movie3.setTitle("The Dark Knight Rises Again");
-        movie3.setReleaseTime("2012-08-09");
+        movie3.setTitle(THE_DARK_KNIGHT_RISES_AGAIN);
+        movie3.setReleaseTime(THE_DARK_KNIGHT_RISES_AGAIN_RELEASE_TIME);
         entityManager.persist(movie3);
 
         // Set up Movie 3 genre, director, and movie crew
@@ -129,6 +130,11 @@ public class DataInitializerService {
 
         MovieCrew movieCrew3 = new MovieCrew(movie3, director2, "director");
         entityManager.persist(movieCrew3);
+
+        // Set up Movie 4, which only contains title.
+        Movie movie4 = new Movie();
+        movie4.setTitle(MOVIE_WITH_TITLE_ONLY);
+        entityManager.persist(movie4);
 
         // Set up each movie1's rating
         MovieRating movieRating1 = new MovieRating();
@@ -150,6 +156,30 @@ public class DataInitializerService {
         movieRating3.setAverageRating(8.5);
         movieRating3.setNumVotes(10);
         entityManager.persist(movieRating3);
+
+        // Add more crew member to movie 1
+        // 1 actor
+        Person actor = new Person();
+        actor.setName(ACTOR_1_NAME);
+        actor.setProfilePath(ACTOR_1_PROFILE_PATH);
+        entityManager.persist(actor);
+        MovieCrew movieCrew4 = new MovieCrew(movie1, actor, ACTOR);
+        entityManager.persist(movieCrew4);
+        // actress
+        Person actress = new Person();
+        actress.setName(ACTRESS_1_NAME);
+        actress.setProfilePath(ACTRESS_1_PROFILE_PATH);
+        entityManager.persist(actress);
+        MovieCrew movie1CrewActress = new MovieCrew(movie1, actress, ACTRESS);
+        entityManager.persist(movie1CrewActress);
+        // 1 composer
+        Person composer = new Person();
+        composer.setName(COMPOSER_1_NAME);
+        composer.setProfilePath(COMPOSER_1_PROFILE_PATH);
+        entityManager.persist(composer);
+        MovieCrew movie1CrewComposer = new MovieCrew(movie1, composer, COMPOSER);
+        entityManager.persist(movie1CrewComposer);
+
     }
 
     @Transactional
