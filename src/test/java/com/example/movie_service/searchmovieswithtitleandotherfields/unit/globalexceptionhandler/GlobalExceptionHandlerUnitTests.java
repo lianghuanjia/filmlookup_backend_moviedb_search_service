@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import static com.example.movie_service.constant.MovieConstant.INTERNAL_SERVICE_ERROR_CODE;
 import static com.example.movie_service.constant.MovieConstant.MISSING_REQUIRED_PARAMETER_CODE;
@@ -103,6 +104,18 @@ class GlobalExceptionHandlerUnitTests {
         assertEquals(MISSING_REQUIRED_PARAMETER_CODE, responseEntity.getBody().getCode());
         assertEquals(MISSING_REQUIRED_PARAMETER_MESSAGE_PREFIX + missingParameter, responseEntity.getBody().getMessage());
         assertNull(responseEntity.getBody().getData());
+    }
+
+    @Test
+    void testHandleNoResourceFoundException() {
+        NoResourceFoundException noResourceFoundException = mock(NoResourceFoundException.class);
+        ResponseEntity<CustomResponse<Object>> responseEntity = globalExceptionHandler.handleNoResourceFoundException(noResourceFoundException);
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertNotNull(responseEntity.getBody());
+        CustomResponse<Object> customResponse = responseEntity.getBody();
+        assertEquals(HttpStatus.NOT_FOUND.value(), customResponse.getCode());
+        assertNull(customResponse.getData());
     }
 
     @Test

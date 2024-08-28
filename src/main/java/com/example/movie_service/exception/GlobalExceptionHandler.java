@@ -58,6 +58,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * Handles NoResourceFoundException.
+     * @param exception NoResourceFoundException. This exception is thrown by controllers when an endpoint is not found.
+     *                  There could be other situation this exception is thrown.
+     * @return ResponseEntity with a CustomResponse and NOT_FOUND HttpStatus
+     */
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<CustomResponse<Object>> handleNoResourceFoundException(NoResourceFoundException exception){
         log.error("handleNoResourceFoundException: ", exception);
