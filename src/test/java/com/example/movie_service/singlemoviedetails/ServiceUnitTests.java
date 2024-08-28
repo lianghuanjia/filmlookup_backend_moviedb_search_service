@@ -2,13 +2,14 @@ package com.example.movie_service.singlemoviedetails;
 
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.exception.ValidationException;
-import com.example.movie_service.repository.CustomMovieRepositoryImpl;
+import com.example.movie_service.repository.CustomMovieRepository;
 import com.example.movie_service.response.CustomResponse;
 import com.example.movie_service.service.MovieServiceImpl;
 import com.example.movie_service.service.ValidationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -35,12 +36,18 @@ class ServiceUnitTests {
 
     private OneMovieDetailsDTO oneMovieDetailsDTO;
 
-
     @Spy
     private ValidationService validationService;
 
-    @Spy
-    private CustomMovieRepositoryImpl customMovieRepository;
+    // Previously I do the following instead of Mock the CustomMovieRepository interface.
+    //    @Spy
+    //    private CustomMovieRepositoryImpl customMovieRepository;
+    // This cause a problem that when I try to mock customMovieRepository.searchOneMovieDetails(movieId)'s
+    // behavior, due to the use of @Spy, it actually executes the customMovieRepository.searchOneMovieDetails(movieId),
+    // and invoke its 2 private methods. These 2 methods use entityManager, and I don't have entityManager in
+    // My test, which gives me NullPointerException.
+    @Mock
+    private CustomMovieRepository customMovieRepository; // Mock the interface, not the implementation
 
     @InjectMocks
     private MovieServiceImpl movieServiceImpl;
@@ -55,6 +62,7 @@ class ServiceUnitTests {
         // mock methods behaviors
         // Assume the movieId is valid and validationService doesn't throw Exception
         doNothing().when(validationService).validateMovieId(anyString());
+
         // Assume the movieRepository found a movie based on the movieId and returns a oneMovieDetailsDTO
         when(customMovieRepository.searchOneMovieDetails(movieId)).thenReturn(oneMovieDetailsDTO);
 
