@@ -1,9 +1,9 @@
-package com.example.movie_service.searchmovieswithtitleandotherfields.integration.customRepositoryImpl;
+package com.example.movie_service.moviesearch.integration.customRepositoryImpl;
 
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.MovieSearchResultDTO;
-import com.example.movie_service.searchmovieswithtitleandotherfields.integration.util.dataInitService.DataInitializerService;
-import com.example.movie_service.searchmovieswithtitleandotherfields.integration.util.junitExtension.MySQLTestContainerExtension;
+import com.example.movie_service.moviesearch.integration.util.dataInitService.DataInitializerService;
+import com.example.movie_service.moviesearch.integration.util.junitExtension.MySQLTestContainerExtension;
 import com.example.movie_service.repository.CustomMovieRepositoryImpl;
 import jakarta.transaction.Transactional;
 

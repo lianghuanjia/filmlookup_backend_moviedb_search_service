@@ -1,4 +1,4 @@
-package com.example.movie_service.searchmovieswithtitleandotherfields.integration.mainApplication;
+package com.example.movie_service.moviesearch.integration.mainApplication;
 
 import com.example.movie_service.MovieServiceApplication;
 import org.junit.jupiter.api.Test;

@@ -1,11 +1,11 @@
-package com.example.movie_service.searchmovieswithtitleandotherfields.integration.testContainer;
+package com.example.movie_service.moviesearch.integration.testContainer;
 
 import com.example.movie_service.entity.movie.Genre;
 import com.example.movie_service.entity.movie.Movie;
 import com.example.movie_service.entity.movie.MovieCrew;
 import com.example.movie_service.entity.movie.MovieRating;
-import com.example.movie_service.searchmovieswithtitleandotherfields.integration.util.dataInitService.DataInitializerService;
-import com.example.movie_service.searchmovieswithtitleandotherfields.integration.util.junitExtension.MySQLTestContainerExtension;
+import com.example.movie_service.moviesearch.integration.util.dataInitService.DataInitializerService;
+import com.example.movie_service.moviesearch.integration.util.junitExtension.MySQLTestContainerExtension;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;

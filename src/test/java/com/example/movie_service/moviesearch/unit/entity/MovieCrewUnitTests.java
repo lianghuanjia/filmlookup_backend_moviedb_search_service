@@ -1,4 +1,4 @@
-package com.example.movie_service.searchmovieswithtitleandotherfields.unit.entity;
+package com.example.movie_service.moviesearch.unit.entity;
 
 import com.example.movie_service.entity.movie.Movie;
 import com.example.movie_service.entity.movie.MovieCrew;

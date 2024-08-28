@@ -1,6 +1,6 @@
-package com.example.movie_service.searchmovieswithtitleandotherfields.integration.testContainer;
+package com.example.movie_service.moviesearch.integration.testContainer;
 
-import com.example.movie_service.searchmovieswithtitleandotherfields.integration.util.junitExtension.MySQLTestContainerExtension;
+import com.example.movie_service.moviesearch.integration.util.junitExtension.MySQLTestContainerExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

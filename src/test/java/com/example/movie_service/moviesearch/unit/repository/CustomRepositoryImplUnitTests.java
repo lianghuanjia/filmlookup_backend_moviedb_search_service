@@ -1,4 +1,4 @@
-package com.example.movie_service.searchmovieswithtitleandotherfields.unit.repository;
+package com.example.movie_service.moviesearch.unit.repository;
 
 
 import com.example.movie_service.builder.MovieSearchParam;

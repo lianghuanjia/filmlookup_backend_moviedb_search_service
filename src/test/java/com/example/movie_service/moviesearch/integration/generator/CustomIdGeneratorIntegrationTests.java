@@ -1,8 +1,8 @@
-package com.example.movie_service.searchmovieswithtitleandotherfields.integration.generator;
+package com.example.movie_service.moviesearch.integration.generator;
 
 import com.example.movie_service.entity.movie.Movie;
 import com.example.movie_service.entity.person.Person;
-import com.example.movie_service.searchmovieswithtitleandotherfields.integration.util.junitExtension.MySQLTestContainerExtension;
+import com.example.movie_service.moviesearch.integration.util.junitExtension.MySQLTestContainerExtension;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 

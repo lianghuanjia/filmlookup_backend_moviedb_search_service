@@ -1,4 +1,4 @@
-package com.example.movie_service.searchmovieswithtitleandotherfields.integration.util.junitExtension;
+package com.example.movie_service.moviesearch.integration.util.junitExtension;
 
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;

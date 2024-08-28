@@ -1,4 +1,4 @@
-package com.example.movie_service.searchmovieswithtitleandotherfields.unit.service;
+package com.example.movie_service.moviesearch.unit.service;
 
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.service.ValidationServiceImpl;

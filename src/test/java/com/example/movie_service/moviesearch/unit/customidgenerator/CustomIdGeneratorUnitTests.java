@@ -1,4 +1,4 @@
-package com.example.movie_service.searchmovieswithtitleandotherfields.unit.customidgenerator;
+package com.example.movie_service.moviesearch.unit.customidgenerator;
 
 import com.example.movie_service.annotation.CustomIdGeneratorAnnotation;
 import com.example.movie_service.exception.NoCustomIdGeneratorAnnotationFoundInEntityException;

@@ -1,4 +1,4 @@
-package com.example.movie_service.searchmovieswithtitleandotherfields.integration.util.dataInitService;
+package com.example.movie_service.moviesearch.integration.util.dataInitService;
 
 import com.example.movie_service.entity.movie.Genre;
 import com.example.movie_service.entity.movie.Movie;

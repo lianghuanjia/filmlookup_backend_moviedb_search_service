@@ -1,4 +1,4 @@
-package com.example.movie_service.searchmovieswithtitleandotherfields.unit.entity;
+package com.example.movie_service.moviesearch.unit.entity;
 
 import com.example.movie_service.entity.mappingholder.MappingHolder;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package com.example.movie_service.searchmovieswithtitleandotherfields.unit.globalexceptionhandler;
+package com.example.movie_service.moviesearch.unit.globalexceptionhandler;
 
 import com.example.movie_service.exception.GlobalExceptionHandler;
 import com.example.movie_service.exception.NoCustomIdGeneratorAnnotationFoundInEntityException;

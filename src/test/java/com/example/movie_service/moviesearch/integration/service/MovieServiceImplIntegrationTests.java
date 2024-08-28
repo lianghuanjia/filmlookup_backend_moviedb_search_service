@@ -1,10 +1,10 @@
-package com.example.movie_service.searchmovieswithtitleandotherfields.integration.service;
+package com.example.movie_service.moviesearch.integration.service;
 
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.MovieSearchResultDTO;
 import com.example.movie_service.exception.ValidationException;
-import com.example.movie_service.searchmovieswithtitleandotherfields.integration.util.dataInitService.DataInitializerService;
-import com.example.movie_service.searchmovieswithtitleandotherfields.integration.util.junitExtension.MySQLTestContainerExtension;
+import com.example.movie_service.moviesearch.integration.util.dataInitService.DataInitializerService;
+import com.example.movie_service.moviesearch.integration.util.junitExtension.MySQLTestContainerExtension;
 import com.example.movie_service.response.CustomResponse;
 import com.example.movie_service.service.MovieServiceImpl;
 import org.junit.jupiter.api.AfterEach;
