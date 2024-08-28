@@ -66,6 +66,9 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
     public OneMovieDetailsDTO searchOneMovieDetails(String movieId) {
         // Get a movie's basic details
         OneMovieDetailsDTO singleMovieBasicDetails = getOneMovieBasicDetails(movieId);
+        if (singleMovieBasicDetails == null) {
+            return null;
+        }
         // Get a movie's crew members
         List<CrewMember> crewMembers = getCrewMembersWithProfilePic(movieId);
         singleMovieBasicDetails.setCrewMemberList(crewMembers);
@@ -91,8 +94,11 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         // bound to the query as a parameter, and the database treats it as a value rather than part of the SQL
         // statement. This prevents any injected SQL from being executed.
         query.setParameter("movieId", movieId);
-
-        return (OneMovieDetailsDTO) query.getSingleResult();
+        try {
+            return (OneMovieDetailsDTO) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     /**

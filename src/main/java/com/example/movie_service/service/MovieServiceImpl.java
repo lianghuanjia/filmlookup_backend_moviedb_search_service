@@ -90,7 +90,7 @@ public class MovieServiceImpl implements MovieService {
         ResponseEntity<CustomResponse<OneMovieDetailsDTO>> responseEntity;
         if (oneMovieDetailsDTO != null) {
             customResponse = new CustomResponse<>(MOVIE_FOUND_CODE, MOVIE_FOUND_MESSAGE, oneMovieDetailsDTO);
-        }else {
+        } else {
             customResponse = new CustomResponse<>(MOVIE_NOT_FOUND_CODE, MOVIE_NOT_FOUND_MESSAGE, null);
         }
         responseEntity = new ResponseEntity<>(customResponse, HttpStatus.OK);
