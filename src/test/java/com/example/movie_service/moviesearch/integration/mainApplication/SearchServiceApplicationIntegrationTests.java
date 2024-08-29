@@ -1,6 +1,6 @@
 package com.example.movie_service.moviesearch.integration.mainApplication;
 
-import com.example.movie_service.MovieServiceApplication;
+import com.example.movie_service.SearchServiceApplication;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -8,8 +8,8 @@ import org.springframework.context.ApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@SpringBootTest(classes = MovieServiceApplication.class)
-class MovieServiceApplicationIntegrationTests {
+@SpringBootTest(classes = SearchServiceApplication.class)
+class SearchServiceApplicationIntegrationTests {
 
     @Autowired
     private ApplicationContext context;
@@ -17,7 +17,7 @@ class MovieServiceApplicationIntegrationTests {
     @Test
     void testSpringApplicationRun() {
         {
-            MovieServiceApplication.main(new String[]{
+            SearchServiceApplication.main(new String[]{
                     "--spring.main.web-environment=false",
             });
             assertNotNull(context);
