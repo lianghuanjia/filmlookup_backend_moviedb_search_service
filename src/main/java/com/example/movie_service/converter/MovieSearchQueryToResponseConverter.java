@@ -17,7 +17,8 @@ public class MovieSearchQueryToResponseConverter implements Converter<MovieSearc
                 source.getTitle(),
                 source.getReleaseTime(),
                 source.getPosterPath() != null ? source.getPosterPath() : DEFAULT_POSTER_PATH,
-                source.getRating() != null ? source.getRating() : DEFAULT_RATING_SCORE
+                source.getRating() != null ? source.getRating() : DEFAULT_RATING_SCORE,
+                source.getOverview()
         );
     }
 }

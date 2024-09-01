@@ -13,4 +13,5 @@ public class MovieSearchResponseDTO {
     private String releaseTime;
     private String posterPath;
     private Double rating;
+    private String overview;
 }

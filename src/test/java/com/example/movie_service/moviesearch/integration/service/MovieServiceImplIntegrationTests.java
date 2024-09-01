@@ -71,6 +71,9 @@ class MovieServiceImplIntegrationTests {
         assertEquals(THE_DARK_KNIGHT, moviesList.get(0).getTitle());
         assertEquals(THE_DARK_KNIGHT_RISES, moviesList.get(1).getTitle());
         assertEquals(THE_DARK_KNIGHT_RISES_AGAIN, moviesList.get(2).getTitle());
+
+        // Check if the first movie has overview:
+        assertEquals(THE_DARK_KNIGHT_OVERVIEW, moviesList.get(0).getOverview());
     }
 
     @Test

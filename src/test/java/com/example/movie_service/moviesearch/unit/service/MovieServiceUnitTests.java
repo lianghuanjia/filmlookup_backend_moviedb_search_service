@@ -195,7 +195,7 @@ class MovieServiceUnitTests {
         // Since we use @Mock on the converter, All methods on this mock return default values (e.g., null, 0, empty collections)
         // unless explicitly stubbed (i.e., told to return specific values). Therefore, we stub the behavior below for the converter
         when(converter.convert(any(MovieSearchQueryDTO.class)))
-                .thenReturn(new MovieSearchResponseDTO("1", "Inception", "2010", "path/to/poster", 9.0));
+                .thenReturn(new MovieSearchResponseDTO("1", "Inception", "2010", "path/to/poster", 9.0, "overview"));
 
 
         // Ensure validation service calls do nothing (if necessary)
