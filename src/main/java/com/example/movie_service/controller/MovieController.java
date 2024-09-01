@@ -23,7 +23,7 @@ import java.util.List;
  */
 @Validated
 @RestController
-@CrossOrigin(origins = "http://localhost:5174")
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/v1/api")
 public class MovieController {
 
