@@ -13,6 +13,10 @@ public final class MovieConstant {
     private MovieConstant() {
     }
 
+    // CONVERTER:
+    public static final String DEFAULT_POSTER_PATH = "default-poster-path";
+    public static final Double DEFAULT_RATING_SCORE = 0.0;
+
     // ID PREFIX:
     public static final String MOVIE_ID_PREFIX = "tt";
     public static final String PERSON_ID_PREFIX = "nm";
@@ -48,7 +52,6 @@ public final class MovieConstant {
     // SUCCESS CODE AND MESSAGE
     public static final int MOVIE_FOUND_CODE = 20001;
     public static final String MOVIE_FOUND_MESSAGE = "Movie(s) found";
-    public static final String MOVIE_FOUND = "MoviesFound";
 
     public static final int MOVIE_NOT_FOUND_CODE = 20002;
     public static final String MOVIE_NOT_FOUND_MESSAGE = "No movies found with the given search parameters";
