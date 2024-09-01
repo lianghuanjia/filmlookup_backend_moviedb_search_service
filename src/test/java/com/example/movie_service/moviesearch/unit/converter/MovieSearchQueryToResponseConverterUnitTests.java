@@ -21,6 +21,7 @@ class MovieSearchQueryToResponseConverterUnitTests {
     private static final String director = "Christopher Nolan";
     private static final String backdropPath = "path/to/backdrop";
     private static final String posterPath = "path/to/poster";
+    private static final String overview = "overview";
     private static final Double rating = 9.0;
 
     @BeforeEach
@@ -31,7 +32,7 @@ class MovieSearchQueryToResponseConverterUnitTests {
     @Test
     void testConvertWithAllFields() {
         // Given
-        MovieSearchQueryDTO queryDTO = new MovieSearchQueryDTO(id, title, releaseTime, director, backdropPath, posterPath, rating);
+        MovieSearchQueryDTO queryDTO = new MovieSearchQueryDTO(id, title, releaseTime, director, backdropPath, posterPath, rating, overview);
 
         // When
         MovieSearchResponseDTO responseDTO = converter.convert(queryDTO);
@@ -48,7 +49,7 @@ class MovieSearchQueryToResponseConverterUnitTests {
     @Test
     void testConvertWithNullPosterPath() {
         // Given
-        MovieSearchQueryDTO queryDTO = new MovieSearchQueryDTO(id, title, releaseTime, director, backdropPath, null, rating);
+        MovieSearchQueryDTO queryDTO = new MovieSearchQueryDTO(id, title, releaseTime, director, backdropPath, null, rating, overview);
 
         // When
         MovieSearchResponseDTO responseDTO = converter.convert(queryDTO);
@@ -65,7 +66,7 @@ class MovieSearchQueryToResponseConverterUnitTests {
     @Test
     void testConvertWithNullRating() {
         // Given
-        MovieSearchQueryDTO queryDTO = new MovieSearchQueryDTO(id, title, releaseTime, director, backdropPath, posterPath, null);
+        MovieSearchQueryDTO queryDTO = new MovieSearchQueryDTO(id, title, releaseTime, director, backdropPath, posterPath, null, overview);
 
         // When
         MovieSearchResponseDTO responseDTO = converter.convert(queryDTO);
@@ -82,7 +83,7 @@ class MovieSearchQueryToResponseConverterUnitTests {
     @Test
     void testConvertWithAllNullFields() {
         // Given
-        MovieSearchQueryDTO queryDTO = new MovieSearchQueryDTO(null, null, null, null, null, null, null);
+        MovieSearchQueryDTO queryDTO = new MovieSearchQueryDTO(null, null, null, null, null, null, null, null);
 
         // When
         MovieSearchResponseDTO responseDTO = converter.convert(queryDTO);

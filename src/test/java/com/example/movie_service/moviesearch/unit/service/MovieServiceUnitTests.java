@@ -185,7 +185,7 @@ class MovieServiceUnitTests {
     void searchMovieReturnListOfMovieSearchResultDTO() {
         // Setup mock data
         List<MovieSearchQueryDTO> mockMovies = List.of(
-                new MovieSearchQueryDTO("1", "Inception", "2010", "Christopher Nolan", "path/to/backdrop", "path/to/poster", 9.0)
+                new MovieSearchQueryDTO("1", "Inception", "2010", "Christopher Nolan", "path/to/backdrop", "path/to/poster", 9.0, "overview")
         );
 
         // Mock the repository call

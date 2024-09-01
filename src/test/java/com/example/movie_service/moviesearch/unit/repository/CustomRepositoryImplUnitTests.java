@@ -57,6 +57,7 @@ class CustomRepositoryImplUnitTests {
     private static final String MOVIE_ID = "tt1";
     private static final String BACKDROP_PATH = "backdropPath";
     private static final String POSTER_PATH = "posterPath";
+    private static final String OVERVIEW = "overview";
 
     @BeforeEach
     public void setUp() {
@@ -81,7 +82,7 @@ class CustomRepositoryImplUnitTests {
         // Mock the behavior
         List<MovieSearchQueryDTO> movieList = new ArrayList<>();
         MovieSearchQueryDTO resultDTO = new MovieSearchQueryDTO(MOVIE_ID, title, releasedYear, director,
-                BACKDROP_PATH, POSTER_PATH, rating);
+                BACKDROP_PATH, POSTER_PATH, rating, OVERVIEW);
         movieList.add(resultDTO);
 
         // Use argument matchers for dynamic parameters
@@ -113,7 +114,7 @@ class CustomRepositoryImplUnitTests {
         // Mock the behavior
         List<MovieSearchQueryDTO> movieList = new ArrayList<>();
         MovieSearchQueryDTO resultDTO = new MovieSearchQueryDTO(MOVIE_ID, title, releasedYear, director,
-                BACKDROP_PATH, POSTER_PATH, rating);
+                BACKDROP_PATH, POSTER_PATH, rating, OVERVIEW);
         movieList.add(resultDTO);
 
         // Use argument matchers for dynamic parameters
@@ -145,7 +146,7 @@ class CustomRepositoryImplUnitTests {
         // Mock the behavior
         List<MovieSearchQueryDTO> movieList = new ArrayList<>();
         MovieSearchQueryDTO resultDTO = new MovieSearchQueryDTO(MOVIE_ID, title, releasedYear, director,
-                BACKDROP_PATH, POSTER_PATH, rating);
+                BACKDROP_PATH, POSTER_PATH, rating, OVERVIEW);
         movieList.add(resultDTO);
 
         // Use argument matchers for dynamic parameters
@@ -177,7 +178,7 @@ class CustomRepositoryImplUnitTests {
         // Mock the behavior
         List<MovieSearchQueryDTO> movieList = new ArrayList<>();
         MovieSearchQueryDTO resultDTO = new MovieSearchQueryDTO(MOVIE_ID, title, releasedYear, director,
-                BACKDROP_PATH, POSTER_PATH, rating);
+                BACKDROP_PATH, POSTER_PATH, rating, OVERVIEW);
         movieList.add(resultDTO);
 
         // Use argument matchers for dynamic parameters
@@ -210,7 +211,7 @@ class CustomRepositoryImplUnitTests {
         // Mock the behavior
         List<MovieSearchQueryDTO> movieList = new ArrayList<>();
         MovieSearchQueryDTO resultDTO = new MovieSearchQueryDTO(MOVIE_ID, title, releasedYear, director,
-                BACKDROP_PATH, POSTER_PATH, rating);
+                BACKDROP_PATH, POSTER_PATH, rating, OVERVIEW);
         movieList.add(resultDTO);
 
         // Use argument matchers for dynamic parameters
@@ -243,7 +244,7 @@ class CustomRepositoryImplUnitTests {
         // Mock the behavior
         List<MovieSearchQueryDTO> movieList = new ArrayList<>();
         MovieSearchQueryDTO resultDTO = new MovieSearchQueryDTO(MOVIE_ID, title, releasedYear, director,
-                BACKDROP_PATH, POSTER_PATH, rating);
+                BACKDROP_PATH, POSTER_PATH, rating, OVERVIEW);
         movieList.add(resultDTO);
 
         // Use argument matchers for dynamic parameters

@@ -63,6 +63,20 @@ class CustomRepositoryImplIntegrationTest {
 
     @Test
     void searchMovieByTitleOnlyFound() {
+        movieSearchParam = movieSearchParam.toBuilder().title(THE_DARK_KNIGHT).build();
+
+        List<MovieSearchQueryDTO> searchResults = customMovieRepositoryImpl.searchMovies(
+                movieSearchParam);
+
+
+        assertNotNull(searchResults);
+        MovieSearchQueryDTO firstResult = searchResults.get(0);
+        assertEquals(THE_DARK_KNIGHT, firstResult.getTitle());
+        assertEquals(THE_DARK_KNIGHT_OVERVIEW, firstResult.getOverview());
+    }
+
+    @Test
+    void searchMovieByTitleOnly_WithSubstringTitle_MovieFound() {
         movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).build();
 
         List<MovieSearchQueryDTO> searchResults = customMovieRepositoryImpl.searchMovies(
@@ -72,6 +86,7 @@ class CustomRepositoryImplIntegrationTest {
         assertNotNull(searchResults);
         MovieSearchQueryDTO firstResult = searchResults.get(0);
         assertEquals(THE_DARK_KNIGHT, firstResult.getTitle());
+        assertEquals(THE_DARK_KNIGHT_OVERVIEW, firstResult.getOverview());
     }
 
     @Test
@@ -87,7 +102,7 @@ class CustomRepositoryImplIntegrationTest {
 
     @Test
     void searchMovieTestOrderByReleaseTimeAsc() {
-        movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).orderBy(RELEASE_TIME).build();
+        movieSearchParam = movieSearchParam.toBuilder().title(THE_DARK_KNIGHT).orderBy(RELEASE_TIME).build();
         List<MovieSearchQueryDTO> searchResults = customMovieRepositoryImpl.searchMovies(
                 movieSearchParam);
 
@@ -103,7 +118,7 @@ class CustomRepositoryImplIntegrationTest {
 
     @Test
     void searchMovieTestOrderByReleaseTimeDesc() {
-        movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).orderBy(RELEASE_TIME).direction(DESC).build();
+        movieSearchParam = movieSearchParam.toBuilder().title(THE_DARK_KNIGHT).orderBy(RELEASE_TIME).direction(DESC).build();
         List<MovieSearchQueryDTO> searchResults = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         assertNotNull(searchResults);
@@ -118,7 +133,7 @@ class CustomRepositoryImplIntegrationTest {
 
     @Test
     void searchMovieTestDescAndOrderByRating() {
-        movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).orderBy(RATING).direction(DESC).build();
+        movieSearchParam = movieSearchParam.toBuilder().title(THE_DARK_KNIGHT).orderBy(RATING).direction(DESC).build();
         List<MovieSearchQueryDTO> searchResults = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         assertNotNull(searchResults);
@@ -133,7 +148,7 @@ class CustomRepositoryImplIntegrationTest {
 
     @Test
     void searchMovieByTitleAndDirector() {
-        movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).director("Nolan").build();
+        movieSearchParam = movieSearchParam.toBuilder().title(THE_DARK_KNIGHT).director("Nolan").build();
 
         List<MovieSearchQueryDTO> searchResults = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 

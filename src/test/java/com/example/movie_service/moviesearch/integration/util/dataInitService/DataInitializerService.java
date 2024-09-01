@@ -87,6 +87,7 @@ public class DataInitializerService {
         Movie movie1 = new Movie();
         movie1.setTitle(THE_DARK_KNIGHT);
         movie1.setReleaseTime(THE_DARK_KNIGHT_RELEASE_TIME);
+        movie1.setOverview(THE_DARK_KNIGHT_OVERVIEW);
         entityManager.persist(movie1);
 
         // Set up a Movie 2

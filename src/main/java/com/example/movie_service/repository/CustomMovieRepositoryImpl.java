@@ -205,7 +205,8 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
                         "GROUP_CONCAT(DISTINCT p.name ORDER BY p.name SEPARATOR ', ') AS directors, " +
                         "m.backdrop_path AS backdropPath, " +
                         "m.poster_path AS posterPath, " +
-                        "mr.averageRating AS rating " +
+                        "mr.averageRating AS rating, " +
+                        "m.overview AS overview " +
                         "FROM movie m " +
                         "LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id " +
                         "LEFT JOIN person p ON mc.person_id = p.person_id AND mc.job = 'director' " +

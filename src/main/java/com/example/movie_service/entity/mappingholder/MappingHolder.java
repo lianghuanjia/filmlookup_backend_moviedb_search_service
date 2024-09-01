@@ -30,6 +30,7 @@ import static com.example.movie_service.constant.MovieConstant.SINGLE_MOVIE_CREW
                         @ColumnResult(name = "backdropPath", type = String.class),
                         @ColumnResult(name = "posterPath", type = String.class),
                         @ColumnResult(name = "rating", type = Double.class),
+                        @ColumnResult(name = "overview", type = String.class),
                 }
         )
 

@@ -21,4 +21,5 @@ public class MovieSearchQueryDTO {
     private String backdropPath;
     private String posterPath;
     private Double rating;
+    private String overview;
 }
