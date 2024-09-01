@@ -1,9 +1,8 @@
 package com.example.movie_service.entity.mappingholder;
 
 import com.example.movie_service.dto.CrewMember;
-import com.example.movie_service.dto.MovieSearchResultDTO;
+import com.example.movie_service.dto.MovieSearchQueryDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
-import com.example.movie_service.entity.movie.MovieCrew;
 import jakarta.persistence.ColumnResult;
 import jakarta.persistence.ConstructorResult;
 import jakarta.persistence.Entity;
@@ -22,7 +21,7 @@ import static com.example.movie_service.constant.MovieConstant.SINGLE_MOVIE_CREW
 @SqlResultSetMapping(
         name = MOVIE_SEARCH_RESULT_DTO_MAPPING,
         classes = @ConstructorResult(
-                targetClass = MovieSearchResultDTO.class,
+                targetClass = MovieSearchQueryDTO.class,
                 columns = {
                         @ColumnResult(name = "id", type = String.class),
                         @ColumnResult(name = "title", type = String.class),

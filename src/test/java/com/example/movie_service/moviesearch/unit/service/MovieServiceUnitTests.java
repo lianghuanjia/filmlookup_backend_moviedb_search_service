@@ -2,7 +2,7 @@ package com.example.movie_service.moviesearch.unit.service;
 
 
 import com.example.movie_service.builder.MovieSearchParam;
-import com.example.movie_service.dto.MovieSearchResultDTO;
+import com.example.movie_service.dto.MovieSearchQueryDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.repository.CustomMovieRepository;
@@ -179,8 +179,8 @@ class MovieServiceUnitTests {
     @Test
     void searchMovieReturnListOfMovieSearchResultDTO() {
         // Setup mock data
-        List<MovieSearchResultDTO> mockMovies = List.of(
-                new MovieSearchResultDTO("1", "Inception", "2010", "Christopher Nolan", "path/to/backdrop", "path/to/poster", 9.0)
+        List<MovieSearchQueryDTO> mockMovies = List.of(
+                new MovieSearchQueryDTO("1", "Inception", "2010", "Christopher Nolan", "path/to/backdrop", "path/to/poster", 9.0)
         );
 
         // Mock the repository call
@@ -196,7 +196,7 @@ class MovieServiceUnitTests {
         doNothing().when(validationService).validateDirection(any());
 
         // Call the actual method under test
-        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> actualResponseEntity = movieServiceImpl.searchMovies(
+        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> actualResponseEntity = movieServiceImpl.searchMovies(
                 movieSearchParam);
 
         // Verify the results
@@ -209,7 +209,7 @@ class MovieServiceUnitTests {
 
     @Test
     void searchMovieWithNoResult() {
-        List<MovieSearchResultDTO> mockMovies = List.of();
+        List<MovieSearchQueryDTO> mockMovies = List.of();
 
         // Mock the repository call
         when(movieRepository.searchMovies(movieSearchParam))
@@ -224,7 +224,7 @@ class MovieServiceUnitTests {
         doNothing().when(validationService).validateDirection(any());
 
 
-        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> actualResponseEntity = movieServiceImpl.searchMovies(
+        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> actualResponseEntity = movieServiceImpl.searchMovies(
                 movieSearchParam
         );
 

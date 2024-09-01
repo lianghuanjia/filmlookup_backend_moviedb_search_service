@@ -1,7 +1,7 @@
 package com.example.movie_service.service;
 
 import com.example.movie_service.builder.MovieSearchParam;
-import com.example.movie_service.dto.MovieSearchResultDTO;
+import com.example.movie_service.dto.MovieSearchQueryDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.repository.CustomMovieRepository;
@@ -44,7 +44,7 @@ public class MovieServiceImpl implements MovieService {
      * @return a list of movies that match the search criteria
      */
     @Override
-    public ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovies(MovieSearchParam movieSearchParam)
+    public ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> searchMovies(MovieSearchParam movieSearchParam)
             throws PersistenceException, ValidationException {
 
         String title = movieSearchParam.getTitle();
@@ -59,10 +59,10 @@ public class MovieServiceImpl implements MovieService {
 
         // Get search results from repository layer
         // If the query times out, it's possible there will be QueryTimeoutException or PersistenceException
-        List<MovieSearchResultDTO> movieList = movieRepository.searchMovies(movieSearchParam);
+        List<MovieSearchQueryDTO> movieList = movieRepository.searchMovies(movieSearchParam);
 
         // Prepare the response's code and message
-        CustomResponse<List<MovieSearchResultDTO>> customResponse;
+        CustomResponse<List<MovieSearchQueryDTO>> customResponse;
 
         // If no movie is found, return a custom response with movie not found code and message inside, with the empty
         // movieList. Before I put null in the data. This is not good because it might cause NullPointerExceptions. It

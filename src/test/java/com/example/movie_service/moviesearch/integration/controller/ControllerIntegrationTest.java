@@ -2,7 +2,7 @@ package com.example.movie_service.moviesearch.integration.controller;
 
 
 import com.example.movie_service.dto.CrewMember;
-import com.example.movie_service.dto.MovieSearchResultDTO;
+import com.example.movie_service.dto.MovieSearchQueryDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.moviesearch.integration.util.dataInitService.DataInitializerService;
 import com.example.movie_service.moviesearch.integration.util.junitExtension.MySQLTestContainerExtension;
@@ -58,7 +58,7 @@ class ControllerIntegrationTest {
     private static final String protocolAndHost = "http://localhost:";
     private String searchMoviePath;
     // Define the response type using ParameterizedTypeReference
-    private final ParameterizedTypeReference<CustomResponse<List<MovieSearchResultDTO>>> responseType =
+    private final ParameterizedTypeReference<CustomResponse<List<MovieSearchQueryDTO>>> responseType =
             new ParameterizedTypeReference<>() {
             };
 
@@ -89,17 +89,17 @@ class ControllerIntegrationTest {
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert
         assertTrue(results.getStatusCode().is2xxSuccessful());
-        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is 20001, representing movies found
         assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
         assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
-        List<MovieSearchResultDTO> movieList = customResponse.getData();
+        List<MovieSearchQueryDTO> movieList = customResponse.getData();
         // Assert there are 3 movies
         assertEquals(3, movieList.size());
         // Assert 1st movie is The Dark Knight
@@ -115,12 +115,12 @@ class ControllerIntegrationTest {
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert the status code is OK, and we have a customResponse
         assertTrue(results.getStatusCode().is2xxSuccessful());
-        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
         assertNotNull(customResponse);
 
         // Assert the code and message are MOVIE_NOT_FOUND
@@ -137,12 +137,12 @@ class ControllerIntegrationTest {
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert the status code is OK, and we have a customResponse
         assertTrue(results.getStatusCode().is4xxClientError());
-        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
         assertNotNull(customResponse);
 
         // Assert the code and message are MOVIE_NOT_FOUND
@@ -163,17 +163,17 @@ class ControllerIntegrationTest {
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert
         assertTrue(results.getStatusCode().is2xxSuccessful());
-        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
         assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
         assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
-        List<MovieSearchResultDTO> movieList = customResponse.getData();
+        List<MovieSearchQueryDTO> movieList = customResponse.getData();
         // Assert there are 2 movies with release time in 2012.
         assertEquals(2, movieList.size());
         // Assert 1st movie is The Dark Knight Rises, and the second one is The Dark Knight Rises Again,
@@ -191,17 +191,17 @@ class ControllerIntegrationTest {
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert
         assertTrue(results.getStatusCode().is2xxSuccessful());
-        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
         assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
         assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
-        List<MovieSearchResultDTO> movieList = customResponse.getData();
+        List<MovieSearchQueryDTO> movieList = customResponse.getData();
 
         // Assert movieList has 3 movies
         assertEquals(3, movieList.size());
@@ -220,17 +220,17 @@ class ControllerIntegrationTest {
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert
         assertTrue(results.getStatusCode().is2xxSuccessful());
-        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
         assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
         assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
-        List<MovieSearchResultDTO> movieList = customResponse.getData();
+        List<MovieSearchQueryDTO> movieList = customResponse.getData();
 
         // Assert movieList has 3 movies
         assertEquals(3, movieList.size());
@@ -251,18 +251,18 @@ class ControllerIntegrationTest {
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         assertTrue(results.getStatusCode().is2xxSuccessful());
-        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
         assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
         assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
-        List<MovieSearchResultDTO> movieList = customResponse.getData();
+        List<MovieSearchQueryDTO> movieList = customResponse.getData();
 
-        MovieSearchResultDTO movie11 = movieList.get(0);
+        MovieSearchQueryDTO movie11 = movieList.get(0);
         assertEquals(MOVIE_11_TITLE, movie11.getTitle());
         assertEquals(MOVIE_11_RATING, movie11.getRating());
     }
@@ -276,12 +276,12 @@ class ControllerIntegrationTest {
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert the status code is BAD_REQUEST, and we have a customResponse
         assertTrue(results.getStatusCode().is4xxClientError());
-        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
         assertNotNull(customResponse);
 
         // Assert the code and message are INVALID_YEAR
@@ -302,17 +302,17 @@ class ControllerIntegrationTest {
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert
         assertTrue(results.getStatusCode().is2xxSuccessful());
-        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
         assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
         assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
-        List<MovieSearchResultDTO> movieList = customResponse.getData();
+        List<MovieSearchQueryDTO> movieList = customResponse.getData();
         // Assert there are 3 movies
         assertEquals(3, movieList.size());
         // Assert 1st movie is The Dark Knight Rises Again, since it has the latest release time
@@ -329,12 +329,12 @@ class ControllerIntegrationTest {
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert the status code is BAD_REQUEST, and we have a customResponse
         assertTrue(results.getStatusCode().is4xxClientError());
-        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
         assertNotNull(customResponse);
 
         // Assert the code and message are INVALID_ORDER_BY
@@ -354,12 +354,12 @@ class ControllerIntegrationTest {
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert the status code is BAD_REQUEST, and we have a customResponse
         assertTrue(results.getStatusCode().is4xxClientError());
-        CustomResponse<List<MovieSearchResultDTO>> customResponse = results.getBody();
+        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
         assertNotNull(customResponse);
 
         // Assert the code and message are INVALID_YEAR

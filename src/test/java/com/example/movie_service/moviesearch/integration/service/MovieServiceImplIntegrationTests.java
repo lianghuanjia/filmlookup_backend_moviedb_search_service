@@ -1,7 +1,7 @@
 package com.example.movie_service.moviesearch.integration.service;
 
 import com.example.movie_service.builder.MovieSearchParam;
-import com.example.movie_service.dto.MovieSearchResultDTO;
+import com.example.movie_service.dto.MovieSearchQueryDTO;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.moviesearch.integration.util.dataInitService.DataInitializerService;
 import com.example.movie_service.moviesearch.integration.util.junitExtension.MySQLTestContainerExtension;
@@ -57,7 +57,7 @@ class MovieServiceImplIntegrationTests {
 
     @Test
     void testMoviesFoundWithTitleOnly() {
-        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> responseEntity = movieServiceImpl.searchMovies
+        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> responseEntity = movieServiceImpl.searchMovies
                 (movieSearchParam);
 
         // Verify the response
@@ -65,7 +65,7 @@ class MovieServiceImplIntegrationTests {
         assertNotNull(responseEntity.getBody());
         assertEquals(MOVIE_FOUND_CODE, responseEntity.getBody().getCode());
         assertEquals(MOVIE_FOUND_MESSAGE, responseEntity.getBody().getMessage());
-        List<MovieSearchResultDTO> moviesList = responseEntity.getBody().getData();
+        List<MovieSearchQueryDTO> moviesList = responseEntity.getBody().getData();
         // Verify the movies
         assertEquals(3, moviesList.size());
         assertEquals(THE_DARK_KNIGHT, moviesList.get(0).getTitle());
@@ -78,7 +78,7 @@ class MovieServiceImplIntegrationTests {
         movieSearchParam = movieSearchParam.toBuilder()
                 .title(NON_EXISTED_MOVIE_TITLE).build();
 
-        ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> responseEntity = movieServiceImpl.searchMovies
+        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> responseEntity = movieServiceImpl.searchMovies
                 (movieSearchParam);
 
         // Verify the response
@@ -86,7 +86,7 @@ class MovieServiceImplIntegrationTests {
         assertNotNull(responseEntity.getBody());
         assertEquals(MOVIE_NOT_FOUND_CODE, responseEntity.getBody().getCode());
         assertEquals(MOVIE_NOT_FOUND_MESSAGE, responseEntity.getBody().getMessage());
-        List<MovieSearchResultDTO> moviesList = responseEntity.getBody().getData();
+        List<MovieSearchQueryDTO> moviesList = responseEntity.getBody().getData();
         // Verify the movies
         assertTrue(moviesList.isEmpty());
     }

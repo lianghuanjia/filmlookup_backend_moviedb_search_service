@@ -3,7 +3,7 @@ package com.example.movie_service.moviesearch.unit.repository;
 
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.CrewMember;
-import com.example.movie_service.dto.MovieSearchResultDTO;
+import com.example.movie_service.dto.MovieSearchQueryDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.repository.CustomMovieRepositoryImpl;
 import jakarta.persistence.EntityManager;
@@ -79,8 +79,8 @@ class CustomRepositoryImplUnitTests {
     void repositoryImplSearchMovies() {
 
         // Mock the behavior
-        List<MovieSearchResultDTO> movieList = new ArrayList<>();
-        MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(MOVIE_ID, title, releasedYear, director,
+        List<MovieSearchQueryDTO> movieList = new ArrayList<>();
+        MovieSearchQueryDTO resultDTO = new MovieSearchQueryDTO(MOVIE_ID, title, releasedYear, director,
                 BACKDROP_PATH, POSTER_PATH, rating);
         movieList.add(resultDTO);
 
@@ -90,7 +90,7 @@ class CustomRepositoryImplUnitTests {
         when(query.getResultList()).thenReturn(movieList);
 
         // Execute the method:
-        List<MovieSearchResultDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
+        List<MovieSearchQueryDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         // Verify if the actualResult is the same as we define
         assertEquals(MOVIE_ID, actualResult.get(0).getId());
@@ -111,8 +111,8 @@ class CustomRepositoryImplUnitTests {
         movieSearchParam = movieSearchParam.toBuilder().releasedYear(null).build();
 
         // Mock the behavior
-        List<MovieSearchResultDTO> movieList = new ArrayList<>();
-        MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(MOVIE_ID, title, releasedYear, director,
+        List<MovieSearchQueryDTO> movieList = new ArrayList<>();
+        MovieSearchQueryDTO resultDTO = new MovieSearchQueryDTO(MOVIE_ID, title, releasedYear, director,
                 BACKDROP_PATH, POSTER_PATH, rating);
         movieList.add(resultDTO);
 
@@ -122,7 +122,7 @@ class CustomRepositoryImplUnitTests {
         when(query.getResultList()).thenReturn(movieList);
 
         // Execute the method:
-        List<MovieSearchResultDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
+        List<MovieSearchQueryDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         // Verify if the actualResult is the same as we define
         assertEquals(MOVIE_ID, actualResult.get(0).getId());
@@ -143,8 +143,8 @@ class CustomRepositoryImplUnitTests {
         movieSearchParam = movieSearchParam.toBuilder().releasedYear("").build();
 
         // Mock the behavior
-        List<MovieSearchResultDTO> movieList = new ArrayList<>();
-        MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(MOVIE_ID, title, releasedYear, director,
+        List<MovieSearchQueryDTO> movieList = new ArrayList<>();
+        MovieSearchQueryDTO resultDTO = new MovieSearchQueryDTO(MOVIE_ID, title, releasedYear, director,
                 BACKDROP_PATH, POSTER_PATH, rating);
         movieList.add(resultDTO);
 
@@ -154,7 +154,7 @@ class CustomRepositoryImplUnitTests {
         when(query.getResultList()).thenReturn(movieList);
 
         // Execute the method:
-        List<MovieSearchResultDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
+        List<MovieSearchQueryDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         // Verify if the actualResult is the same as we define
         assertEquals(MOVIE_ID, actualResult.get(0).getId());
@@ -175,8 +175,8 @@ class CustomRepositoryImplUnitTests {
         movieSearchParam = movieSearchParam.toBuilder().director("").build();
 
         // Mock the behavior
-        List<MovieSearchResultDTO> movieList = new ArrayList<>();
-        MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(MOVIE_ID, title, releasedYear, director,
+        List<MovieSearchQueryDTO> movieList = new ArrayList<>();
+        MovieSearchQueryDTO resultDTO = new MovieSearchQueryDTO(MOVIE_ID, title, releasedYear, director,
                 BACKDROP_PATH, POSTER_PATH, rating);
         movieList.add(resultDTO);
 
@@ -186,7 +186,7 @@ class CustomRepositoryImplUnitTests {
         when(query.getResultList()).thenReturn(movieList);
 
         // Execute the method:
-        List<MovieSearchResultDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
+        List<MovieSearchQueryDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         // Verify if the actualResult is the same as we define
         assertEquals(MOVIE_ID, actualResult.get(0).getId());
@@ -208,8 +208,8 @@ class CustomRepositoryImplUnitTests {
         movieSearchParam = movieSearchParam.toBuilder().genre("").build();
 
         // Mock the behavior
-        List<MovieSearchResultDTO> movieList = new ArrayList<>();
-        MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(MOVIE_ID, title, releasedYear, director,
+        List<MovieSearchQueryDTO> movieList = new ArrayList<>();
+        MovieSearchQueryDTO resultDTO = new MovieSearchQueryDTO(MOVIE_ID, title, releasedYear, director,
                 BACKDROP_PATH, POSTER_PATH, rating);
         movieList.add(resultDTO);
 
@@ -219,7 +219,7 @@ class CustomRepositoryImplUnitTests {
         when(query.getResultList()).thenReturn(movieList);
 
         // Execute the method:
-        List<MovieSearchResultDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
+        List<MovieSearchQueryDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         // Verify if the actualResult is the same as we define
         assertEquals(MOVIE_ID, actualResult.get(0).getId());
@@ -241,8 +241,8 @@ class CustomRepositoryImplUnitTests {
                 .build();
 
         // Mock the behavior
-        List<MovieSearchResultDTO> movieList = new ArrayList<>();
-        MovieSearchResultDTO resultDTO = new MovieSearchResultDTO(MOVIE_ID, title, releasedYear, director,
+        List<MovieSearchQueryDTO> movieList = new ArrayList<>();
+        MovieSearchQueryDTO resultDTO = new MovieSearchQueryDTO(MOVIE_ID, title, releasedYear, director,
                 BACKDROP_PATH, POSTER_PATH, rating);
         movieList.add(resultDTO);
 
@@ -252,7 +252,7 @@ class CustomRepositoryImplUnitTests {
         when(query.getResultList()).thenReturn(movieList);
 
         // Execute the method:
-        List<MovieSearchResultDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
+        List<MovieSearchQueryDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         // Verify if the actualResult is the same as we define
         assertEquals(MOVIE_ID, actualResult.get(0).getId());

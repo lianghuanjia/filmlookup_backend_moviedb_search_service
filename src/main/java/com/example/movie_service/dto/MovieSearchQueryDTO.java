@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MovieSearchResultDTO {
+public class MovieSearchQueryDTO {
     private String id;
     private String title;
     private String releaseTime;

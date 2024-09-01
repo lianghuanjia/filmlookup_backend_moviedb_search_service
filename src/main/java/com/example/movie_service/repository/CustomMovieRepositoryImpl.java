@@ -2,7 +2,7 @@ package com.example.movie_service.repository;
 
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.CrewMember;
-import com.example.movie_service.dto.MovieSearchResultDTO;
+import com.example.movie_service.dto.MovieSearchQueryDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -33,7 +33,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
      * @return A list of MovieSearchResultDTO. Each MovieSearchResultDTO represents one searched movie result
      */
     @Override
-    public List<MovieSearchResultDTO> searchMovies(MovieSearchParam movieSearchParam) {
+    public List<MovieSearchQueryDTO> searchMovies(MovieSearchParam movieSearchParam) {
         // Build string query with optional parameters
         String sqlQuery = buildQueryStringToSearchMovieWithTitleAndOtherFields(movieSearchParam.getReleasedYear(), movieSearchParam.getDirector(),
                 movieSearchParam.getGenre(), movieSearchParam.getOrderBy(), movieSearchParam.getDirection());
@@ -50,7 +50,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         // Since the MOVIE_SEARCH_RESULT_DTO_MAPPING's target class is MovieSearchResultDTO, I am sure the result will
         // be MovieSearchResultDTO class, so I use @SuppressWarnings("unchecked")  here
         @SuppressWarnings("unchecked")
-        List<MovieSearchResultDTO> results = query.getResultList();
+        List<MovieSearchQueryDTO> results = query.getResultList();
         return results;
     }
 

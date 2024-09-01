@@ -1,7 +1,7 @@
 package com.example.movie_service.moviesearch.integration.customRepositoryImpl;
 
 import com.example.movie_service.builder.MovieSearchParam;
-import com.example.movie_service.dto.MovieSearchResultDTO;
+import com.example.movie_service.dto.MovieSearchQueryDTO;
 import com.example.movie_service.moviesearch.integration.util.dataInitService.DataInitializerService;
 import com.example.movie_service.moviesearch.integration.util.junitExtension.MySQLTestContainerExtension;
 import com.example.movie_service.repository.CustomMovieRepositoryImpl;
@@ -65,19 +65,19 @@ class CustomRepositoryImplIntegrationTest {
     void searchMovieByTitleOnlyFound() {
         movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).build();
 
-        List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
+        List<MovieSearchQueryDTO> searchResults = customMovieRepositoryImpl.searchMovies(
                 movieSearchParam);
 
 
         assertNotNull(searchResults);
-        MovieSearchResultDTO firstResult = searchResults.get(0);
+        MovieSearchQueryDTO firstResult = searchResults.get(0);
         assertEquals(THE_DARK_KNIGHT, firstResult.getTitle());
     }
 
     @Test
     void searchMovieByTitleNoMovieFound() {
         movieSearchParam = movieSearchParam.toBuilder().title(NON_EXISTED_MOVIE_TITLE).build();
-        List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
+        List<MovieSearchQueryDTO> searchResults = customMovieRepositoryImpl.searchMovies(
                 movieSearchParam);
 
 
@@ -88,14 +88,14 @@ class CustomRepositoryImplIntegrationTest {
     @Test
     void searchMovieTestOrderByReleaseTimeAsc() {
         movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).orderBy(RELEASE_TIME).build();
-        List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(
+        List<MovieSearchQueryDTO> searchResults = customMovieRepositoryImpl.searchMovies(
                 movieSearchParam);
 
         assertNotNull(searchResults);
         assertEquals(3, searchResults.size());
-        MovieSearchResultDTO firstResult = searchResults.get(0);
-        MovieSearchResultDTO secondResult = searchResults.get(1);
-        MovieSearchResultDTO thirdResult = searchResults.get(2);
+        MovieSearchQueryDTO firstResult = searchResults.get(0);
+        MovieSearchQueryDTO secondResult = searchResults.get(1);
+        MovieSearchQueryDTO thirdResult = searchResults.get(2);
         assertEquals(THE_DARK_KNIGHT, firstResult.getTitle());
         assertEquals(THE_DARK_KNIGHT_RISES, secondResult.getTitle());
         assertEquals(THE_DARK_KNIGHT_RISES_AGAIN, thirdResult.getTitle());
@@ -104,13 +104,13 @@ class CustomRepositoryImplIntegrationTest {
     @Test
     void searchMovieTestOrderByReleaseTimeDesc() {
         movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).orderBy(RELEASE_TIME).direction(DESC).build();
-        List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(movieSearchParam);
+        List<MovieSearchQueryDTO> searchResults = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         assertNotNull(searchResults);
         assertEquals(3, searchResults.size());
-        MovieSearchResultDTO firstResult = searchResults.get(0);
-        MovieSearchResultDTO secondResult = searchResults.get(1);
-        MovieSearchResultDTO thirdResult = searchResults.get(2);
+        MovieSearchQueryDTO firstResult = searchResults.get(0);
+        MovieSearchQueryDTO secondResult = searchResults.get(1);
+        MovieSearchQueryDTO thirdResult = searchResults.get(2);
         assertEquals(THE_DARK_KNIGHT_RISES_AGAIN, firstResult.getTitle());
         assertEquals(THE_DARK_KNIGHT_RISES, secondResult.getTitle());
         assertEquals(THE_DARK_KNIGHT, thirdResult.getTitle());
@@ -119,13 +119,13 @@ class CustomRepositoryImplIntegrationTest {
     @Test
     void searchMovieTestDescAndOrderByRating() {
         movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).orderBy(RATING).direction(DESC).build();
-        List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(movieSearchParam);
+        List<MovieSearchQueryDTO> searchResults = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         assertNotNull(searchResults);
         assertEquals(3, searchResults.size());
-        MovieSearchResultDTO firstResult = searchResults.get(0);
-        MovieSearchResultDTO secondResult = searchResults.get(1);
-        MovieSearchResultDTO thirdResult = searchResults.get(2);
+        MovieSearchQueryDTO firstResult = searchResults.get(0);
+        MovieSearchQueryDTO secondResult = searchResults.get(1);
+        MovieSearchQueryDTO thirdResult = searchResults.get(2);
         assertEquals(THE_DARK_KNIGHT, firstResult.getTitle());
         assertEquals(THE_DARK_KNIGHT_RISES, secondResult.getTitle());
         assertEquals(THE_DARK_KNIGHT_RISES_AGAIN, thirdResult.getTitle());
@@ -135,13 +135,13 @@ class CustomRepositoryImplIntegrationTest {
     void searchMovieByTitleAndDirector() {
         movieSearchParam = movieSearchParam.toBuilder().title(DARK_KNIGHT).director("Nolan").build();
 
-        List<MovieSearchResultDTO> searchResults = customMovieRepositoryImpl.searchMovies(movieSearchParam);
+        List<MovieSearchQueryDTO> searchResults = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
 
         assertNotNull(searchResults);
         assertEquals(2, searchResults.size());
-        MovieSearchResultDTO firstResult = searchResults.get(0);
-        MovieSearchResultDTO secondResult = searchResults.get(1);
+        MovieSearchQueryDTO firstResult = searchResults.get(0);
+        MovieSearchQueryDTO secondResult = searchResults.get(1);
         assertEquals(THE_DARK_KNIGHT, firstResult.getTitle());
         assertEquals(THE_DARK_KNIGHT_RISES, secondResult.getTitle());
     }
