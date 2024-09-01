@@ -1,7 +1,7 @@
 package com.example.movie_service.service;
 
 import com.example.movie_service.builder.MovieSearchParam;
-import com.example.movie_service.dto.MovieSearchQueryDTO;
+import com.example.movie_service.dto.MovieSearchResponseDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.response.CustomResponse;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ public interface MovieService {
      *
      * @return a list of movies that match the search criteria
      */
-    ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> searchMovies(MovieSearchParam movieSearchParam);
+    ResponseEntity<CustomResponse<List<MovieSearchResponseDTO>>> searchMovies(MovieSearchParam movieSearchParam);
 
     ResponseEntity<CustomResponse<OneMovieDetailsDTO>> searchOneMovieDetails(String movieId);
 }

@@ -1,7 +1,9 @@
 package com.example.movie_service.service;
 
 import com.example.movie_service.builder.MovieSearchParam;
+import com.example.movie_service.converter.MovieSearchQueryToResponseConverter;
 import com.example.movie_service.dto.MovieSearchQueryDTO;
+import com.example.movie_service.dto.MovieSearchResponseDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.repository.CustomMovieRepository;
@@ -12,7 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static com.example.movie_service.constant.MovieConstant.*;
 
@@ -24,6 +28,7 @@ public class MovieServiceImpl implements MovieService {
 
     private final CustomMovieRepository movieRepository;
     private final ValidationService validationService;
+    private final MovieSearchQueryToResponseConverter converter;
 
 
     /**
@@ -32,10 +37,11 @@ public class MovieServiceImpl implements MovieService {
      * @param movieRepository the repository for accessing movie data
      */
     @Autowired
-    public MovieServiceImpl(CustomMovieRepository movieRepository,
-                            ValidationService validationService) {
+    public MovieServiceImpl(CustomMovieRepository movieRepository, ValidationService validationService,
+                            MovieSearchQueryToResponseConverter converter) {
         this.movieRepository = movieRepository;
         this.validationService = validationService;
+        this.converter = converter;
     }
 
     /**
@@ -44,7 +50,7 @@ public class MovieServiceImpl implements MovieService {
      * @return a list of movies that match the search criteria
      */
     @Override
-    public ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> searchMovies(MovieSearchParam movieSearchParam)
+    public ResponseEntity<CustomResponse<List<MovieSearchResponseDTO>>> searchMovies(MovieSearchParam movieSearchParam)
             throws PersistenceException, ValidationException {
 
         String title = movieSearchParam.getTitle();
@@ -62,15 +68,21 @@ public class MovieServiceImpl implements MovieService {
         List<MovieSearchQueryDTO> movieList = movieRepository.searchMovies(movieSearchParam);
 
         // Prepare the response's code and message
-        CustomResponse<List<MovieSearchQueryDTO>> customResponse;
+        CustomResponse<List<MovieSearchResponseDTO>> customResponse;
+
+        // Perform the DTO conversions
+        List<MovieSearchResponseDTO> responseList = movieList.stream()
+                .map(converter::convert)
+                .filter(Objects::nonNull)  // Removes null elements from the stream
+                .toList();
 
         // If no movie is found, return a custom response with movie not found code and message inside, with the empty
         // movieList. Before I put null in the data. This is not good because it might cause NullPointerExceptions. It
         // also simplifies the handling of responses, as clients don't need to check for both 'null' and empty conditions.
-        if (movieList.isEmpty()) {
-            customResponse = new CustomResponse<>(MOVIE_NOT_FOUND_CODE, MOVIE_NOT_FOUND_MESSAGE, movieList);
+        if (responseList.isEmpty()) {
+            customResponse = new CustomResponse<>(MOVIE_NOT_FOUND_CODE, MOVIE_NOT_FOUND_MESSAGE, Collections.emptyList());
         } else {
-            customResponse = new CustomResponse<>(MOVIE_FOUND_CODE, MOVIE_FOUND_MESSAGE, movieList);
+            customResponse = new CustomResponse<>(MOVIE_FOUND_CODE, MOVIE_FOUND_MESSAGE, responseList);
         }
 
 

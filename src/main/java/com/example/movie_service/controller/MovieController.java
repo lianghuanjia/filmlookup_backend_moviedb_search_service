@@ -1,7 +1,7 @@
 package com.example.movie_service.controller;
 
 import com.example.movie_service.builder.MovieSearchParam;
-import com.example.movie_service.dto.MovieSearchQueryDTO;
+import com.example.movie_service.dto.MovieSearchResponseDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.response.CustomResponse;
 import com.example.movie_service.service.MovieService;
@@ -50,7 +50,7 @@ public class MovieController {
      * @return a ResponseEntity containing a CustomResponse with the list of movies found
      */
     @GetMapping("/movies")
-    public ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> searchMovies(
+    public ResponseEntity<CustomResponse<List<MovieSearchResponseDTO>>> searchMovies(
             @RequestParam String title,
             @RequestParam(required = false) String releasedYear,
             @RequestParam(required = false) String director,

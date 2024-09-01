@@ -2,7 +2,7 @@ package com.example.movie_service.moviesearch.unit.controller;
 
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.controller.MovieController;
-import com.example.movie_service.dto.MovieSearchQueryDTO;
+import com.example.movie_service.dto.MovieSearchResponseDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.response.CustomResponse;
 import com.example.movie_service.service.MovieService;
@@ -61,20 +61,20 @@ class MovieControllerUnitTests {
     void searchMovieReturnOkTest() {
 
         // Set up: define the parameters and what should return
-        MovieSearchQueryDTO movieSearchQueryDTO = new MovieSearchQueryDTO();
-        List<MovieSearchQueryDTO> movieSearchQueryDTOList = new ArrayList<>();
+        MovieSearchResponseDTO movieSearchQueryDTO = new MovieSearchResponseDTO();
+        List<MovieSearchResponseDTO> movieSearchQueryDTOList = new ArrayList<>();
         movieSearchQueryDTOList.add(movieSearchQueryDTO);
 
-        CustomResponse<List<MovieSearchQueryDTO>> customResponse = new CustomResponse<>(MOVIE_FOUND_CODE, MOVIE_FOUND_MESSAGE, movieSearchQueryDTOList);
+        CustomResponse<List<MovieSearchResponseDTO>> customResponse = new CustomResponse<>(MOVIE_FOUND_CODE, MOVIE_FOUND_MESSAGE, movieSearchQueryDTOList);
 
-        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> responseEntity = new ResponseEntity<>(customResponse, HttpStatus.OK);
+        ResponseEntity<CustomResponse<List<MovieSearchResponseDTO>>> responseEntity = new ResponseEntity<>(customResponse, HttpStatus.OK);
 
         // What I expect my function to do, like the correct outcome I expect
         when(mockMovieService.searchMovies(any(MovieSearchParam.class)))
                 .thenReturn(responseEntity);
 
         // Test my actual function
-        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> actual = movieController.searchMovies(title, releasedYear, director,
+        ResponseEntity<CustomResponse<List<MovieSearchResponseDTO>>> actual = movieController.searchMovies(title, releasedYear, director,
                 genre, limit, page, orderBy, direction);
 
         assertEquals(responseEntity, actual);

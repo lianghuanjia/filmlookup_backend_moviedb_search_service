@@ -2,7 +2,9 @@ package com.example.movie_service.moviesearch.unit.service;
 
 
 import com.example.movie_service.builder.MovieSearchParam;
+import com.example.movie_service.converter.MovieSearchQueryToResponseConverter;
 import com.example.movie_service.dto.MovieSearchQueryDTO;
+import com.example.movie_service.dto.MovieSearchResponseDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.repository.CustomMovieRepository;
@@ -41,6 +43,9 @@ class MovieServiceUnitTests {
 
     @Mock
     private ValidationService validationService;
+
+    @Mock
+    private MovieSearchQueryToResponseConverter converter;
 
     @InjectMocks
     private MovieServiceImpl movieServiceImpl; // Should this be MovieService or MovieServiceImpl?
@@ -187,6 +192,12 @@ class MovieServiceUnitTests {
         when(movieRepository.searchMovies(movieSearchParam))
                 .thenReturn(mockMovies);
 
+        // Since we use @Mock on the converter, All methods on this mock return default values (e.g., null, 0, empty collections)
+        // unless explicitly stubbed (i.e., told to return specific values). Therefore, we stub the behavior below for the converter
+        when(converter.convert(any(MovieSearchQueryDTO.class)))
+                .thenReturn(new MovieSearchResponseDTO("1", "Inception", "2010", "path/to/poster", 9.0));
+
+
         // Ensure validation service calls do nothing (if necessary)
         doNothing().when(validationService).validateTitle(any());
         doNothing().when(validationService).validateReleasedYear(any());
@@ -196,13 +207,14 @@ class MovieServiceUnitTests {
         doNothing().when(validationService).validateDirection(any());
 
         // Call the actual method under test
-        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> actualResponseEntity = movieServiceImpl.searchMovies(
+        ResponseEntity<CustomResponse<List<MovieSearchResponseDTO>>> actualResponseEntity = movieServiceImpl.searchMovies(
                 movieSearchParam);
 
         // Verify the results
         assertNotNull(actualResponseEntity.getBody());
         assertNotNull(actualResponseEntity.getBody().getData());
         assertEquals(1, actualResponseEntity.getBody().getData().size());
+        System.out.println(actualResponseEntity.getBody().getData());
         assertEquals("Inception", actualResponseEntity.getBody().getData().get(0).getTitle());
     }
 
@@ -223,8 +235,7 @@ class MovieServiceUnitTests {
         doNothing().when(validationService).validateOrderBy(any());
         doNothing().when(validationService).validateDirection(any());
 
-
-        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> actualResponseEntity = movieServiceImpl.searchMovies(
+        ResponseEntity<CustomResponse<List<MovieSearchResponseDTO>>> actualResponseEntity = movieServiceImpl.searchMovies(
                 movieSearchParam
         );
 
