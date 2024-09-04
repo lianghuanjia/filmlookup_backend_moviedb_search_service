@@ -6,6 +6,9 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * Define the Global CORS Policy of this application
+ */
 @Configuration
 public class CorsConfig {
 
@@ -20,7 +23,7 @@ public class CorsConfig {
                 // However, the CorsRegistry parameter in the addCorsMappings method is not explicitly annotated as
                 // @NonNull, leading to a potential mismatch between the annotations and the actual method signature.
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5174")  // Allow your frontend origin
+                        .allowedOrigins("http://localhost:5173")  // Allow your frontend origin
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*");
             }
