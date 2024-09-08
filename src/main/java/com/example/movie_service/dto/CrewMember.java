@@ -15,5 +15,5 @@ public class CrewMember {
     private String personId;
     private String name;
     private String profilePath;
-    private String job;
+    private String jobs;
 }

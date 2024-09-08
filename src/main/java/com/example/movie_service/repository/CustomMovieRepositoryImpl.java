@@ -128,15 +128,17 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
      * @return a String.
      */
     private String buildQueryStringToSearchOneMovieCrewMembers() {
-        return "SELECT " +
+        return "SELECT DISTINCT " +
                 "mc.person_id AS person_id, " +
                 "p.name AS person_name, " +
                 "p.profile_path AS profilePath, " +
-                "mc.job " +
+                "GROUP_CONCAT(mc.job SEPARATOR ', ') AS jobs " + // Correct alias
                 "FROM movie_crew mc " +
-                "INNER JOIN person p ON mc.person_id = p.person_id AND p.profile_path IS NOT NULL " + // Only get people who have profile_path
-                "AND mc.job IN ('Director', 'Actor', 'Actress') " + // Only get director(s), actors, actresses
-                "WHERE mc.movie_id = :movieId ";
+                "INNER JOIN person p ON mc.person_id = p.person_id " +
+                "WHERE p.profile_path IS NOT NULL " +
+                "AND mc.job IN ('Director', 'Actor', 'Actress') " +
+                "AND mc.movie_id = :movieId " +
+                "GROUP BY mc.person_id, p.name, p.profile_path";
     }
 
     /**

@@ -71,7 +71,7 @@ import static com.example.movie_service.constant.MovieConstant.SINGLE_MOVIE_CREW
                         @ColumnResult(name = "person_id", type = String.class),
                         @ColumnResult(name = "person_name", type = String.class),
                         @ColumnResult(name = "profilePath", type = String.class),
-                        @ColumnResult(name = "job", type = String.class)
+                        @ColumnResult(name = "jobs", type = String.class)
                 }
         )
 )

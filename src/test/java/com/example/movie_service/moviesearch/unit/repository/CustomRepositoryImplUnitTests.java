@@ -310,7 +310,7 @@ class CustomRepositoryImplUnitTests {
         assertEquals(personId, crewMember1.getPersonId());
         assertEquals(personName, crewMember1.getName());
         assertEquals(profilePath, crewMember1.getProfilePath());
-        assertEquals(job, crewMember1.getJob());
+        assertEquals(job, crewMember1.getJobs());
     }
 
     @Test
