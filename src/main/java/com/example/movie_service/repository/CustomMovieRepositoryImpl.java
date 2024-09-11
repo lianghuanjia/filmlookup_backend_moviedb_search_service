@@ -29,6 +29,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
 
     /**
      * Search movies that meets the criteria of the parameters inside the movieSearchParam from MySQL database
+     * NOTE: Movies that don't have poster_path in the database won't be returned.
      * @param movieSearchParam a class that encapsulates all necessary parameters to search movies
      * @return A list of MovieSearchResultDTO. Each MovieSearchResultDTO represents one searched movie result
      */
@@ -215,7 +216,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
                         "LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id " +
                         "LEFT JOIN genre g ON mg.genre_id = g.id " +
                         "LEFT JOIN movie_rating mr ON m.movie_id = mr.movie_id " +
-                        "WHERE m.primaryTitle LIKE :title "
+                        "WHERE m.poster_path IS NOT NULL AND m.primaryTitle LIKE :title "
         );
 
         if (releasedYear != null && !releasedYear.isEmpty()) {
