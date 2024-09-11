@@ -6,6 +6,7 @@ public class TestConstant {
 
     public static final String EXISTED_MOVIE_TITLE = "Knight";
     public static final String NON_EXISTED_MOVIE_TITLE = "Miss Jerry";
+    public static final String MOVIE_TITLE_FOR_RETURN_RESULTS_NOT_INCLUDING_POSTER_PATH = "poster_path_testing_title";
     public static final String ORDER_BY_TITLE = "title";
     public static final String RELEASED_YEAR = "releasedYear";
     public static final String ORDER_BY = "orderBy";
@@ -28,6 +29,8 @@ public class TestConstant {
     public static final String DIRECTOR_NOLAN_PROFILE_PATH = "NolanProfilePath";
     public static final String EMPTY_STRING = "";
     public static final String DIRECTOR_ROLE = "director";
+    public static final String BACKDROP_PATH = "backdrop_path";
+    public static final String POSTER_PATH = "poster_path";
 
     // Constants to set up test container database
 

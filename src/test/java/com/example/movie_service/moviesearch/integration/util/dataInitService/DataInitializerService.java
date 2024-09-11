@@ -49,23 +49,37 @@ public class DataInitializerService {
         entityManager.flush();
     }
 
+    @Transactional
+    public void generateTwoMoviesWithAndWithoutPosterPath(){
+        Movie movie1 = new Movie();
+        movie1.setTitle(MOVIE_TITLE_FOR_RETURN_RESULTS_NOT_INCLUDING_POSTER_PATH);
+        movie1.setBackdropPath(BACKDROP_PATH);
+        entityManager.persist(movie1);
+
+        Movie movie2 = new Movie();
+        movie2.setTitle(MOVIE_TITLE_FOR_RETURN_RESULTS_NOT_INCLUDING_POSTER_PATH);
+        movie2.setBackdropPath(BACKDROP_PATH);
+        movie2.setPosterPath(POSTER_PATH);
+        entityManager.persist(movie2);
+    }
+
     @Transactional()
     public void insertMovieData() {
         List<String> action_list = List.of(ACTION_GENRE);
         List<String> action_crime_list = List.of(ACTION_GENRE, CRIME_GENRE);
-        initializeOneMovieData(MOVIE_1_TITLE, MOVIE_1_RELEASE_TIME, action_list, DIRECTOR_1, MOVIE_1_RATING, NUM_OF_VOTES_10);
-        initializeOneMovieData(MOVIE_2_TITLE, MOVIE_2_RELEASE_TIME, action_list, DIRECTOR_1, MOVIE_2_RATING, NUM_OF_VOTES_15);
-        initializeOneMovieData(MOVIE_3_TITLE, MOVIE_3_RELEASE_TIME, action_list, DIRECTOR_1, MOVIE_3_RATING, NUM_OF_VOTES_10);
-        initializeOneMovieData(MOVIE_4_TITLE, MOVIE_4_RELEASE_TIME, action_list, DIRECTOR_2, MOVIE_4_RATING, NUM_OF_VOTES_10);
-        initializeOneMovieData(MOVIE_5_TITLE, MOVIE_5_RELEASE_TIME, action_list, DIRECTOR_2, MOVIE_5_RATING, NUM_OF_VOTES_10);
-        initializeOneMovieData(MOVIE_6_TITLE, MOVIE_6_RELEASE_TIME, action_list, DIRECTOR_2, MOVIE_6_RATING, NUM_OF_VOTES_10);
-        initializeOneMovieData(MOVIE_7_TITLE, MOVIE_7_RELEASE_TIME, action_list, DIRECTOR_2, MOVIE_7_RATING, NUM_OF_VOTES_10);
-        initializeOneMovieData(MOVIE_8_TITLE, MOVIE_8_RELEASE_TIME, action_list, DIRECTOR_3, MOVIE_8_RATING, NUM_OF_VOTES_10);
-        initializeOneMovieData(MOVIE_9_TITLE, MOVIE_9_RELEASE_TIME, action_crime_list, DIRECTOR_3, MOVIE_9_RATING, NUM_OF_VOTES_10);
-        initializeOneMovieData(MOVIE_10_TITLE, MOVIE_10_RELEASE_TIME, action_crime_list, DIRECTOR_3, MOVIE_10_RATING, NUM_OF_VOTES_10);
-        initializeOneMovieData(MOVIE_11_TITLE, MOVIE_11_RELEASE_TIME, action_crime_list, DIRECTOR_3, MOVIE_11_RATING, NUM_OF_VOTES_10);
-        initializeOneMovieData(MOVIE_12_TITLE, MOVIE_12_RELEASE_TIME, action_crime_list, DIRECTOR_4, MOVIE_12_RATING, NUM_OF_VOTES_10);
-        initializeOneMovieData(MOVIE_13_TITLE, MOVIE_13_RELEASE_TIME, action_crime_list, DIRECTOR_4, MOVIE_13_RATING, NUM_OF_VOTES_10);
+        initializeOneMovieData(MOVIE_1_TITLE, MOVIE_1_RELEASE_TIME, action_list, DIRECTOR_1, MOVIE_1_RATING, NUM_OF_VOTES_10, POSTER_PATH);
+        initializeOneMovieData(MOVIE_2_TITLE, MOVIE_2_RELEASE_TIME, action_list, DIRECTOR_1, MOVIE_2_RATING, NUM_OF_VOTES_15, POSTER_PATH);
+        initializeOneMovieData(MOVIE_3_TITLE, MOVIE_3_RELEASE_TIME, action_list, DIRECTOR_1, MOVIE_3_RATING, NUM_OF_VOTES_10, POSTER_PATH);
+        initializeOneMovieData(MOVIE_4_TITLE, MOVIE_4_RELEASE_TIME, action_list, DIRECTOR_2, MOVIE_4_RATING, NUM_OF_VOTES_10, POSTER_PATH);
+        initializeOneMovieData(MOVIE_5_TITLE, MOVIE_5_RELEASE_TIME, action_list, DIRECTOR_2, MOVIE_5_RATING, NUM_OF_VOTES_10, POSTER_PATH);
+        initializeOneMovieData(MOVIE_6_TITLE, MOVIE_6_RELEASE_TIME, action_list, DIRECTOR_2, MOVIE_6_RATING, NUM_OF_VOTES_10, POSTER_PATH);
+        initializeOneMovieData(MOVIE_7_TITLE, MOVIE_7_RELEASE_TIME, action_list, DIRECTOR_2, MOVIE_7_RATING, NUM_OF_VOTES_10, POSTER_PATH);
+        initializeOneMovieData(MOVIE_8_TITLE, MOVIE_8_RELEASE_TIME, action_list, DIRECTOR_3, MOVIE_8_RATING, NUM_OF_VOTES_10, POSTER_PATH);
+        initializeOneMovieData(MOVIE_9_TITLE, MOVIE_9_RELEASE_TIME, action_crime_list, DIRECTOR_3, MOVIE_9_RATING, NUM_OF_VOTES_10, POSTER_PATH);
+        initializeOneMovieData(MOVIE_10_TITLE, MOVIE_10_RELEASE_TIME, action_crime_list, DIRECTOR_3, MOVIE_10_RATING, NUM_OF_VOTES_10, POSTER_PATH);
+        initializeOneMovieData(MOVIE_11_TITLE, MOVIE_11_RELEASE_TIME, action_crime_list, DIRECTOR_3, MOVIE_11_RATING, NUM_OF_VOTES_10, POSTER_PATH);
+        initializeOneMovieData(MOVIE_12_TITLE, MOVIE_12_RELEASE_TIME, action_crime_list, DIRECTOR_4, MOVIE_12_RATING, NUM_OF_VOTES_10, POSTER_PATH);
+        initializeOneMovieData(MOVIE_13_TITLE, MOVIE_13_RELEASE_TIME, action_crime_list, DIRECTOR_4, MOVIE_13_RATING, NUM_OF_VOTES_10, POSTER_PATH);
     }
 
     @Transactional()
@@ -88,12 +102,16 @@ public class DataInitializerService {
         movie1.setTitle(THE_DARK_KNIGHT);
         movie1.setReleaseTime(THE_DARK_KNIGHT_RELEASE_TIME);
         movie1.setOverview(THE_DARK_KNIGHT_OVERVIEW);
+        movie1.setBackdropPath(BACKDROP_PATH);
+        movie1.setPosterPath(POSTER_PATH);
         entityManager.persist(movie1);
 
         // Set up a Movie 2
         Movie movie2 = new Movie();
         movie2.setTitle(THE_DARK_KNIGHT_RISES);
         movie2.setReleaseTime(THE_DARK_KNIGHT_RISES_RELEASE_TIME);
+        movie2.setBackdropPath(BACKDROP_PATH);
+        movie2.setPosterPath(POSTER_PATH);
         entityManager.persist(movie2);
 
         // Add the genre to the movie
@@ -114,6 +132,8 @@ public class DataInitializerService {
         Movie movie3 = new Movie();
         movie3.setTitle(THE_DARK_KNIGHT_RISES_AGAIN);
         movie3.setReleaseTime(THE_DARK_KNIGHT_RISES_AGAIN_RELEASE_TIME);
+        movie3.setBackdropPath(BACKDROP_PATH);
+        movie3.setPosterPath(POSTER_PATH);
         entityManager.persist(movie3);
 
         // Set up Movie 3 genre, director, and movie crew
@@ -135,6 +155,8 @@ public class DataInitializerService {
         // Set up Movie 4, which only contains title.
         Movie movie4 = new Movie();
         movie4.setTitle(MOVIE_WITH_TITLE_ONLY);
+        movie4.setBackdropPath(BACKDROP_PATH);
+        movie4.setPosterPath(POSTER_PATH);
         entityManager.persist(movie4);
 
         // Set up each movie1's rating
@@ -180,12 +202,11 @@ public class DataInitializerService {
         entityManager.persist(composer);
         MovieCrew movie1CrewComposer = new MovieCrew(movie1, composer, COMPOSER);
         entityManager.persist(movie1CrewComposer);
-
     }
 
     @Transactional
     public void initializeOneMovieData(String title, String releaseTime, List<String> genreNames, String directorName,
-                                       Double averageRating, Integer numOfVotes) {
+                                       Double averageRating, Integer numOfVotes, String posterPath) {
         // Set up genres
         // For each genre name, initialize a Genre, and add it to a Genre set
         Set<Genre> genres = new HashSet<>();
@@ -198,7 +219,7 @@ public class DataInitializerService {
         Person director = createAndPersistDirector(directorName);
 
         // Set up movie
-        Movie movie = createAndPersistMovie(title, releaseTime, genres);
+        Movie movie = createAndPersistMovie(title, releaseTime, genres, posterPath);
 
         // Set up MovieCrew
         createAndPersistMovieCrew(movie, director);
@@ -212,11 +233,12 @@ public class DataInitializerService {
         entityManager.persist(movieCrew);
     }
 
-    private Movie createAndPersistMovie(String title, String releaseTime, Set<Genre> genres) {
+    private Movie createAndPersistMovie(String title, String releaseTime, Set<Genre> genres, String posterPath) {
         Movie movie = new Movie();
         movie.setTitle(title);
         movie.setReleaseTime(releaseTime);
         movie.setGenres(genres);
+        movie.setPosterPath(posterPath);
         entityManager.persist(movie);
         return movie;
     }

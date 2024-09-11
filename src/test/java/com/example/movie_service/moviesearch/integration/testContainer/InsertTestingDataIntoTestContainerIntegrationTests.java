@@ -45,8 +45,8 @@ class InsertTestingDataIntoTestContainerIntegrationTests {
     void testInsertMovieData() {
         List<String> action_list = List.of(ACTION_GENRE);
         List<String> action_crime_list = List.of(ACTION_GENRE, CRIME_GENRE);
-        dataInitializerService.initializeOneMovieData(MOVIE_1_TITLE, MOVIE_1_RELEASE_TIME, action_list, DIRECTOR_1, MOVIE_1_RATING, NUM_OF_VOTES_10);
-        dataInitializerService.initializeOneMovieData(MOVIE_2_TITLE, MOVIE_2_RELEASE_TIME, action_crime_list, DIRECTOR_2, MOVIE_2_RATING, NUM_OF_VOTES_15);
+        dataInitializerService.initializeOneMovieData(MOVIE_1_TITLE, MOVIE_1_RELEASE_TIME, action_list, DIRECTOR_1, MOVIE_1_RATING, NUM_OF_VOTES_10, POSTER_PATH);
+        dataInitializerService.initializeOneMovieData(MOVIE_2_TITLE, MOVIE_2_RELEASE_TIME, action_crime_list, DIRECTOR_2, MOVIE_2_RATING, NUM_OF_VOTES_15, POSTER_PATH);
 
         // Assert: Verify that the movies have been created
         List<Movie> movies = entityManager.createQuery("SELECT m FROM Movie m", Movie.class).getResultList();

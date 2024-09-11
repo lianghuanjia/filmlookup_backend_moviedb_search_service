@@ -109,6 +109,34 @@ class ControllerIntegrationTest {
     }
 
     @Test
+    void testSearchMoviesMovieFound_MoviesWithoutPosterPathAreNotIncluded() {
+        // Insert 2 new movies, one has poster path and the other doesn't.
+        dataInitializerService.generateTwoMoviesWithAndWithoutPosterPath();
+
+        // Define URI with query param
+        URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
+                .queryParam(ORDER_BY_TITLE, MOVIE_TITLE_FOR_RETURN_RESULTS_NOT_INCLUDING_POSTER_PATH)
+                .build().toUri();
+
+        // Perform a GET request to the controller
+        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
+                (uri, HttpMethod.GET, null, responseType);
+
+        // Assert
+        assertTrue(results.getStatusCode().is2xxSuccessful());
+        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
+        assertNotNull(customResponse);
+        // Assert that the return code is 20001, representing movies found
+        assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
+        assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
+        List<MovieSearchQueryDTO> movieList = customResponse.getData();
+        // Assert there are 3 movies
+        assertEquals(1, movieList.size());
+        // Assert 1st movie is The Dark Knight
+        assertEquals(MOVIE_TITLE_FOR_RETURN_RESULTS_NOT_INCLUDING_POSTER_PATH, movieList.get(0).getTitle());
+    }
+
+    @Test
     void testSearchMoviesNotFound() {
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
                 .queryParam(ORDER_BY_TITLE, NON_EXISTED_MOVIE_TITLE)
