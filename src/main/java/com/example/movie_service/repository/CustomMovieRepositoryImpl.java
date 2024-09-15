@@ -3,7 +3,6 @@ package com.example.movie_service.repository;
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.CrewMember;
 import com.example.movie_service.dto.MovieSearchQueryDTO;
-import com.example.movie_service.dto.MovieSearchResponseDTO;
 import com.example.movie_service.dto.MovieSearchWithTitleRepoReturnDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import jakarta.persistence.EntityManager;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.example.movie_service.constant.MovieConstant.MOVIE_SEARCH_RESULT_DTO_MAPPING;
 import static com.example.movie_service.constant.MovieConstant.SINGLE_MOVIE_BASIC_DETAILS_DTO_MAPPING;
@@ -29,6 +27,13 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
     // @PersistenceContext is specific for EntityManager that provides Transaction-Scoped Behavior
     @PersistenceContext
     private EntityManager entityManager;
+
+    private static final String LEFT_JOIN_MOVIE_RATING_TO_MOVIE_ON_MOVIE_ID = "LEFT JOIN movie_rating mr ON m.movie_id = mr.movie_id ";
+    private static final String LEFT_JOIN_MOVIE_GENRE_TO_MOVIE_ON_MOVIE_ID = "LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id ";
+    private static final String LEFT_JOIN_GENRE_TO_MOVIE_GENRE_ON_GENRE_ID = "LEFT JOIN genre g ON mg.genre_id = g.id ";
+    private static final String ADD_MOVIE_RELEASE_TIME_FIELD_IN_QUERY_STRING = "AND m.releaseTime LIKE :releasedYear ";
+    private static final String ADD_DIRECTOR_FIELD_IN_QUERY_STRING = "AND p.name LIKE :director ";
+    private static final String ADD_GENRE_FIELD_IN_QUERY_STRING = "AND g.name LIKE :genre ";
 
     /**
      * Search movies that meets the criteria of the parameters inside the movieSearchParam from MySQL database
@@ -49,7 +54,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
                 movieSearchParam.getGenre());
 
         int totalItems = ((Long)countTotalRowsQuery.getSingleResult()).intValue();
-        System.out.println(totalItems);
+
         // Build string query with optional parameters
         String sqlQuery = buildQueryStringToSearchMovieWithTitleAndOtherFields(movieSearchParam.getReleasedYear(), movieSearchParam.getDirector(),
                 movieSearchParam.getGenre(), movieSearchParam.getOrderBy(), movieSearchParam.getDirection());
@@ -196,10 +201,10 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
                 "FROM movie m " +
 
                 // Left join other tables
-                "LEFT JOIN movie_rating mr ON m.movie_id = mr.movie_id " +
+                LEFT_JOIN_MOVIE_RATING_TO_MOVIE_ON_MOVIE_ID +
                 "LEFT JOIN movie_akas ma ON m.movie_id = ma.movie_id " +
-                "LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id " +
-                "LEFT JOIN genre g ON mg.genre_id = g.id " +
+                LEFT_JOIN_MOVIE_GENRE_TO_MOVIE_ON_MOVIE_ID +
+                LEFT_JOIN_GENRE_TO_MOVIE_GENRE_ON_GENRE_ID +
 
                 // Set the condition
                 "WHERE m.movie_id = :movieId " +
@@ -234,21 +239,15 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
                         "FROM movie m " +
                         "LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id " +
                         "LEFT JOIN person p ON mc.person_id = p.person_id AND mc.job = 'director' " +
-                        "LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id " +
-                        "LEFT JOIN genre g ON mg.genre_id = g.id " +
-                        "LEFT JOIN movie_rating mr ON m.movie_id = mr.movie_id " +
+                        LEFT_JOIN_MOVIE_GENRE_TO_MOVIE_ON_MOVIE_ID +
+                        LEFT_JOIN_GENRE_TO_MOVIE_GENRE_ON_GENRE_ID +
+                        LEFT_JOIN_MOVIE_RATING_TO_MOVIE_ON_MOVIE_ID +
                         "WHERE m.poster_path IS NOT NULL AND m.primaryTitle LIKE :title "
         );
 
-        if (releasedYear != null && !releasedYear.isEmpty()) {
-            queryBuilder.append("AND m.releaseTime LIKE :releasedYear ");
-        }
-        if (director != null && !director.isEmpty()) {
-            queryBuilder.append("AND p.name LIKE :director ");
-        }
-        if (genre != null && !genre.isEmpty()) {
-            queryBuilder.append("AND g.name LIKE :genre ");
-        }
+        appendConditionIfNotEmpty(releasedYear, ADD_MOVIE_RELEASE_TIME_FIELD_IN_QUERY_STRING, queryBuilder);
+        appendConditionIfNotEmpty(director, ADD_DIRECTOR_FIELD_IN_QUERY_STRING, queryBuilder);
+        appendConditionIfNotEmpty(genre, ADD_GENRE_FIELD_IN_QUERY_STRING, queryBuilder);
 
         queryBuilder.append("GROUP BY m.movie_id, m.primaryTitle, m.releaseTime, m.backdrop_path, m.poster_path ")
                 .append("ORDER BY ").append(orderBy).append(" ").append(direction).append(" ")
@@ -262,23 +261,29 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
                 "SELECT COUNT(DISTINCT m.movie_id) FROM movie m " +
                         "LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id " +
                         "LEFT JOIN person p ON mc.person_id = p.person_id AND mc.job = 'director' " +
-                        "LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id " +
-                        "LEFT JOIN genre g ON mg.genre_id = g.id " +
-                        "LEFT JOIN movie_rating mr ON m.movie_id = mr.movie_id " +
+                        LEFT_JOIN_MOVIE_GENRE_TO_MOVIE_ON_MOVIE_ID +
+                        LEFT_JOIN_GENRE_TO_MOVIE_GENRE_ON_GENRE_ID +
+                        LEFT_JOIN_MOVIE_RATING_TO_MOVIE_ON_MOVIE_ID +
                         "WHERE m.poster_path IS NOT NULL AND m.primaryTitle LIKE :title "
         );
 
-        if (releasedYear != null && !releasedYear.isEmpty()) {
-            queryBuilder.append("AND m.releaseTime LIKE :releasedYear ");
-        }
-        if (director != null && !director.isEmpty()) {
-            queryBuilder.append("AND p.name LIKE :director ");
-        }
-        if (genre != null && !genre.isEmpty()) {
-            queryBuilder.append("AND g.name LIKE :genre ");
-        }
+        appendConditionIfNotEmpty(releasedYear, ADD_MOVIE_RELEASE_TIME_FIELD_IN_QUERY_STRING, queryBuilder);
+        appendConditionIfNotEmpty(director, ADD_DIRECTOR_FIELD_IN_QUERY_STRING, queryBuilder);
+        appendConditionIfNotEmpty(genre, ADD_GENRE_FIELD_IN_QUERY_STRING, queryBuilder);
 
         return queryBuilder.toString();
+    }
+
+    private void appendConditionIfNotEmpty(String value, String condition, StringBuilder queryBuilder) {
+        if (value != null && !value.isEmpty()) {
+            queryBuilder.append(condition);
+        }
+    }
+
+    private void setQueryParameterIfNotEmpty(Query query, String value, String queryParameter, String queryParameterValue) {
+        if (value != null && !value.isEmpty()) {
+            query.setParameter(queryParameter, queryParameterValue);
+        }
     }
 
 
@@ -301,28 +306,16 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         query.setParameter("limit", limit);
         query.setParameter("offset", page * limit);
 
-        if (releasedYear != null && !releasedYear.isEmpty()) {
-            query.setParameter("releasedYear", releasedYear + "%");
-        }
-        if (director != null && !director.isEmpty()) {
-            query.setParameter("director", "%" + director + "%");
-        }
-        if (genre != null && !genre.isEmpty()) {
-            query.setParameter("genre", "%" + genre + "%");
-        }
+        setQueryParameterIfNotEmpty(query, releasedYear, "releasedYear", releasedYear + "%");
+        setQueryParameterIfNotEmpty(query, director, "director", "%" + director + "%");
+        setQueryParameterIfNotEmpty(query, genre, "genre", "%" + genre + "%");
     }
 
     private void setQueryParametersForCount(Query countTotalRowsQuery, String title, String releasedYear, String director, String genre) {
         countTotalRowsQuery.setParameter("title", "%" + title + "%");
-        if (releasedYear != null && !releasedYear.isEmpty()) {
-            countTotalRowsQuery.setParameter("releasedYear", releasedYear + "%");
-        }
-        if (director != null && !director.isEmpty()) {
-            countTotalRowsQuery.setParameter("director", "%" + director + "%");
-        }
-        if (genre != null && !genre.isEmpty()) {
-            countTotalRowsQuery.setParameter("genre", "%" + genre + "%");
-        }
+        setQueryParameterIfNotEmpty(countTotalRowsQuery, releasedYear, "releasedYear", releasedYear + "%");
+        setQueryParameterIfNotEmpty(countTotalRowsQuery, director, "director", "%" + director + "%");
+        setQueryParameterIfNotEmpty(countTotalRowsQuery, genre, "genre", "%" + genre + "%");
     }
 
 }
