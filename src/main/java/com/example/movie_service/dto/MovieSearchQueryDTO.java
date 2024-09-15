@@ -22,4 +22,5 @@ public class MovieSearchQueryDTO {
     private String posterPath;
     private Double rating;
     private String overview;
+    private Integer totalItems;
 }

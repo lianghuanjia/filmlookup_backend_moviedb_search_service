@@ -3,6 +3,7 @@ package com.example.movie_service.repository;
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.CrewMember;
 import com.example.movie_service.dto.MovieSearchQueryDTO;
+import com.example.movie_service.dto.MovieSearchResponseDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.example.movie_service.constant.MovieConstant.MOVIE_SEARCH_RESULT_DTO_MAPPING;
 import static com.example.movie_service.constant.MovieConstant.SINGLE_MOVIE_BASIC_DETAILS_DTO_MAPPING;
@@ -52,6 +54,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         // be MovieSearchResultDTO class, so I use @SuppressWarnings("unchecked")  here
         @SuppressWarnings("unchecked")
         List<MovieSearchQueryDTO> results = query.getResultList();
+
         return results;
     }
 
@@ -209,7 +212,8 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
                         "m.backdrop_path AS backdropPath, " +
                         "m.poster_path AS posterPath, " +
                         "mr.averageRating AS rating, " +
-                        "m.overview AS overview " +
+                        "m.overview AS overview, " +
+                        "COUNT(*) OVER() AS totalItems " +
                         "FROM movie m " +
                         "LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id " +
                         "LEFT JOIN person p ON mc.person_id = p.person_id AND mc.job = 'director' " +
