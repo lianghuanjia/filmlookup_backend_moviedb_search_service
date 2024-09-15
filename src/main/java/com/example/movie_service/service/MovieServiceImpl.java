@@ -5,6 +5,7 @@ import com.example.movie_service.converter.MovieSearchQueryToResponseConverter;
 import com.example.movie_service.dto.MovieSearchQueryDTO;
 import com.example.movie_service.dto.MovieSearchResponseDTO;
 import com.example.movie_service.dto.MovieSearchResultWithPaginationDTO;
+import com.example.movie_service.dto.MovieSearchWithTitleRepoReturnDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.repository.CustomMovieRepository;
@@ -63,11 +64,15 @@ public class MovieServiceImpl implements MovieService {
         // Validate parameters:
         validateSearchMoviesParameters(title, releasedYear, limit, page, orderBy, direction);
 
+
+
         // Get search results from repository layer
         // If the query times out, it's possible there will be QueryTimeoutException or PersistenceException
-        List<MovieSearchQueryDTO> queryResults = movieRepository.searchMovies(movieSearchParam);
+        MovieSearchWithTitleRepoReturnDTO queryDTO = movieRepository.searchMovies(movieSearchParam);
 
-        int totalItems = queryResults.isEmpty() ? 0 : queryResults.get(0).getTotalItems();
+        List<MovieSearchQueryDTO> queryResults = queryDTO.getMovies();
+
+        int totalItems = queryDTO.getTotalItem();
 
         // Prepare the response's code and message
         CustomResponse<MovieSearchResultWithPaginationDTO> customResponse;

@@ -4,6 +4,7 @@ import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.CrewMember;
 import com.example.movie_service.dto.MovieSearchQueryDTO;
 import com.example.movie_service.dto.MovieSearchResponseDTO;
+import com.example.movie_service.dto.MovieSearchWithTitleRepoReturnDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -36,7 +37,19 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
      * @return A list of MovieSearchResultDTO. Each MovieSearchResultDTO represents one searched movie result
      */
     @Override
-    public List<MovieSearchQueryDTO> searchMovies(MovieSearchParam movieSearchParam) {
+    public MovieSearchWithTitleRepoReturnDTO searchMovies(MovieSearchParam movieSearchParam) {
+        // For counting the total rows for pagination
+        String countTotalRowsQueryString = buildCountQueryString(movieSearchParam.getReleasedYear(), movieSearchParam.getDirector(), movieSearchParam.getGenre());
+
+        Query countTotalRowsQuery = entityManager.createNativeQuery(countTotalRowsQueryString);
+
+        setQueryParametersForCount(countTotalRowsQuery, movieSearchParam.getTitle(),
+                movieSearchParam.getReleasedYear(),
+                movieSearchParam.getDirector(),
+                movieSearchParam.getGenre());
+
+        int totalItems = ((Long)countTotalRowsQuery.getSingleResult()).intValue();
+        System.out.println(totalItems);
         // Build string query with optional parameters
         String sqlQuery = buildQueryStringToSearchMovieWithTitleAndOtherFields(movieSearchParam.getReleasedYear(), movieSearchParam.getDirector(),
                 movieSearchParam.getGenre(), movieSearchParam.getOrderBy(), movieSearchParam.getDirection());
@@ -55,8 +68,13 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         @SuppressWarnings("unchecked")
         List<MovieSearchQueryDTO> results = query.getResultList();
 
-        return results;
+        MovieSearchWithTitleRepoReturnDTO returnDTO = new MovieSearchWithTitleRepoReturnDTO();
+        returnDTO.setMovies(results);
+        returnDTO.setTotalItem(totalItems);
+
+        return returnDTO;
     }
+
 
     /**
      * Search one movie's detailed information with its id.
@@ -203,7 +221,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
      * @return A query string
      */
     private String buildQueryStringToSearchMovieWithTitleAndOtherFields(String releasedYear, String director, String genre
-                                                                            , String orderBy, String direction) {
+            , String orderBy, String direction) {
         StringBuilder queryBuilder = new StringBuilder(
                 "SELECT m.movie_id AS id, " +
                         "m.primaryTitle AS title, " +
@@ -212,8 +230,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
                         "m.backdrop_path AS backdropPath, " +
                         "m.poster_path AS posterPath, " +
                         "mr.averageRating AS rating, " +
-                        "m.overview AS overview, " +
-                        "COUNT(*) OVER() AS totalItems " +
+                        "m.overview AS overview " +
                         "FROM movie m " +
                         "LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id " +
                         "LEFT JOIN person p ON mc.person_id = p.person_id AND mc.job = 'director' " +
@@ -239,6 +256,31 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
 
         return queryBuilder.toString();
     }
+
+    private String buildCountQueryString(String releasedYear, String director, String genre) {
+        StringBuilder queryBuilder = new StringBuilder(
+                "SELECT COUNT(DISTINCT m.movie_id) FROM movie m " +
+                        "LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id " +
+                        "LEFT JOIN person p ON mc.person_id = p.person_id AND mc.job = 'director' " +
+                        "LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id " +
+                        "LEFT JOIN genre g ON mg.genre_id = g.id " +
+                        "LEFT JOIN movie_rating mr ON m.movie_id = mr.movie_id " +
+                        "WHERE m.poster_path IS NOT NULL AND m.primaryTitle LIKE :title "
+        );
+
+        if (releasedYear != null && !releasedYear.isEmpty()) {
+            queryBuilder.append("AND m.releaseTime LIKE :releasedYear ");
+        }
+        if (director != null && !director.isEmpty()) {
+            queryBuilder.append("AND p.name LIKE :director ");
+        }
+        if (genre != null && !genre.isEmpty()) {
+            queryBuilder.append("AND g.name LIKE :genre ");
+        }
+
+        return queryBuilder.toString();
+    }
+
 
 
     /**
@@ -270,4 +312,18 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         }
     }
 
+    private void setQueryParametersForCount(Query countTotalRowsQuery, String title, String releasedYear, String director, String genre) {
+        countTotalRowsQuery.setParameter("title", "%" + title + "%");
+        if (releasedYear != null && !releasedYear.isEmpty()) {
+            countTotalRowsQuery.setParameter("releasedYear", releasedYear + "%");
+        }
+        if (director != null && !director.isEmpty()) {
+            countTotalRowsQuery.setParameter("director", "%" + director + "%");
+        }
+        if (genre != null && !genre.isEmpty()) {
+            countTotalRowsQuery.setParameter("genre", "%" + genre + "%");
+        }
+    }
+
 }
+
