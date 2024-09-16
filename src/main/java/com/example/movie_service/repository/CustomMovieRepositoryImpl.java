@@ -230,20 +230,31 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         StringBuilder queryBuilder = new StringBuilder(
                 "SELECT m.movie_id AS id, " +
                         "m.primaryTitle AS title, " +
-                        "m.releaseTime AS releaseTime, " +
-                        "GROUP_CONCAT(DISTINCT p.name ORDER BY p.name SEPARATOR ', ') AS directors, " +
+                        "m.releaseTime AS releaseTime, ");
+
+        queryBuilder.append("GROUP_CONCAT(DISTINCT p.name ORDER BY p.name SEPARATOR ', ') AS directors, ");
+
+
+        queryBuilder.append(
                         "m.backdrop_path AS backdropPath, " +
                         "m.poster_path AS posterPath, " +
                         "mr.averageRating AS rating, " +
                         "m.overview AS overview " +
-                        "FROM movie m " +
-                        "LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id " +
-                        "LEFT JOIN person p ON mc.person_id = p.person_id AND mc.job = 'director' " +
-                        LEFT_JOIN_MOVIE_GENRE_TO_MOVIE_ON_MOVIE_ID +
-                        LEFT_JOIN_GENRE_TO_MOVIE_GENRE_ON_GENRE_ID +
-                        LEFT_JOIN_MOVIE_RATING_TO_MOVIE_ON_MOVIE_ID +
-                        "WHERE m.poster_path IS NOT NULL AND m.primaryTitle LIKE :title "
-        );
+                        "FROM movie m ");
+
+
+        queryBuilder.append("LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id ")
+                    .append("LEFT JOIN person p ON mc.person_id = p.person_id AND mc.job = 'director' ");
+
+
+        if (genre != null && !genre.isEmpty()) {
+            queryBuilder.append(LEFT_JOIN_MOVIE_GENRE_TO_MOVIE_ON_MOVIE_ID)
+                    .append(LEFT_JOIN_GENRE_TO_MOVIE_GENRE_ON_GENRE_ID);
+        }
+
+        queryBuilder.append(LEFT_JOIN_MOVIE_RATING_TO_MOVIE_ON_MOVIE_ID)
+                .append("WHERE m.poster_path IS NOT NULL AND m.primaryTitle LIKE :title ");
+
 
         appendConditionIfNotEmpty(releasedYear, ADD_MOVIE_RELEASE_TIME_FIELD_IN_QUERY_STRING, queryBuilder);
         appendConditionIfNotEmpty(director, ADD_DIRECTOR_FIELD_IN_QUERY_STRING, queryBuilder);
@@ -260,12 +271,15 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         StringBuilder queryBuilder = new StringBuilder(
                 "SELECT COUNT(DISTINCT m.movie_id) FROM movie m " +
                         "LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id " +
-                        "LEFT JOIN person p ON mc.person_id = p.person_id AND mc.job = 'director' " +
-                        LEFT_JOIN_MOVIE_GENRE_TO_MOVIE_ON_MOVIE_ID +
-                        LEFT_JOIN_GENRE_TO_MOVIE_GENRE_ON_GENRE_ID +
-                        LEFT_JOIN_MOVIE_RATING_TO_MOVIE_ON_MOVIE_ID +
-                        "WHERE m.poster_path IS NOT NULL AND m.primaryTitle LIKE :title "
-        );
+                        "LEFT JOIN person p ON mc.person_id = p.person_id AND mc.job = 'director' ");
+
+        if (genre != null && !genre.isEmpty()) {
+            queryBuilder.append(LEFT_JOIN_MOVIE_GENRE_TO_MOVIE_ON_MOVIE_ID)
+                    .append(LEFT_JOIN_GENRE_TO_MOVIE_GENRE_ON_GENRE_ID);
+        }
+        queryBuilder.append(LEFT_JOIN_MOVIE_RATING_TO_MOVIE_ON_MOVIE_ID)
+                .append("WHERE m.poster_path IS NOT NULL AND m.primaryTitle LIKE :title ");
+
 
         appendConditionIfNotEmpty(releasedYear, ADD_MOVIE_RELEASE_TIME_FIELD_IN_QUERY_STRING, queryBuilder);
         appendConditionIfNotEmpty(director, ADD_DIRECTOR_FIELD_IN_QUERY_STRING, queryBuilder);
