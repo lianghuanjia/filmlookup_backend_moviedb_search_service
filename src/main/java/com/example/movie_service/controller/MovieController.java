@@ -65,7 +65,7 @@ public class MovieController {
         MovieSearchParam movieSearchRequestParam = MovieSearchParam.builder()
                 .title(title)
                 .releasedYear(releasedYear)
-                .direction(director)
+                .director(director)
                 .genre(genre)
                 .limit(limit)
                 .page(page)
