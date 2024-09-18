@@ -3,7 +3,7 @@ package com.example.movie_service.repository;
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.CrewMember;
 import com.example.movie_service.dto.MovieSearchQueryDTO;
-import com.example.movie_service.dto.MovieSearchWithTitleRepoReturnDTO;
+import com.example.movie_service.dto.MovieSearchWithTitleDTOFromRepoToService;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -42,7 +42,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
      * @return A list of MovieSearchResultDTO. Each MovieSearchResultDTO represents one searched movie result
      */
     @Override
-    public MovieSearchWithTitleRepoReturnDTO searchMovies(MovieSearchParam movieSearchParam) {
+    public MovieSearchWithTitleDTOFromRepoToService searchMovies(MovieSearchParam movieSearchParam) {
         // For counting the total rows for pagination
         String countTotalRowsQueryString = buildCountQueryString(movieSearchParam.getReleasedYear(), movieSearchParam.getDirector(), movieSearchParam.getGenre());
 
@@ -73,7 +73,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         @SuppressWarnings("unchecked")
         List<MovieSearchQueryDTO> results = query.getResultList();
 
-        MovieSearchWithTitleRepoReturnDTO returnDTO = new MovieSearchWithTitleRepoReturnDTO();
+        MovieSearchWithTitleDTOFromRepoToService returnDTO = new MovieSearchWithTitleDTOFromRepoToService();
         returnDTO.setMovies(results);
         returnDTO.setTotalItem(totalItems);
 
@@ -233,7 +233,6 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
                         "m.releaseTime AS releaseTime, ");
 
         queryBuilder.append("GROUP_CONCAT(DISTINCT p.name ORDER BY p.name SEPARATOR ', ') AS directors, ");
-
 
         queryBuilder.append(
                         "m.backdrop_path AS backdropPath, " +

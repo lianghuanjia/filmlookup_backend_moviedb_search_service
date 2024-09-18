@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class MovieSearchWithTitleRepoReturnDTO {
+public class MovieSearchWithTitleDTOFromRepoToService {
     private int totalItem;
     private List<MovieSearchQueryDTO> movies;
 }
