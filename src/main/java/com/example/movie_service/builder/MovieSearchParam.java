@@ -2,6 +2,7 @@ package com.example.movie_service.builder;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * <p>
@@ -17,6 +18,7 @@ import lombok.Getter;
  * @see com.example.movie_service.repository.CustomMovieRepositoryImpl#searchMovies(MovieSearchParam);
  */
 @Getter
+@Setter
 @Builder(toBuilder = true) // Enable toBuilder for making modifications
 public class MovieSearchParam {
     private String title;

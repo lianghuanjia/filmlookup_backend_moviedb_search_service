@@ -57,7 +57,7 @@ public class MovieController {
             @RequestParam(required = false) String director,
             @RequestParam(required = false) String genre,
             @RequestParam(required = false, defaultValue = "10") Integer limit,
-            @RequestParam(required = false, defaultValue = "0") Integer page,
+            @RequestParam(required = false, defaultValue = "1") Integer page,
             @RequestParam(required = false, defaultValue = "title") String orderBy,
             @RequestParam(required = false, defaultValue = "asc") String direction) {
 

@@ -5,7 +5,7 @@ import com.example.movie_service.converter.MovieSearchQueryToResponseConverter;
 import com.example.movie_service.dto.MovieSearchQueryDTO;
 import com.example.movie_service.dto.MovieSearchResponseDTO;
 import com.example.movie_service.dto.MovieSearchResultWithPaginationDTO;
-import com.example.movie_service.dto.MovieSearchWithTitleRepoReturnDTO;
+import com.example.movie_service.dto.MovieSearchWithTitleDTOFromRepoToService;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.repository.CustomMovieRepository;
@@ -57,18 +57,23 @@ public class MovieServiceImpl implements MovieService {
         String title = movieSearchParam.getTitle();
         String releasedYear = movieSearchParam.getReleasedYear();
         Integer limit = movieSearchParam.getLimit();
-        Integer page = movieSearchParam.getPage();
+        Integer pageNumberFromFrontend = movieSearchParam.getPage();
+
+        // Convert the page in movieSearchParam to zero index because its OFFSET, and in SQL OFFSET is 0-indexed
+        movieSearchParam.setPage(movieSearchParam.getPage()-1);
+
+        Integer zeroIndexPage = movieSearchParam.getPage();
         String orderBy = movieSearchParam.getOrderBy();
         String direction = movieSearchParam.getDirection();
 
         // Validate parameters:
-        validateSearchMoviesParameters(title, releasedYear, limit, page, orderBy, direction);
+        validateSearchMoviesParameters(title, releasedYear, limit, zeroIndexPage, orderBy, direction);
 
 
 
         // Get search results from repository layer
         // If the query times out, it's possible there will be QueryTimeoutException or PersistenceException
-        MovieSearchWithTitleRepoReturnDTO queryDTO = movieRepository.searchMovies(movieSearchParam);
+        MovieSearchWithTitleDTOFromRepoToService queryDTO = movieRepository.searchMovies(movieSearchParam);
 
         List<MovieSearchQueryDTO> queryResults = queryDTO.getMovies();
 
@@ -84,7 +89,7 @@ public class MovieServiceImpl implements MovieService {
                 .toList();
 
         int itemsPerPage = movieSearchParam.getLimit();
-        int currentPage = movieSearchParam.getPage(); // Page index starts from 0, not 1
+        int currentPage = pageNumberFromFrontend; // Page index starts from 0, not 1
         int totalPages = (int) Math.ceil((double)totalItems / itemsPerPage);
 
         MovieSearchResultWithPaginationDTO resultWithPaginationDTO = new MovieSearchResultWithPaginationDTO();
