@@ -2,7 +2,7 @@ package com.example.movie_service.repository;
 
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.CrewMember;
-import com.example.movie_service.dto.MovieSearchQueryDTO;
+import com.example.movie_service.dto.MovieTitleSearchQueryResultDTO;
 import com.example.movie_service.dto.MovieSearchWithTitleDTOFromRepoToService;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import jakarta.persistence.EntityManager;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Collections;
 import java.util.List;
 
-import static com.example.movie_service.constant.MovieConstant.MOVIE_SEARCH_RESULT_DTO_MAPPING;
+import static com.example.movie_service.constant.MovieConstant.MOVIE_TITLE_SEARCH_QUERY_RESULT_DTO_MAPPING;
 import static com.example.movie_service.constant.MovieConstant.SINGLE_MOVIE_BASIC_DETAILS_DTO_MAPPING;
 import static com.example.movie_service.constant.MovieConstant.SINGLE_MOVIE_CREW_MEMBER_DTO_MAPPING;
 
@@ -32,8 +32,8 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
     private static final String LEFT_JOIN_MOVIE_GENRE_TO_MOVIE_ON_MOVIE_ID = "LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id ";
     private static final String LEFT_JOIN_GENRE_TO_MOVIE_GENRE_ON_GENRE_ID = "LEFT JOIN genre g ON mg.genre_id = g.id ";
     private static final String ADD_MOVIE_RELEASE_TIME_FIELD_IN_QUERY_STRING = "AND m.releaseTime LIKE :releasedYear ";
-    private static final String ADD_DIRECTOR_FIELD_IN_QUERY_STRING = "AND p.name LIKE :director ";
-    private static final String ADD_GENRE_FIELD_IN_QUERY_STRING = "AND g.name LIKE :genre ";
+    private static final String ADD_DIRECTOR_FIELD_IN_QUERY_STRING = "AND m.directors LIKE :director ";
+    private static final String ADD_GENRE_FIELD_IN_QUERY_STRING = "AND m.genres LIKE :genre ";
 
     /**
      * Search movies that meets the criteria of the parameters inside the movieSearchParam from MySQL database
@@ -55,12 +55,14 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
 
         int totalItems = ((Long)countTotalRowsQuery.getSingleResult()).intValue();
 
+        // For getting the movie(s) information
+
         // Build string query with optional parameters
         String sqlQuery = buildQueryStringToSearchMovieWithTitleAndOtherFields(movieSearchParam.getReleasedYear(), movieSearchParam.getDirector(),
                 movieSearchParam.getGenre(), movieSearchParam.getOrderBy(), movieSearchParam.getDirection());
 
         // Create bare-bones native SQL Query
-        Query query = entityManager.createNativeQuery(sqlQuery, MOVIE_SEARCH_RESULT_DTO_MAPPING);
+        Query query = entityManager.createNativeQuery(sqlQuery, MOVIE_TITLE_SEARCH_QUERY_RESULT_DTO_MAPPING);
 
         // Set the query's parameters based on the function's parameters
         setQueryParameters(query, movieSearchParam.getTitle(), movieSearchParam.getReleasedYear(),
@@ -71,7 +73,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         // Since the MOVIE_SEARCH_RESULT_DTO_MAPPING's target class is MovieSearchResultDTO, I am sure the result will
         // be MovieSearchResultDTO class, so I use @SuppressWarnings("unchecked")  here
         @SuppressWarnings("unchecked")
-        List<MovieSearchQueryDTO> results = query.getResultList();
+        List<MovieTitleSearchQueryResultDTO> results = query.getResultList();
 
         MovieSearchWithTitleDTOFromRepoToService returnDTO = new MovieSearchWithTitleDTOFromRepoToService();
         returnDTO.setMovies(results);
@@ -230,37 +232,21 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         StringBuilder queryBuilder = new StringBuilder(
                 "SELECT m.movie_id AS id, " +
                         "m.primaryTitle AS title, " +
-                        "m.releaseTime AS releaseTime, ");
-
-        queryBuilder.append("GROUP_CONCAT(DISTINCT p.name ORDER BY p.name SEPARATOR ', ') AS directors, ");
-
-        queryBuilder.append(
+                        "m.releaseTime AS releaseTime, " +
+                        "m.directors AS directors, " +
                         "m.backdrop_path AS backdropPath, " +
                         "m.poster_path AS posterPath, " +
-                        "mr.averageRating AS rating, " +
+                        "m.averageRating AS rating, " +
                         "m.overview AS overview " +
-                        "FROM movie m ");
-
-
-        queryBuilder.append("LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id ")
-                    .append("LEFT JOIN person p ON mc.person_id = p.person_id AND mc.job = 'director' ");
-
-
-        if (genre != null && !genre.isEmpty()) {
-            queryBuilder.append(LEFT_JOIN_MOVIE_GENRE_TO_MOVIE_ON_MOVIE_ID)
-                    .append(LEFT_JOIN_GENRE_TO_MOVIE_GENRE_ON_GENRE_ID);
-        }
-
-        queryBuilder.append(LEFT_JOIN_MOVIE_RATING_TO_MOVIE_ON_MOVIE_ID)
-                .append("WHERE m.poster_path IS NOT NULL AND m.primaryTitle LIKE :title ");
+                        "FROM movie_materialized_view m " +
+                        "WHERE m.poster_path IS NOT NULL AND m.primaryTitle LIKE :title ");
 
 
         appendConditionIfNotEmpty(releasedYear, ADD_MOVIE_RELEASE_TIME_FIELD_IN_QUERY_STRING, queryBuilder);
         appendConditionIfNotEmpty(director, ADD_DIRECTOR_FIELD_IN_QUERY_STRING, queryBuilder);
         appendConditionIfNotEmpty(genre, ADD_GENRE_FIELD_IN_QUERY_STRING, queryBuilder);
 
-        queryBuilder.append("GROUP BY m.movie_id, m.primaryTitle, m.releaseTime, m.backdrop_path, m.poster_path ")
-                .append("ORDER BY ").append(orderBy).append(" ").append(direction).append(" ")
+        queryBuilder.append("ORDER BY ").append(orderBy).append(" ").append(direction).append(" ")
                 .append("LIMIT :limit OFFSET :offset");
 
         return queryBuilder.toString();
@@ -268,16 +254,8 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
 
     private String buildCountQueryString(String releasedYear, String director, String genre) {
         StringBuilder queryBuilder = new StringBuilder(
-                "SELECT COUNT(DISTINCT m.movie_id) FROM movie m " +
-                        "LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id " +
-                        "LEFT JOIN person p ON mc.person_id = p.person_id AND mc.job = 'director' ");
+                "SELECT COUNT(DISTINCT movie_id) FROM movie_materialized_view m WHERE m.poster_path IS NOT NULL AND m.primaryTitle LIKE :title ");
 
-        if (genre != null && !genre.isEmpty()) {
-            queryBuilder.append(LEFT_JOIN_MOVIE_GENRE_TO_MOVIE_ON_MOVIE_ID)
-                    .append(LEFT_JOIN_GENRE_TO_MOVIE_GENRE_ON_GENRE_ID);
-        }
-        queryBuilder.append(LEFT_JOIN_MOVIE_RATING_TO_MOVIE_ON_MOVIE_ID)
-                .append("WHERE m.poster_path IS NOT NULL AND m.primaryTitle LIKE :title ");
 
 
         appendConditionIfNotEmpty(releasedYear, ADD_MOVIE_RELEASE_TIME_FIELD_IN_QUERY_STRING, queryBuilder);
