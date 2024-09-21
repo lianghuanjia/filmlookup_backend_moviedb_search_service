@@ -3,7 +3,8 @@ package com.example.movie_service.moviesearch.unit.repository;
 
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.CrewMember;
-import com.example.movie_service.dto.MovieSearchQueryDTO;
+import com.example.movie_service.dto.MovieTitleSearchQueryResultDTO;
+import com.example.movie_service.dto.MovieSearchWithTitleDTOFromRepoToService;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.repository.CustomMovieRepositoryImpl;
 import jakarta.persistence.EntityManager;
@@ -58,6 +59,8 @@ class CustomRepositoryImplUnitTests {
     private static final String BACKDROP_PATH = "backdropPath";
     private static final String POSTER_PATH = "posterPath";
     private static final String OVERVIEW = "overview";
+    private static final int totalItems = 10;
+    private static final Long totalItemsLong = 10L;
 
     @BeforeEach
     public void setUp() {
@@ -78,10 +81,16 @@ class CustomRepositoryImplUnitTests {
 
     @Test
     void repositoryImplSearchMovies() {
+        // Mock the behavior for the count query
+        Query countTotalRowsQuery = mock(Query.class);
+        when(entityManager.createNativeQuery(anyString()))
+                .thenReturn(countTotalRowsQuery);
+        when(countTotalRowsQuery.getSingleResult())
+                .thenReturn(totalItemsLong);
 
         // Mock the behavior
-        List<MovieSearchQueryDTO> movieList = new ArrayList<>();
-        MovieSearchQueryDTO resultDTO = new MovieSearchQueryDTO(MOVIE_ID, title, releasedYear, director,
+        List<MovieTitleSearchQueryResultDTO> movieList = new ArrayList<>();
+        MovieTitleSearchQueryResultDTO resultDTO = new MovieTitleSearchQueryResultDTO(MOVIE_ID, title, releasedYear, director,
                 BACKDROP_PATH, POSTER_PATH, rating, OVERVIEW);
         movieList.add(resultDTO);
 
@@ -90,12 +99,14 @@ class CustomRepositoryImplUnitTests {
                 .thenReturn(query);
         when(query.getResultList()).thenReturn(movieList);
 
+
+
         // Execute the method:
-        List<MovieSearchQueryDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
+        MovieSearchWithTitleDTOFromRepoToService returnDTO = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         // Verify if the actualResult is the same as we define
-        assertEquals(MOVIE_ID, actualResult.get(0).getId());
-        assertEquals(1, actualResult.size());
+        assertEquals(totalItems, returnDTO.getTotalItem());
+        assertEquals(movieList, returnDTO.getMovies());
 
         // Verify all setParameters methods are called given the query parameters we provide
         verify(query).setParameter("title", "%" + title + "%");
@@ -111,9 +122,16 @@ class CustomRepositoryImplUnitTests {
 
         movieSearchParam = movieSearchParam.toBuilder().releasedYear(null).build();
 
+        // Mock the behavior for the count query
+        Query countTotalRowsQuery = mock(Query.class);
+        when(entityManager.createNativeQuery(anyString()))
+                .thenReturn(countTotalRowsQuery);
+        when(countTotalRowsQuery.getSingleResult())
+                .thenReturn(totalItemsLong);
+
         // Mock the behavior
-        List<MovieSearchQueryDTO> movieList = new ArrayList<>();
-        MovieSearchQueryDTO resultDTO = new MovieSearchQueryDTO(MOVIE_ID, title, releasedYear, director,
+        List<MovieTitleSearchQueryResultDTO> movieList = new ArrayList<>();
+        MovieTitleSearchQueryResultDTO resultDTO = new MovieTitleSearchQueryResultDTO(MOVIE_ID, title, releasedYear, director,
                 BACKDROP_PATH, POSTER_PATH, rating, OVERVIEW);
         movieList.add(resultDTO);
 
@@ -123,11 +141,11 @@ class CustomRepositoryImplUnitTests {
         when(query.getResultList()).thenReturn(movieList);
 
         // Execute the method:
-        List<MovieSearchQueryDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
+        MovieSearchWithTitleDTOFromRepoToService returnDTO = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         // Verify if the actualResult is the same as we define
-        assertEquals(MOVIE_ID, actualResult.get(0).getId());
-        assertEquals(1, actualResult.size());
+        assertEquals(totalItems, returnDTO.getTotalItem());
+        assertEquals(movieList, returnDTO.getMovies());
 
         // Verify all setParameters methods are called given the query parameters we provide
         verify(query).setParameter("title", "%" + title + "%");
@@ -143,9 +161,16 @@ class CustomRepositoryImplUnitTests {
 
         movieSearchParam = movieSearchParam.toBuilder().releasedYear("").build();
 
-        // Mock the behavior
-        List<MovieSearchQueryDTO> movieList = new ArrayList<>();
-        MovieSearchQueryDTO resultDTO = new MovieSearchQueryDTO(MOVIE_ID, title, releasedYear, director,
+        // Mock the behavior for the count query
+        Query countTotalRowsQuery = mock(Query.class);
+        when(entityManager.createNativeQuery(anyString()))
+                .thenReturn(countTotalRowsQuery);
+        when(countTotalRowsQuery.getSingleResult())
+                .thenReturn(totalItemsLong);
+
+        // Mock the behavior for the query that search movies
+        List<MovieTitleSearchQueryResultDTO> movieList = new ArrayList<>();
+        MovieTitleSearchQueryResultDTO resultDTO = new MovieTitleSearchQueryResultDTO(MOVIE_ID, title, releasedYear, director,
                 BACKDROP_PATH, POSTER_PATH, rating, OVERVIEW);
         movieList.add(resultDTO);
 
@@ -155,11 +180,12 @@ class CustomRepositoryImplUnitTests {
         when(query.getResultList()).thenReturn(movieList);
 
         // Execute the method:
-        List<MovieSearchQueryDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
+        MovieSearchWithTitleDTOFromRepoToService returnDTO = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         // Verify if the actualResult is the same as we define
-        assertEquals(MOVIE_ID, actualResult.get(0).getId());
-        assertEquals(1, actualResult.size());
+        // Verify if the actualResult is the same as we define
+        assertEquals(totalItems, returnDTO.getTotalItem());
+        assertEquals(movieList, returnDTO.getMovies());
 
         // Verify all setParameters methods are called given the query parameters we provide
         verify(query).setParameter("title", "%" + title + "%");
@@ -175,9 +201,16 @@ class CustomRepositoryImplUnitTests {
 
         movieSearchParam = movieSearchParam.toBuilder().director("").build();
 
-        // Mock the behavior
-        List<MovieSearchQueryDTO> movieList = new ArrayList<>();
-        MovieSearchQueryDTO resultDTO = new MovieSearchQueryDTO(MOVIE_ID, title, releasedYear, director,
+        // Mock the behavior for the count query
+        Query countTotalRowsQuery = mock(Query.class);
+        when(entityManager.createNativeQuery(anyString()))
+                .thenReturn(countTotalRowsQuery);
+        when(countTotalRowsQuery.getSingleResult())
+                .thenReturn(totalItemsLong);
+
+        // Mock the behavior for the query that search movies
+        List<MovieTitleSearchQueryResultDTO> movieList = new ArrayList<>();
+        MovieTitleSearchQueryResultDTO resultDTO = new MovieTitleSearchQueryResultDTO(MOVIE_ID, title, releasedYear, director,
                 BACKDROP_PATH, POSTER_PATH, rating, OVERVIEW);
         movieList.add(resultDTO);
 
@@ -187,11 +220,12 @@ class CustomRepositoryImplUnitTests {
         when(query.getResultList()).thenReturn(movieList);
 
         // Execute the method:
-        List<MovieSearchQueryDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
+        MovieSearchWithTitleDTOFromRepoToService returnDTO = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         // Verify if the actualResult is the same as we define
-        assertEquals(MOVIE_ID, actualResult.get(0).getId());
-        assertEquals(1, actualResult.size());
+        // Verify if the actualResult is the same as we define
+        assertEquals(totalItems, returnDTO.getTotalItem());
+        assertEquals(movieList, returnDTO.getMovies());
 
         // Verify all setParameters methods are called given the query parameters we provide
         verify(query).setParameter("title", "%" + title + "%");
@@ -208,9 +242,16 @@ class CustomRepositoryImplUnitTests {
 
         movieSearchParam = movieSearchParam.toBuilder().genre("").build();
 
-        // Mock the behavior
-        List<MovieSearchQueryDTO> movieList = new ArrayList<>();
-        MovieSearchQueryDTO resultDTO = new MovieSearchQueryDTO(MOVIE_ID, title, releasedYear, director,
+        // Mock the behavior for the count query
+        Query countTotalRowsQuery = mock(Query.class);
+        when(entityManager.createNativeQuery(anyString()))
+                .thenReturn(countTotalRowsQuery);
+        when(countTotalRowsQuery.getSingleResult())
+                .thenReturn(totalItemsLong);
+
+        // Mock the behavior for the query that search movies
+        List<MovieTitleSearchQueryResultDTO> movieList = new ArrayList<>();
+        MovieTitleSearchQueryResultDTO resultDTO = new MovieTitleSearchQueryResultDTO(MOVIE_ID, title, releasedYear, director,
                 BACKDROP_PATH, POSTER_PATH, rating, OVERVIEW);
         movieList.add(resultDTO);
 
@@ -220,11 +261,12 @@ class CustomRepositoryImplUnitTests {
         when(query.getResultList()).thenReturn(movieList);
 
         // Execute the method:
-        List<MovieSearchQueryDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
+        MovieSearchWithTitleDTOFromRepoToService returnDTO = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         // Verify if the actualResult is the same as we define
-        assertEquals(MOVIE_ID, actualResult.get(0).getId());
-        assertEquals(1, actualResult.size());
+        // Verify if the actualResult is the same as we define
+        assertEquals(totalItems, returnDTO.getTotalItem());
+        assertEquals(movieList, returnDTO.getMovies());
 
         // Verify all setParameters methods are called given the query parameters we provide
         verify(query).setParameter("title", "%" + title + "%");
@@ -241,23 +283,38 @@ class CustomRepositoryImplUnitTests {
         movieSearchParam = movieSearchParam.toBuilder().releasedYear(null).director(null).genre(null)
                 .build();
 
-        // Mock the behavior
-        List<MovieSearchQueryDTO> movieList = new ArrayList<>();
-        MovieSearchQueryDTO resultDTO = new MovieSearchQueryDTO(MOVIE_ID, title, releasedYear, director,
+        // Mock the behavior of query that get movies and their information
+        List<MovieTitleSearchQueryResultDTO> movieList = new ArrayList<>();
+        MovieTitleSearchQueryResultDTO resultDTO = new MovieTitleSearchQueryResultDTO(MOVIE_ID, title, releasedYear, director,
                 BACKDROP_PATH, POSTER_PATH, rating, OVERVIEW);
         movieList.add(resultDTO);
 
-        // Use argument matchers for dynamic parameters
+        // Mock the behavior for the count query
+        Query countTotalRowsQuery = mock(Query.class);
+        when(entityManager.createNativeQuery(anyString()))
+                .thenReturn(countTotalRowsQuery);
+        when(countTotalRowsQuery.getSingleResult())
+                .thenReturn(totalItemsLong);
+
+        // Mock the movie result query
         when(entityManager.createNativeQuery(anyString(), anyString()))
                 .thenReturn(query);
         when(query.getResultList()).thenReturn(movieList);
 
         // Execute the method:
-        List<MovieSearchQueryDTO> actualResult = customMovieRepositoryImpl.searchMovies(movieSearchParam);
+        MovieSearchWithTitleDTOFromRepoToService returnDTO = customMovieRepositoryImpl.searchMovies(movieSearchParam);
 
         // Verify if the actualResult is the same as we define
-        assertEquals(MOVIE_ID, actualResult.get(0).getId());
-        assertEquals(1, actualResult.size());
+        // Verify if the actualResult is the same as we define
+        assertEquals(totalItems, returnDTO.getTotalItem());
+        assertEquals(movieList, returnDTO.getMovies());
+
+        // Verify setParametersForCount was called for count query
+        verify(countTotalRowsQuery).setParameter("title", "%" + title + "%");
+        verify(countTotalRowsQuery, never()).setParameter("releasedYear", releasedYear + "%");
+        verify(countTotalRowsQuery, never()).setParameter("director", "%" + director + "%");
+        verify(countTotalRowsQuery, never()).setParameter("genre", "%" + genre + "%");
+
 
         // Verify all setParameters methods are called given the query parameters we provide
         verify(query).setParameter("title", "%" + title + "%");

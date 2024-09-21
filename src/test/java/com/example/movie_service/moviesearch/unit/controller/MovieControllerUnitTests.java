@@ -3,6 +3,7 @@ package com.example.movie_service.moviesearch.unit.controller;
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.controller.MovieController;
 import com.example.movie_service.dto.MovieSearchResponseDTO;
+import com.example.movie_service.dto.MovieSearchResultWithPaginationDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.response.CustomResponse;
 import com.example.movie_service.service.MovieService;
@@ -52,7 +53,7 @@ class MovieControllerUnitTests {
         director = "director";
         genre = "genre";
         limit = 10;
-        page = 0;
+        page = 1;
         orderBy = "orderBy";
         direction = "direction";
     }
@@ -65,16 +66,25 @@ class MovieControllerUnitTests {
         List<MovieSearchResponseDTO> movieSearchQueryDTOList = new ArrayList<>();
         movieSearchQueryDTOList.add(movieSearchQueryDTO);
 
-        CustomResponse<List<MovieSearchResponseDTO>> customResponse = new CustomResponse<>(MOVIE_FOUND_CODE, MOVIE_FOUND_MESSAGE, movieSearchQueryDTOList);
+        MovieSearchResultWithPaginationDTO  returnDTO = new MovieSearchResultWithPaginationDTO();
+        returnDTO.setMovies(movieSearchQueryDTOList);
+        returnDTO.setTotalItems(10);
+        returnDTO.setCurrentPage(page);
+        returnDTO.setItemsPerPage(limit);
+        returnDTO.setTotalPages(5);
+        returnDTO.setHasPrevPage(false);
+        returnDTO.setHasNextPage(true);
 
-        ResponseEntity<CustomResponse<List<MovieSearchResponseDTO>>> responseEntity = new ResponseEntity<>(customResponse, HttpStatus.OK);
+        CustomResponse<MovieSearchResultWithPaginationDTO> customResponse = new CustomResponse<>(MOVIE_FOUND_CODE, MOVIE_FOUND_MESSAGE, returnDTO);
+
+        ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> responseEntity = new ResponseEntity<>(customResponse, HttpStatus.OK);
 
         // What I expect my function to do, like the correct outcome I expect
         when(mockMovieService.searchMovies(any(MovieSearchParam.class)))
                 .thenReturn(responseEntity);
 
         // Test my actual function
-        ResponseEntity<CustomResponse<List<MovieSearchResponseDTO>>> actual = movieController.searchMovies(title, releasedYear, director,
+        ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> actual = movieController.searchMovies(title, releasedYear, director,
                 genre, limit, page, orderBy, direction);
 
         assertEquals(responseEntity, actual);

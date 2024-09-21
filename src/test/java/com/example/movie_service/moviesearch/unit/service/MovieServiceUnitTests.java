@@ -3,7 +3,9 @@ package com.example.movie_service.moviesearch.unit.service;
 
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.converter.MovieSearchQueryToResponseConverter;
-import com.example.movie_service.dto.MovieSearchQueryDTO;
+import com.example.movie_service.dto.MovieSearchResultWithPaginationDTO;
+import com.example.movie_service.dto.MovieSearchWithTitleDTOFromRepoToService;
+import com.example.movie_service.dto.MovieTitleSearchQueryResultDTO;
 import com.example.movie_service.dto.MovieSearchResponseDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.exception.ValidationException;
@@ -56,8 +58,9 @@ class MovieServiceUnitTests {
     public void setUp() {
 
         // Build the basic valid MovieSearchParam
+        // Note: here because the search param is from the frontend, so the page starts at 1 instead of 0
         movieSearchParam = MovieSearchParam.builder()
-                .title("title").releasedYear("2020").director("director").genre("genre").limit(10).page(0)
+                .title("title").releasedYear("2020").director("director").genre("genre").limit(10).page(1)
                 .orderBy("orderBy").direction("orderBy").build();
 
     }
@@ -184,17 +187,19 @@ class MovieServiceUnitTests {
     @Test
     void searchMovieReturnListOfMovieSearchResultDTO() {
         // Setup mock data
-        List<MovieSearchQueryDTO> mockMovies = List.of(
-                new MovieSearchQueryDTO("1", "Inception", "2010", "Christopher Nolan", "path/to/backdrop", "path/to/poster", 9.0, "overview")
+        List<MovieTitleSearchQueryResultDTO> mockMovies = List.of(
+                new MovieTitleSearchQueryResultDTO("1", "Inception", "2010", "Christopher Nolan", "path/to/backdrop", "path/to/poster", 9.0, "overview")
         );
+
+        MovieSearchWithTitleDTOFromRepoToService dtoFromRepoToService = new MovieSearchWithTitleDTOFromRepoToService(1, mockMovies);
 
         // Mock the repository call
         when(movieRepository.searchMovies(movieSearchParam))
-                .thenReturn(mockMovies);
+                .thenReturn(dtoFromRepoToService);
 
         // Since we use @Mock on the converter, All methods on this mock return default values (e.g., null, 0, empty collections)
         // unless explicitly stubbed (i.e., told to return specific values). Therefore, we stub the behavior below for the converter
-        when(converter.convert(any(MovieSearchQueryDTO.class)))
+        when(converter.convert(any(MovieTitleSearchQueryResultDTO.class)))
                 .thenReturn(new MovieSearchResponseDTO("1", "Inception", "2010", "path/to/poster", 9.0, "overview"));
 
 
@@ -207,25 +212,32 @@ class MovieServiceUnitTests {
         doNothing().when(validationService).validateDirection(any());
 
         // Call the actual method under test
-        ResponseEntity<CustomResponse<List<MovieSearchResponseDTO>>> actualResponseEntity = movieServiceImpl.searchMovies(
+        ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> actualResponseEntity = movieServiceImpl.searchMovies(
                 movieSearchParam);
 
         // Verify the results
         assertNotNull(actualResponseEntity.getBody());
         assertNotNull(actualResponseEntity.getBody().getData());
-        assertEquals(1, actualResponseEntity.getBody().getData().size());
+        MovieSearchResultWithPaginationDTO dto = actualResponseEntity.getBody().getData();
+        assertEquals(1, dto.getTotalItems());
+        assertEquals(1, dto.getMovies().size());
+        assertEquals(1, dto.getCurrentPage());
+        assertEquals(1, dto.getTotalPages());
+        assertFalse(dto.isHasNextPage());
+        assertFalse(dto.isHasPrevPage());
         System.out.println(actualResponseEntity.getBody().getData());
-        assertEquals("Inception", actualResponseEntity.getBody().getData().get(0).getTitle());
+        assertEquals("Inception", dto.getMovies().get(0).getTitle());
     }
 
 
     @Test
     void searchMovieWithNoResult() {
-        List<MovieSearchQueryDTO> mockMovies = List.of();
+        List<MovieTitleSearchQueryResultDTO> mockMovies = List.of();
+        MovieSearchWithTitleDTOFromRepoToService dtoFromRepoToService = new MovieSearchWithTitleDTOFromRepoToService(0, mockMovies);
 
         // Mock the repository call
         when(movieRepository.searchMovies(movieSearchParam))
-                .thenReturn(mockMovies);
+                .thenReturn(dtoFromRepoToService);
 
         // Ensure validation service calls do nothing (if necessary)
         doNothing().when(validationService).validateTitle(any());
@@ -235,16 +247,15 @@ class MovieServiceUnitTests {
         doNothing().when(validationService).validateOrderBy(any());
         doNothing().when(validationService).validateDirection(any());
 
-        ResponseEntity<CustomResponse<List<MovieSearchResponseDTO>>> actualResponseEntity = movieServiceImpl.searchMovies(
+        ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> actualResponseEntity = movieServiceImpl.searchMovies(
                 movieSearchParam
         );
 
         assertNotNull(actualResponseEntity.getBody());
-        assertTrue(actualResponseEntity.getBody().getData().isEmpty());
         assertEquals(HttpStatus.OK, actualResponseEntity.getStatusCode());
         assertEquals(MOVIE_NOT_FOUND_CODE, actualResponseEntity.getBody().getCode());
         assertEquals(MOVIE_NOT_FOUND_MESSAGE, actualResponseEntity.getBody().getMessage());
-
+        assertNull(actualResponseEntity.getBody().getData());
     }
 
 
