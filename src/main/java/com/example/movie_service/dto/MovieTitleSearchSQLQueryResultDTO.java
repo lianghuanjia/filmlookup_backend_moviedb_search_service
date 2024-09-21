@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MovieSearchQueryDTO {
+public class MovieTitleSearchSQLQueryResultDTO {
     private String id;
     private String title;
     private String releaseTime;
@@ -22,5 +22,4 @@ public class MovieSearchQueryDTO {
     private String posterPath;
     private Double rating;
     private String overview;
-    private Integer totalItems;
 }
