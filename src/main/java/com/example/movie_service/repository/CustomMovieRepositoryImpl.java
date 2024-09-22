@@ -2,7 +2,7 @@ package com.example.movie_service.repository;
 
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.CrewMember;
-import com.example.movie_service.dto.MovieTitleSearchQueryResultDTO;
+import com.example.movie_service.dto.MovieTitleSearchSQLQueryResultDTO;
 import com.example.movie_service.dto.MovieSearchWithTitleDTOFromRepoToService;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import jakarta.persistence.EntityManager;
@@ -73,7 +73,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         // Since the MOVIE_SEARCH_RESULT_DTO_MAPPING's target class is MovieSearchResultDTO, I am sure the result will
         // be MovieSearchResultDTO class, so I use @SuppressWarnings("unchecked")  here
         @SuppressWarnings("unchecked")
-        List<MovieTitleSearchQueryResultDTO> results = query.getResultList();
+        List<MovieTitleSearchSQLQueryResultDTO> results = query.getResultList();
 
         MovieSearchWithTitleDTOFromRepoToService returnDTO = new MovieSearchWithTitleDTOFromRepoToService();
         returnDTO.setMovies(results);
@@ -246,9 +246,17 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         appendConditionIfNotEmpty(director, ADD_DIRECTOR_FIELD_IN_QUERY_STRING, queryBuilder);
         appendConditionIfNotEmpty(genre, ADD_GENRE_FIELD_IN_QUERY_STRING, queryBuilder);
 
-        queryBuilder.append("ORDER BY ").append(orderBy).append(" ").append(direction).append(" ")
-                .append("LIMIT :limit OFFSET :offset");
+        queryBuilder.append("ORDER BY ");
 
+        // Logic to ensure NULLs are at the end for both ASC and DESC
+        queryBuilder.append(orderBy)
+                .append(" IS NULL, ")
+                .append(orderBy).
+                append(" ").
+                append(direction).
+                append(" ");
+
+        queryBuilder.append(" LIMIT :limit OFFSET :offset");
         return queryBuilder.toString();
     }
 
