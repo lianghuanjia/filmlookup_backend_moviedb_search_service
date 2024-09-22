@@ -1,13 +1,11 @@
 package com.example.movie_service.service;
 
 import com.example.movie_service.builder.MovieSearchParam;
-import com.example.movie_service.dto.MovieSearchResponseDTO;
 import com.example.movie_service.dto.MovieSearchResultWithPaginationDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.response.CustomResponse;
 import org.springframework.http.ResponseEntity;
 
-import java.util.List;
 
 /**
  * Service interface for managing movies.
