@@ -2,6 +2,7 @@ package com.example.movie_service.moviesearch.integration.service;
 
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.MovieSearchResponseDTO;
+import com.example.movie_service.dto.MovieSearchResultWithPaginationDTO;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.moviesearch.integration.util.dataInitService.DataInitializerService;
 import com.example.movie_service.moviesearch.integration.util.junitExtension.MySQLTestContainerExtension;
@@ -42,11 +43,14 @@ class MovieServiceImplIntegrationTests {
     @BeforeEach
     public void beforeEach() {
         dataInitializerService.checkDatabaseEmpty();
-        dataInitializerService.initializeData();
+        dataInitializerService.insertMovieData();
+        dataInitializerService.createMovieMaterializedViewTable();
 
         // Build the basic valid MovieSearchParam
+        // NOTE: Because we are passing the movieSearchParam to service layer, so the page is 1-index. Only
+        // when the parameters are passed from service layer to repository layer, the page is 0-index.
         movieSearchParam = MovieSearchParam.builder()
-                .title(EXISTED_MOVIE_TITLE).releasedYear(null).director(null).genre(null).limit(10).page(0)
+                .title(EXISTED_MOVIE_TITLE_LOWER_CASE).releasedYear(null).director(null).genre(null).limit(10).page(1)
                 .orderBy(ORDER_BY_TITLE).direction(ASC).build();
     }
 
@@ -57,7 +61,7 @@ class MovieServiceImplIntegrationTests {
 
     @Test
     void testMoviesFoundWithTitleOnly() {
-        ResponseEntity<CustomResponse<List<MovieSearchResponseDTO>>> responseEntity = movieServiceImpl.searchMovies
+        ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> responseEntity = movieServiceImpl.searchMovies
                 (movieSearchParam);
 
         // Verify the response
@@ -65,15 +69,19 @@ class MovieServiceImplIntegrationTests {
         assertNotNull(responseEntity.getBody());
         assertEquals(MOVIE_FOUND_CODE, responseEntity.getBody().getCode());
         assertEquals(MOVIE_FOUND_MESSAGE, responseEntity.getBody().getMessage());
-        List<MovieSearchResponseDTO> moviesList = responseEntity.getBody().getData();
+        MovieSearchResultWithPaginationDTO dto = responseEntity.getBody().getData();
         // Verify the movies
-        assertEquals(3, moviesList.size());
-        assertEquals(THE_DARK_KNIGHT, moviesList.get(0).getTitle());
-        assertEquals(THE_DARK_KNIGHT_RISES, moviesList.get(1).getTitle());
-        assertEquals(THE_DARK_KNIGHT_RISES_AGAIN, moviesList.get(2).getTitle());
-
+        assertNotNull(dto);
+        List<MovieSearchResponseDTO> movies = dto.getMovies();
+        assertEquals(12, dto.getTotalItems());
+        assertEquals(MOVIE_1_TITLE, movies.get(0).getTitle());
+        assertEquals(MOVIE_10_TITLE, movies.get(1).getTitle());
+        assertEquals(MOVIE_11_TITLE, movies.get(2).getTitle());
+        assertEquals(MOVIE_12_TITLE, movies.get(3).getTitle());
+        assertEquals(MOVIE_2_TITLE, movies.get(4).getTitle());
         // Check if the first movie has overview:
-        assertEquals(THE_DARK_KNIGHT_OVERVIEW, moviesList.get(0).getOverview());
+        assertNull(movies.get(0).getOverview());
+        assertEquals(MOVIE_1_RELEASE_TIME, movies.get(0).getReleaseTime());
     }
 
     @Test
@@ -81,7 +89,7 @@ class MovieServiceImplIntegrationTests {
         movieSearchParam = movieSearchParam.toBuilder()
                 .title(NON_EXISTED_MOVIE_TITLE).build();
 
-        ResponseEntity<CustomResponse<List<MovieSearchResponseDTO>>> responseEntity = movieServiceImpl.searchMovies
+        ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> responseEntity = movieServiceImpl.searchMovies
                 (movieSearchParam);
 
         // Verify the response
@@ -89,9 +97,7 @@ class MovieServiceImplIntegrationTests {
         assertNotNull(responseEntity.getBody());
         assertEquals(MOVIE_NOT_FOUND_CODE, responseEntity.getBody().getCode());
         assertEquals(MOVIE_NOT_FOUND_MESSAGE, responseEntity.getBody().getMessage());
-        List<MovieSearchResponseDTO> moviesList = responseEntity.getBody().getData();
-        // Verify the movies
-        assertTrue(moviesList.isEmpty());
+        assertNull(responseEntity.getBody().getData());
     }
 
     @Test

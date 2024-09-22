@@ -2,7 +2,8 @@ package com.example.movie_service.moviesearch.integration.controller;
 
 
 import com.example.movie_service.dto.CrewMember;
-import com.example.movie_service.dto.MovieSearchQueryDTO;
+import com.example.movie_service.dto.MovieSearchResponseDTO;
+import com.example.movie_service.dto.MovieSearchResultWithPaginationDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.moviesearch.integration.util.dataInitService.DataInitializerService;
 import com.example.movie_service.moviesearch.integration.util.junitExtension.MySQLTestContainerExtension;
@@ -58,7 +59,7 @@ class ControllerIntegrationTest {
     private static final String protocolAndHost = "http://localhost:";
     private String searchMoviePath;
     // Define the response type using ParameterizedTypeReference
-    private final ParameterizedTypeReference<CustomResponse<List<MovieSearchQueryDTO>>> responseType =
+    private final ParameterizedTypeReference<CustomResponse<MovieSearchResultWithPaginationDTO>> responseType =
             new ParameterizedTypeReference<>() {
             };
 
@@ -72,7 +73,8 @@ class ControllerIntegrationTest {
         searchMoviePath = baseUrl + "/movies";
 
         dataInitializerService.checkDatabaseEmpty();
-        dataInitializerService.initializeData();
+        dataInitializerService.insertMovieData();
+        dataInitializerService.createMovieMaterializedViewTable();
     }
 
     @AfterEach
@@ -85,56 +87,102 @@ class ControllerIntegrationTest {
     void testSearchMoviesMovieFound() {
         // Define URI with query param
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE_LOWER_CASE)
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert
         assertTrue(results.getStatusCode().is2xxSuccessful());
-        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
+        CustomResponse<MovieSearchResultWithPaginationDTO> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is 20001, representing movies found
         assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
         assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
-        List<MovieSearchQueryDTO> movieList = customResponse.getData();
-        // Assert there are 3 movies
-        assertEquals(3, movieList.size());
+        assertNotNull(customResponse.getData());
+        List<MovieSearchResponseDTO> movieList = customResponse.getData().getMovies();
+        // There are 13 movies, but the 13th one doesn't have poster_path, so it's not included in the result
+        assertEquals(12, customResponse.getData().getTotalItems());
+        // 10 items at the 1st page. We are not specifying the page in our query, so the search query specify page
+        // 1 because 1 is the default value for page.
+        assertEquals(10, movieList.size());
         // Assert 1st movie is The Dark Knight
-        assertEquals(THE_DARK_KNIGHT, movieList.get(0).getTitle());
-        assertEquals(THE_DARK_KNIGHT_RISES, movieList.get(1).getTitle());
-        assertEquals(THE_DARK_KNIGHT_RISES_AGAIN, movieList.get(2).getTitle());
+        assertEquals(MOVIE_1_TITLE, movieList.get(0).getTitle());
+        assertEquals(MOVIE_10_TITLE, movieList.get(1).getTitle());
+        assertEquals(MOVIE_11_TITLE, movieList.get(2).getTitle());
+        assertEquals(MOVIE_12_TITLE, movieList.get(3).getTitle());
+        assertEquals(MOVIE_2_TITLE, movieList.get(4).getTitle());
     }
 
     @Test
-    void testSearchMoviesMovieFound_MoviesWithoutPosterPathAreNotIncluded() {
-        // Insert 2 new movies, one has poster path and the other doesn't.
-        dataInitializerService.generateTwoMoviesWithAndWithoutPosterPath();
-
+    void testSearchMovies_UsingAllUpperCaseTitle_MovieFound() {
         // Define URI with query param
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam(ORDER_BY_TITLE, MOVIE_TITLE_FOR_RETURN_RESULTS_NOT_INCLUDING_POSTER_PATH)
+                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE_UPPER_CASE)
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert
         assertTrue(results.getStatusCode().is2xxSuccessful());
-        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
+        CustomResponse<MovieSearchResultWithPaginationDTO> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is 20001, representing movies found
         assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
         assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
-        List<MovieSearchQueryDTO> movieList = customResponse.getData();
-        // Assert there are 3 movies
-        assertEquals(1, movieList.size());
+        assertNotNull(customResponse.getData());
+        List<MovieSearchResponseDTO> movieList = customResponse.getData().getMovies();
+        // There are 13 movies, but the 13th one doesn't have poster_path, so it's not included in the result
+        assertEquals(12, customResponse.getData().getTotalItems());
+        // 10 items at the 1st page. We are not specifying the page in our query, so the search query specify page
+        // 1 because 1 is the default value for page.
+        assertEquals(10, movieList.size());
         // Assert 1st movie is The Dark Knight
-        assertEquals(MOVIE_TITLE_FOR_RETURN_RESULTS_NOT_INCLUDING_POSTER_PATH, movieList.get(0).getTitle());
+        assertEquals(MOVIE_1_TITLE, movieList.get(0).getTitle());
+        assertEquals(MOVIE_10_TITLE, movieList.get(1).getTitle());
+        assertEquals(MOVIE_11_TITLE, movieList.get(2).getTitle());
+        assertEquals(MOVIE_12_TITLE, movieList.get(3).getTitle());
+        assertEquals(MOVIE_2_TITLE, movieList.get(4).getTitle());
     }
+
+
+    @Test
+    void testSearchMovies_UsingCapitalizedTitle_MovieFound() {
+        // Define URI with query param
+        URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
+                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE_CAPITALIZED)
+                .build().toUri();
+
+        // Perform a GET request to the controller
+        ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> results = restTemplate.exchange
+                (uri, HttpMethod.GET, null, responseType);
+
+        // Assert
+        assertTrue(results.getStatusCode().is2xxSuccessful());
+        CustomResponse<MovieSearchResultWithPaginationDTO> customResponse = results.getBody();
+        assertNotNull(customResponse);
+        // Assert that the return code is 20001, representing movies found
+        assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
+        assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
+        assertNotNull(customResponse.getData());
+        List<MovieSearchResponseDTO> movieList = customResponse.getData().getMovies();
+        // There are 13 movies, but the 13th one doesn't have poster_path, so it's not included in the result
+        assertEquals(12, customResponse.getData().getTotalItems());
+        // 10 items at the 1st page. We are not specifying the page in our query, so the search query specify page
+        // 1 because 1 is the default value for page.
+        assertEquals(10, movieList.size());
+        // Assert 1st movie is The Dark Knight
+        assertEquals(MOVIE_1_TITLE, movieList.get(0).getTitle());
+        assertEquals(MOVIE_10_TITLE, movieList.get(1).getTitle());
+        assertEquals(MOVIE_11_TITLE, movieList.get(2).getTitle());
+        assertEquals(MOVIE_12_TITLE, movieList.get(3).getTitle());
+        assertEquals(MOVIE_2_TITLE, movieList.get(4).getTitle());
+    }
+
 
     @Test
     void testSearchMoviesNotFound() {
@@ -143,12 +191,12 @@ class ControllerIntegrationTest {
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert the status code is OK, and we have a customResponse
         assertTrue(results.getStatusCode().is2xxSuccessful());
-        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
+        CustomResponse<MovieSearchResultWithPaginationDTO> customResponse = results.getBody();
         assertNotNull(customResponse);
 
         // Assert the code and message are MOVIE_NOT_FOUND
@@ -156,7 +204,7 @@ class ControllerIntegrationTest {
         assertEquals(MOVIE_NOT_FOUND_MESSAGE, customResponse.getMessage());
 
         // Assert the MovieSearchResultDTO List is empty
-        assertTrue(customResponse.getData().isEmpty());
+        assertNull(customResponse.getData());
     }
 
     @Test
@@ -165,12 +213,12 @@ class ControllerIntegrationTest {
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert the status code is OK, and we have a customResponse
         assertTrue(results.getStatusCode().is4xxClientError());
-        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
+        CustomResponse<MovieSearchResultWithPaginationDTO> customResponse = results.getBody();
         assertNotNull(customResponse);
 
         // Assert the code and message are MOVIE_NOT_FOUND
@@ -183,85 +231,87 @@ class ControllerIntegrationTest {
 
     @Test
     void testSearchMoviesValidYear() {
-        String validYear = "2012";
+        String validYear = "2023";
         // Define URI with query param
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE_LOWER_CASE)
                 .queryParam(RELEASED_YEAR, validYear)
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert
         assertTrue(results.getStatusCode().is2xxSuccessful());
-        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
+        CustomResponse<MovieSearchResultWithPaginationDTO> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
         assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
         assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
-        List<MovieSearchQueryDTO> movieList = customResponse.getData();
-        // Assert there are 2 movies with release time in 2012.
-        assertEquals(2, movieList.size());
+        List<MovieSearchResponseDTO> movieList = customResponse.getData().getMovies();
+        // Assert there are 5 movies with release time in 2023.
+        assertEquals(5, customResponse.getData().getTotalItems());
+        assertEquals(5, movieList.size());
         // Assert 1st movie is The Dark Knight Rises, and the second one is The Dark Knight Rises Again,
         // because we didn't put orderBy and direction in the query param, so it sets to default with
         // orderBy = "title", direction = "asc".
-        assertEquals(THE_DARK_KNIGHT_RISES, movieList.get(0).getTitle());
-        assertEquals(THE_DARK_KNIGHT_RISES_AGAIN, movieList.get(1).getTitle());
+        assertEquals(MOVIE_1_TITLE, movieList.get(0).getTitle());
+        assertEquals(MOVIE_2_TITLE, movieList.get(1).getTitle());
     }
 
     @Test
     void searchMovieWithOrderByRatingAndAsc() {
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE_LOWER_CASE)
                 .queryParam(ORDER_BY, RATING)
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert
         assertTrue(results.getStatusCode().is2xxSuccessful());
-        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
+        CustomResponse<MovieSearchResultWithPaginationDTO> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
         assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
         assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
-        List<MovieSearchQueryDTO> movieList = customResponse.getData();
+        List<MovieSearchResponseDTO> movieList = customResponse.getData().getMovies();
 
-        // Assert movieList has 3 movies
-        assertEquals(3, movieList.size());
+        // Assert movieList has 12 movies
+        assertEquals(12, customResponse.getData().getTotalItems());
 
         // Assert first movie's rating < second movie's rating < third movie's rating
-        assertTrue(movieList.get(0).getRating() < movieList.get(1).getRating()
-                && movieList.get(1).getRating() < movieList.get(2).getRating());
+        assertTrue(Double.compare(movieList.get(0).getRating(), movieList.get(1).getRating()) <= 0
+                && Double.compare(movieList.get(1).getRating(), movieList.get(2).getRating()) <= 0
+                && Double.compare(movieList.get(2).getRating(), movieList.get(3).getRating()) <= 0);
     }
 
     @Test
-    void searchMovieWithOrderByRatingAndDesc() {
+    void searchMovie_OrderByRating_Desc() {
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE_LOWER_CASE)
                 .queryParam(ORDER_BY, RATING)
                 .queryParam(DIRECTION, DESC)
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert
         assertTrue(results.getStatusCode().is2xxSuccessful());
-        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
+        CustomResponse<MovieSearchResultWithPaginationDTO> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
         assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
         assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
-        List<MovieSearchQueryDTO> movieList = customResponse.getData();
+        List<MovieSearchResponseDTO> movieList = customResponse.getData().getMovies();
 
-        // Assert movieList has 3 movies
-        assertEquals(3, movieList.size());
+        // Assert movieList has 12 movies
+        assertEquals(12, customResponse.getData().getTotalItems());
 
         // Assert first movie's rating > second movie's rating > third movie's rating
         assertTrue(movieList.get(0).getRating() > movieList.get(1).getRating()
@@ -269,47 +319,55 @@ class ControllerIntegrationTest {
     }
 
     @Test
-    void TestPageOneOrderByRatingAsc() {
+    void TestPageTwoOrderByRatingAsc() {
         dataInitializerService.insertMovieData();
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam(TITLE, TITLE_STARTS_WITH_MOVIE)
+                .queryParam(TITLE, EXISTED_MOVIE_TITLE_LOWER_CASE)
                 .queryParam(ORDER_BY, RATING)
                 .queryParam(DIRECTION, ASC)
-                .queryParam(PAGE, 1)
+                .queryParam(PAGE, 2)
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         assertTrue(results.getStatusCode().is2xxSuccessful());
-        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
+        CustomResponse<MovieSearchResultWithPaginationDTO> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
         assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
         assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
-        List<MovieSearchQueryDTO> movieList = customResponse.getData();
+        List<MovieSearchResponseDTO> movieList = customResponse.getData().getMovies();
 
-        MovieSearchQueryDTO movie11 = movieList.get(0);
+        // Only 2 movies in the second page, since there are total 12 movies
+        assertEquals(12, customResponse.getData().getTotalItems());
+        assertEquals(2, movieList.size());
+
+        MovieSearchResponseDTO movie11 = movieList.get(0);
         assertEquals(MOVIE_11_TITLE, movie11.getTitle());
         assertEquals(MOVIE_11_RATING, movie11.getRating());
+
+        MovieSearchResponseDTO movie12 = movieList.get(1);
+        assertEquals(MOVIE_12_TITLE, movie12.getTitle());
+        assertEquals(MOVIE_12_RATING, movie12.getRating());
     }
 
     @Test
     void SearchMoviesInvalidReleasedYear() {
         String invalidYear = "2025";
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE_LOWER_CASE)
                 .queryParam(RELEASED_YEAR, invalidYear)
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert the status code is BAD_REQUEST, and we have a customResponse
         assertTrue(results.getStatusCode().is4xxClientError());
-        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
+        CustomResponse<MovieSearchResultWithPaginationDTO> customResponse = results.getBody();
         assertNotNull(customResponse);
 
         // Assert the code and message are INVALID_YEAR
@@ -324,45 +382,46 @@ class ControllerIntegrationTest {
     void searchMoviesValidWithReleaseTimeOrderByAndDescDirection() {
         // Define URI with query param
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE_LOWER_CASE)
                 .queryParam(ORDER_BY, RELEASE_TIME)
                 .queryParam(DIRECTION, DESC)
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert
         assertTrue(results.getStatusCode().is2xxSuccessful());
-        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
+        CustomResponse<MovieSearchResultWithPaginationDTO> customResponse = results.getBody();
         assertNotNull(customResponse);
         // Assert that the return code is MOVIE_FOUND_CODE, representing movies found
         assertEquals(MOVIE_FOUND_CODE, customResponse.getCode());
         assertEquals(MOVIE_FOUND_MESSAGE, customResponse.getMessage());
-        List<MovieSearchQueryDTO> movieList = customResponse.getData();
-        // Assert there are 3 movies
-        assertEquals(3, movieList.size());
+        List<MovieSearchResponseDTO> movieList = customResponse.getData().getMovies();
+        // Assert there are 10 movies in page 1, and 12 total items
+        assertEquals(12, customResponse.getData().getTotalItems());
+        assertEquals(10, movieList.size());
         // Assert 1st movie is The Dark Knight Rises Again, since it has the latest release time
-        assertEquals(THE_DARK_KNIGHT_RISES_AGAIN, movieList.get(0).getTitle());
-        assertEquals(THE_DARK_KNIGHT_RISES, movieList.get(1).getTitle());
-        assertEquals(THE_DARK_KNIGHT, movieList.get(2).getTitle());
+        assertEquals(MOVIE_1_TITLE, movieList.get(0).getTitle());
+        assertEquals(MOVIE_2_TITLE, movieList.get(1).getTitle());
+        assertEquals(MOVIE_3_TITLE, movieList.get(2).getTitle());
     }
 
     @Test
     void SearchMoviesInvalidOrderBy() {
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE_LOWER_CASE)
                 .queryParam(ORDER_BY, DIRECTOR_ROLE)
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert the status code is BAD_REQUEST, and we have a customResponse
         assertTrue(results.getStatusCode().is4xxClientError());
-        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
+        CustomResponse<MovieSearchResultWithPaginationDTO> customResponse = results.getBody();
         assertNotNull(customResponse);
 
         // Assert the code and message are INVALID_ORDER_BY
@@ -377,17 +436,17 @@ class ControllerIntegrationTest {
     void SearchMoviesInvalidDirection() {
         String invalidDirection = "up";
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath)
-                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE)
+                .queryParam(ORDER_BY_TITLE, EXISTED_MOVIE_TITLE_LOWER_CASE)
                 .queryParam(DIRECTION, invalidDirection)
                 .build().toUri();
 
         // Perform a GET request to the controller
-        ResponseEntity<CustomResponse<List<MovieSearchQueryDTO>>> results = restTemplate.exchange
+        ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> results = restTemplate.exchange
                 (uri, HttpMethod.GET, null, responseType);
 
         // Assert the status code is BAD_REQUEST, and we have a customResponse
         assertTrue(results.getStatusCode().is4xxClientError());
-        CustomResponse<List<MovieSearchQueryDTO>> customResponse = results.getBody();
+        CustomResponse<MovieSearchResultWithPaginationDTO> customResponse = results.getBody();
         assertNotNull(customResponse);
 
         // Assert the code and message are INVALID_YEAR
@@ -401,7 +460,7 @@ class ControllerIntegrationTest {
 
     @Test
     void SearchOneMovieDetails_MovieFound_CrewMembersFound() {
-        String movie1Id = getMovieIdByMovieTitle(THE_DARK_KNIGHT);
+        String movie1Id = getMovieIdByMovieTitle(MOVIE_1_TITLE);
         assertNotNull(movie1Id);
 
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath+"/"+movie1Id).build().toUri();
@@ -420,21 +479,24 @@ class ControllerIntegrationTest {
 
         OneMovieDetailsDTO singleMovieDetails = customResponse.getData();
         assertEquals(movie1Id, singleMovieDetails.getId());
-        assertEquals(THE_DARK_KNIGHT, singleMovieDetails.getTitle());
-        assertEquals(THE_DARK_KNIGHT_RELEASE_TIME, singleMovieDetails.getReleaseTime());
+        assertEquals(MOVIE_1_TITLE, singleMovieDetails.getTitle());
+        assertEquals(MOVIE_1_RELEASE_TIME, singleMovieDetails.getReleaseTime());
         assertTrue(singleMovieDetails.getGenres().contains(ACTION_GENRE));
+        assertFalse(singleMovieDetails.getGenres().contains(CRIME_GENRE));
         assertFalse(singleMovieDetails.getGenres().contains(LOVE_GENRE));
         List<CrewMember> crewMembers = singleMovieDetails.getCrewMemberList();
-        assertEquals(3, crewMembers.size());
+        assertEquals(2, crewMembers.size());
         assertTrue(crewMembers.stream().anyMatch(crewMember -> ACTOR_1_NAME.equals(crewMember.getName())));
         assertTrue(crewMembers.stream().anyMatch(crewMember -> ACTRESS_1_NAME.equals(crewMember.getName())));
-        assertTrue(crewMembers.stream().anyMatch(crewMember -> DIRECTOR_NOLAN.equals(crewMember.getName())));
+        // Director 1 doesn't have profile_path, so it's not included
+        assertFalse(crewMembers.stream().anyMatch(crewMember -> DIRECTOR_1.equals(crewMember.getName())));
+        // Composer job is not included in the result
         assertFalse(crewMembers.stream().anyMatch(crewMember -> COMPOSER_1_NAME.equals(crewMember.getName())));
     }
 
     @Test
     void SearchOneMovieDetails_MovieFound_CrewMembersNotFound() {
-        String movieWithTitleOnlyId = getMovieIdByMovieTitle(MOVIE_WITH_TITLE_ONLY);
+        String movieWithTitleOnlyId = getMovieIdByMovieTitle(MOVIE_9_TITLE);
         assertNotNull(movieWithTitleOnlyId);
 
         URI uri = UriComponentsBuilder.fromHttpUrl(searchMoviePath+"/"+movieWithTitleOnlyId).build().toUri();
@@ -453,10 +515,11 @@ class ControllerIntegrationTest {
 
         OneMovieDetailsDTO singleMovieDetails = customResponse.getData();
         assertEquals(movieWithTitleOnlyId, singleMovieDetails.getId());
-        assertEquals(MOVIE_WITH_TITLE_ONLY, singleMovieDetails.getTitle());
-        assertNull(singleMovieDetails.getRating());
-        assertNull(singleMovieDetails.getReleaseTime());
-        assertNull(singleMovieDetails.getGenres());
+        assertEquals(MOVIE_9_TITLE, singleMovieDetails.getTitle());
+        assertEquals(MOVIE_9_RATING, singleMovieDetails.getRating());
+        assertEquals(MOVIE_9_RELEASE_TIME, singleMovieDetails.getReleaseTime());
+        assertTrue(singleMovieDetails.getGenres().contains(ACTION_GENRE));
+        assertTrue(singleMovieDetails.getGenres().contains(CRIME_GENRE));
         assertEquals(Collections.emptyList(), singleMovieDetails.getCrewMemberList());
         assertEquals(0, singleMovieDetails.getCrewMemberList().size());
     }

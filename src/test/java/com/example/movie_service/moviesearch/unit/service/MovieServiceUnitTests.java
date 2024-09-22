@@ -5,7 +5,7 @@ import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.converter.MovieSearchQueryToResponseConverter;
 import com.example.movie_service.dto.MovieSearchResultWithPaginationDTO;
 import com.example.movie_service.dto.MovieSearchWithTitleDTOFromRepoToService;
-import com.example.movie_service.dto.MovieTitleSearchQueryResultDTO;
+import com.example.movie_service.dto.MovieTitleSearchSQLQueryResultDTO;
 import com.example.movie_service.dto.MovieSearchResponseDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.exception.ValidationException;
@@ -187,8 +187,8 @@ class MovieServiceUnitTests {
     @Test
     void searchMovieReturnListOfMovieSearchResultDTO() {
         // Setup mock data
-        List<MovieTitleSearchQueryResultDTO> mockMovies = List.of(
-                new MovieTitleSearchQueryResultDTO("1", "Inception", "2010", "Christopher Nolan", "path/to/backdrop", "path/to/poster", 9.0, "overview")
+        List<MovieTitleSearchSQLQueryResultDTO> mockMovies = List.of(
+                new MovieTitleSearchSQLQueryResultDTO("1", "Inception", "2010", "Christopher Nolan", "path/to/backdrop", "path/to/poster", 9.0, "overview")
         );
 
         MovieSearchWithTitleDTOFromRepoToService dtoFromRepoToService = new MovieSearchWithTitleDTOFromRepoToService(1, mockMovies);
@@ -199,7 +199,7 @@ class MovieServiceUnitTests {
 
         // Since we use @Mock on the converter, All methods on this mock return default values (e.g., null, 0, empty collections)
         // unless explicitly stubbed (i.e., told to return specific values). Therefore, we stub the behavior below for the converter
-        when(converter.convert(any(MovieTitleSearchQueryResultDTO.class)))
+        when(converter.convert(any(MovieTitleSearchSQLQueryResultDTO.class)))
                 .thenReturn(new MovieSearchResponseDTO("1", "Inception", "2010", "path/to/poster", 9.0, "overview"));
 
 
@@ -232,7 +232,7 @@ class MovieServiceUnitTests {
 
     @Test
     void searchMovieWithNoResult() {
-        List<MovieTitleSearchQueryResultDTO> mockMovies = List.of();
+        List<MovieTitleSearchSQLQueryResultDTO> mockMovies = List.of();
         MovieSearchWithTitleDTOFromRepoToService dtoFromRepoToService = new MovieSearchWithTitleDTOFromRepoToService(0, mockMovies);
 
         // Mock the repository call

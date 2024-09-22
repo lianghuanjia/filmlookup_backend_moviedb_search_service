@@ -3,7 +3,7 @@ package com.example.movie_service.moviesearch.unit.repository;
 
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.dto.CrewMember;
-import com.example.movie_service.dto.MovieTitleSearchQueryResultDTO;
+import com.example.movie_service.dto.MovieTitleSearchSQLQueryResultDTO;
 import com.example.movie_service.dto.MovieSearchWithTitleDTOFromRepoToService;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.repository.CustomMovieRepositoryImpl;
@@ -89,8 +89,8 @@ class CustomRepositoryImplUnitTests {
                 .thenReturn(totalItemsLong);
 
         // Mock the behavior
-        List<MovieTitleSearchQueryResultDTO> movieList = new ArrayList<>();
-        MovieTitleSearchQueryResultDTO resultDTO = new MovieTitleSearchQueryResultDTO(MOVIE_ID, title, releasedYear, director,
+        List<MovieTitleSearchSQLQueryResultDTO> movieList = new ArrayList<>();
+        MovieTitleSearchSQLQueryResultDTO resultDTO = new MovieTitleSearchSQLQueryResultDTO(MOVIE_ID, title, releasedYear, director,
                 BACKDROP_PATH, POSTER_PATH, rating, OVERVIEW);
         movieList.add(resultDTO);
 
@@ -130,8 +130,8 @@ class CustomRepositoryImplUnitTests {
                 .thenReturn(totalItemsLong);
 
         // Mock the behavior
-        List<MovieTitleSearchQueryResultDTO> movieList = new ArrayList<>();
-        MovieTitleSearchQueryResultDTO resultDTO = new MovieTitleSearchQueryResultDTO(MOVIE_ID, title, releasedYear, director,
+        List<MovieTitleSearchSQLQueryResultDTO> movieList = new ArrayList<>();
+        MovieTitleSearchSQLQueryResultDTO resultDTO = new MovieTitleSearchSQLQueryResultDTO(MOVIE_ID, title, releasedYear, director,
                 BACKDROP_PATH, POSTER_PATH, rating, OVERVIEW);
         movieList.add(resultDTO);
 
@@ -169,8 +169,8 @@ class CustomRepositoryImplUnitTests {
                 .thenReturn(totalItemsLong);
 
         // Mock the behavior for the query that search movies
-        List<MovieTitleSearchQueryResultDTO> movieList = new ArrayList<>();
-        MovieTitleSearchQueryResultDTO resultDTO = new MovieTitleSearchQueryResultDTO(MOVIE_ID, title, releasedYear, director,
+        List<MovieTitleSearchSQLQueryResultDTO> movieList = new ArrayList<>();
+        MovieTitleSearchSQLQueryResultDTO resultDTO = new MovieTitleSearchSQLQueryResultDTO(MOVIE_ID, title, releasedYear, director,
                 BACKDROP_PATH, POSTER_PATH, rating, OVERVIEW);
         movieList.add(resultDTO);
 
@@ -209,8 +209,8 @@ class CustomRepositoryImplUnitTests {
                 .thenReturn(totalItemsLong);
 
         // Mock the behavior for the query that search movies
-        List<MovieTitleSearchQueryResultDTO> movieList = new ArrayList<>();
-        MovieTitleSearchQueryResultDTO resultDTO = new MovieTitleSearchQueryResultDTO(MOVIE_ID, title, releasedYear, director,
+        List<MovieTitleSearchSQLQueryResultDTO> movieList = new ArrayList<>();
+        MovieTitleSearchSQLQueryResultDTO resultDTO = new MovieTitleSearchSQLQueryResultDTO(MOVIE_ID, title, releasedYear, director,
                 BACKDROP_PATH, POSTER_PATH, rating, OVERVIEW);
         movieList.add(resultDTO);
 
@@ -250,8 +250,8 @@ class CustomRepositoryImplUnitTests {
                 .thenReturn(totalItemsLong);
 
         // Mock the behavior for the query that search movies
-        List<MovieTitleSearchQueryResultDTO> movieList = new ArrayList<>();
-        MovieTitleSearchQueryResultDTO resultDTO = new MovieTitleSearchQueryResultDTO(MOVIE_ID, title, releasedYear, director,
+        List<MovieTitleSearchSQLQueryResultDTO> movieList = new ArrayList<>();
+        MovieTitleSearchSQLQueryResultDTO resultDTO = new MovieTitleSearchSQLQueryResultDTO(MOVIE_ID, title, releasedYear, director,
                 BACKDROP_PATH, POSTER_PATH, rating, OVERVIEW);
         movieList.add(resultDTO);
 
@@ -284,8 +284,8 @@ class CustomRepositoryImplUnitTests {
                 .build();
 
         // Mock the behavior of query that get movies and their information
-        List<MovieTitleSearchQueryResultDTO> movieList = new ArrayList<>();
-        MovieTitleSearchQueryResultDTO resultDTO = new MovieTitleSearchQueryResultDTO(MOVIE_ID, title, releasedYear, director,
+        List<MovieTitleSearchSQLQueryResultDTO> movieList = new ArrayList<>();
+        MovieTitleSearchSQLQueryResultDTO resultDTO = new MovieTitleSearchSQLQueryResultDTO(MOVIE_ID, title, releasedYear, director,
                 BACKDROP_PATH, POSTER_PATH, rating, OVERVIEW);
         movieList.add(resultDTO);
 

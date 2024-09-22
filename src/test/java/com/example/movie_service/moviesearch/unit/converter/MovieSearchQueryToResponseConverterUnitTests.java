@@ -1,7 +1,7 @@
 package com.example.movie_service.moviesearch.unit.converter;
 
 import com.example.movie_service.converter.MovieSearchQueryToResponseConverter;
-import com.example.movie_service.dto.MovieSearchQueryDTO;
+import com.example.movie_service.dto.MovieTitleSearchSQLQueryResultDTO;
 import com.example.movie_service.dto.MovieSearchResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ class MovieSearchQueryToResponseConverterUnitTests {
     @Test
     void testConvertWithAllFields() {
         // Given
-        MovieSearchQueryDTO queryDTO = new MovieSearchQueryDTO(id, title, releaseTime, director, backdropPath, posterPath, rating, overview);
+        MovieTitleSearchSQLQueryResultDTO queryDTO = new MovieTitleSearchSQLQueryResultDTO(id, title, releaseTime, director, backdropPath, posterPath, rating, overview);
 
         // When
         MovieSearchResponseDTO responseDTO = converter.convert(queryDTO);
@@ -49,7 +49,7 @@ class MovieSearchQueryToResponseConverterUnitTests {
     @Test
     void testConvertWithNullPosterPath() {
         // Given
-        MovieSearchQueryDTO queryDTO = new MovieSearchQueryDTO(id, title, releaseTime, director, backdropPath, null, rating, overview);
+        MovieTitleSearchSQLQueryResultDTO queryDTO = new MovieTitleSearchSQLQueryResultDTO(id, title, releaseTime, director, backdropPath, null, rating, overview);
 
         // When
         MovieSearchResponseDTO responseDTO = converter.convert(queryDTO);
@@ -66,7 +66,7 @@ class MovieSearchQueryToResponseConverterUnitTests {
     @Test
     void testConvertWithNullRating() {
         // Given
-        MovieSearchQueryDTO queryDTO = new MovieSearchQueryDTO(id, title, releaseTime, director, backdropPath, posterPath, null, overview);
+        MovieTitleSearchSQLQueryResultDTO queryDTO = new MovieTitleSearchSQLQueryResultDTO(id, title, releaseTime, director, backdropPath, posterPath, null, overview);
 
         // When
         MovieSearchResponseDTO responseDTO = converter.convert(queryDTO);
@@ -83,7 +83,7 @@ class MovieSearchQueryToResponseConverterUnitTests {
     @Test
     void testConvertWithAllNullFields() {
         // Given
-        MovieSearchQueryDTO queryDTO = new MovieSearchQueryDTO(null, null, null, null, null, null, null, null);
+        MovieTitleSearchSQLQueryResultDTO queryDTO = new MovieTitleSearchSQLQueryResultDTO(null, null, null, null, null, null, null, null);
 
         // When
         MovieSearchResponseDTO responseDTO = converter.convert(queryDTO);
