@@ -2,7 +2,7 @@ package com.example.movie_service.service;
 
 import com.example.movie_service.builder.MovieSearchParam;
 import com.example.movie_service.converter.MovieSearchQueryToResponseConverter;
-import com.example.movie_service.dto.MovieSearchQueryDTO;
+import com.example.movie_service.dto.MovieTitleSearchSQLQueryResultDTO;
 import com.example.movie_service.dto.MovieSearchResponseDTO;
 import com.example.movie_service.dto.MovieSearchResultWithPaginationDTO;
 import com.example.movie_service.dto.MovieSearchWithTitleDTOFromRepoToService;
@@ -75,7 +75,7 @@ public class MovieServiceImpl implements MovieService {
         // If the query times out, it's possible there will be QueryTimeoutException or PersistenceException
         MovieSearchWithTitleDTOFromRepoToService queryDTO = movieRepository.searchMovies(movieSearchParam);
 
-        List<MovieSearchQueryDTO> queryResults = queryDTO.getMovies();
+        List<MovieTitleSearchSQLQueryResultDTO> queryResults = queryDTO.getMovies();
 
         int totalItems = queryDTO.getTotalItem();
 
@@ -89,7 +89,7 @@ public class MovieServiceImpl implements MovieService {
                 .toList();
 
         int itemsPerPage = movieSearchParam.getLimit();
-        int currentPage = pageNumberFromFrontend; // Page index starts from 0, not 1
+        int currentPage = pageNumberFromFrontend; // Page index starts from 1
         int totalPages = (int) Math.ceil((double)totalItems / itemsPerPage);
 
         MovieSearchResultWithPaginationDTO resultWithPaginationDTO = new MovieSearchResultWithPaginationDTO();
@@ -98,8 +98,8 @@ public class MovieServiceImpl implements MovieService {
         resultWithPaginationDTO.setCurrentPage(currentPage);
         resultWithPaginationDTO.setItemsPerPage(itemsPerPage);
         resultWithPaginationDTO.setTotalPages(totalPages);
-        resultWithPaginationDTO.setHasNextPage(currentPage < totalPages-1);
-        resultWithPaginationDTO.setHasPrevPage(currentPage > 0);
+        resultWithPaginationDTO.setHasNextPage(currentPage < totalPages); // e.g. totalPages = 10. if currentPage < 10, then it can go to next page. If it's >= 10, it can't go to next page
+        resultWithPaginationDTO.setHasPrevPage(currentPage > 1); // page starts from 1. If current page > 1, it has previous page to go, if it's <= 1, it's the first page and doesn't have previous page
 
         // If no movie is found, return a custom response with movie not found code and message inside, with the empty
         // movieList. Before I put null in the data. This is not good because it might cause NullPointerExceptions. It
