@@ -62,7 +62,7 @@ public final class MovieConstant {
     public static final String MOVIE_NOT_FOUND_WITH_PERSON_ID_MESSAGE = "No movies found with the given personId";
 
     // SQL REQUEST DTO MAPPING
-    public static final String MOVIE_SEARCH_RESULT_DTO_MAPPING = "MovieSearchResultDTOMapping";
+    public static final String MOVIE_TITLE_SEARCH_QUERY_RESULT_DTO_MAPPING = "MovieSearchResultDTOMapping";
     public static final String SINGLE_MOVIE_BASIC_DETAILS_DTO_MAPPING = "SingleMovieBasicDetailsDTOMapping";
     public static final String SINGLE_MOVIE_CREW_MEMBER_DTO_MAPPING = "SingleMovieCrewMemberDTOMapping";
 

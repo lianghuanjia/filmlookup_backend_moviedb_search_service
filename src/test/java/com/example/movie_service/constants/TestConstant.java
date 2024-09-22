@@ -4,7 +4,9 @@ public class TestConstant {
     // Test container's MySQL version
     public static final String SQL_VERSION = "mysql:8.0.39";
 
-    public static final String EXISTED_MOVIE_TITLE = "Knight";
+    public static final String EXISTED_MOVIE_TITLE_LOWER_CASE = "movie";
+    public static final String EXISTED_MOVIE_TITLE_CAPITALIZED = "Movie";
+    public static final String EXISTED_MOVIE_TITLE_UPPER_CASE = "MOVIE";
     public static final String NON_EXISTED_MOVIE_TITLE = "Miss Jerry";
     public static final String MOVIE_TITLE_FOR_RETURN_RESULTS_NOT_INCLUDING_POSTER_PATH = "poster_path_testing_title";
     public static final String ORDER_BY_TITLE = "title";
@@ -54,7 +56,7 @@ public class TestConstant {
     // Movie releaseTime
     public static final String MOVIE_1_RELEASE_TIME = "2023-10-08";
     public static final String MOVIE_2_RELEASE_TIME = "2023-09-08";
-    public static final String MOVIE_3_RELEASE_TIME = "2023-08-08";
+    public static final String MOVIE_3_RELEASE_TIME = "2023-09-08";
     public static final String MOVIE_4_RELEASE_TIME = "2023-07-08";
     public static final String MOVIE_5_RELEASE_TIME = "2023";
     public static final String MOVIE_6_RELEASE_TIME = "2022-01-08";
@@ -97,7 +99,7 @@ public class TestConstant {
     // Ratings
     public static final Double MOVIE_1_RATING = 0.1;
     public static final Double MOVIE_2_RATING = 0.2;
-    public static final Double MOVIE_3_RATING = 0.3;
+    public static final Double MOVIE_3_RATING = 0.2;
     public static final Double MOVIE_4_RATING = 0.4;
     public static final Double MOVIE_5_RATING = 0.5;
     public static final Double MOVIE_6_RATING = 0.6;
@@ -112,4 +114,24 @@ public class TestConstant {
     // Number of votes
     public static final Integer NUM_OF_VOTES_10 = 10;
     public static final Integer NUM_OF_VOTES_15 = 15;
+
+    public static final String MOVIE_MATERIALIZED_VIEW_QUERY_STRING = "CREATE TABLE movie_materialized_view AS "
+            + "SELECT m.movie_id AS movie_id, "
+            + "m.primaryTitle AS primaryTitle, "
+            + "m.releaseTime AS releaseTime, "
+            + "GROUP_CONCAT(DISTINCT p.name ORDER BY p.name SEPARATOR ', ') AS directors, "
+            + "m.backdrop_path AS backdrop_path, "
+            + "m.poster_path AS poster_path, "
+            + "mr.averageRating AS averageRating, "
+            + "m.overview AS overview, "
+            + "GROUP_CONCAT(DISTINCT g.name ORDER BY g.name SEPARATOR ', ') AS genres "
+            + "FROM movie m "
+            + "LEFT JOIN movie_crew mc ON m.movie_id = mc.movie_id "
+            + "LEFT JOIN person p ON mc.person_id = p.person_id AND mc.job = 'director' "
+            + "LEFT JOIN movie_genres mg ON m.movie_id = mg.movie_id "
+            + "LEFT JOIN genre g ON mg.genre_id = g.id "
+            + "LEFT JOIN movie_rating mr ON m.movie_id = mr.movie_id "
+            + "GROUP BY m.movie_id, m.primaryTitle, m.releaseTime, m.backdrop_path, m.poster_path, mr.averageRating, m.overview;";
+
+    public static final String DROP_MOVIE_MATERIALIZED_VIEW_QUERY_STRING = "DROP TABLE IF EXISTS movie_materialized_view;";
 }
