@@ -46,28 +46,16 @@ public class DataInitializerService {
         entityManager.createQuery("DELETE FROM Movie").executeUpdate();
         entityManager.createQuery("DELETE FROM Person").executeUpdate();
         entityManager.createQuery("DELETE FROM Genre").executeUpdate();
+        entityManager.createNativeQuery(DROP_MOVIE_MATERIALIZED_VIEW_QUERY_STRING).executeUpdate();
         entityManager.flush();
     }
 
-    @Transactional
-    public void generateTwoMoviesWithAndWithoutPosterPath(){
-        Movie movie1 = new Movie();
-        movie1.setTitle(MOVIE_TITLE_FOR_RETURN_RESULTS_NOT_INCLUDING_POSTER_PATH);
-        movie1.setBackdropPath(BACKDROP_PATH);
-        entityManager.persist(movie1);
-
-        Movie movie2 = new Movie();
-        movie2.setTitle(MOVIE_TITLE_FOR_RETURN_RESULTS_NOT_INCLUDING_POSTER_PATH);
-        movie2.setBackdropPath(BACKDROP_PATH);
-        movie2.setPosterPath(POSTER_PATH);
-        entityManager.persist(movie2);
-    }
 
     @Transactional()
     public void insertMovieData() {
         List<String> action_list = List.of(ACTION_GENRE);
         List<String> action_crime_list = List.of(ACTION_GENRE, CRIME_GENRE);
-        initializeOneMovieData(MOVIE_1_TITLE, MOVIE_1_RELEASE_TIME, action_list, DIRECTOR_1, MOVIE_1_RATING, NUM_OF_VOTES_10, POSTER_PATH);
+        Movie movie1 = initializeOneMovieData(MOVIE_1_TITLE, MOVIE_1_RELEASE_TIME, action_list, DIRECTOR_1, MOVIE_1_RATING, NUM_OF_VOTES_10, POSTER_PATH);
         initializeOneMovieData(MOVIE_2_TITLE, MOVIE_2_RELEASE_TIME, action_list, DIRECTOR_1, MOVIE_2_RATING, NUM_OF_VOTES_15, POSTER_PATH);
         initializeOneMovieData(MOVIE_3_TITLE, MOVIE_3_RELEASE_TIME, action_list, DIRECTOR_1, MOVIE_3_RATING, NUM_OF_VOTES_10, POSTER_PATH);
         initializeOneMovieData(MOVIE_4_TITLE, MOVIE_4_RELEASE_TIME, action_list, DIRECTOR_2, MOVIE_4_RATING, NUM_OF_VOTES_10, POSTER_PATH);
@@ -79,133 +67,31 @@ public class DataInitializerService {
         initializeOneMovieData(MOVIE_10_TITLE, MOVIE_10_RELEASE_TIME, action_crime_list, DIRECTOR_3, MOVIE_10_RATING, NUM_OF_VOTES_10, POSTER_PATH);
         initializeOneMovieData(MOVIE_11_TITLE, MOVIE_11_RELEASE_TIME, action_crime_list, DIRECTOR_3, MOVIE_11_RATING, NUM_OF_VOTES_10, POSTER_PATH);
         initializeOneMovieData(MOVIE_12_TITLE, MOVIE_12_RELEASE_TIME, action_crime_list, DIRECTOR_4, MOVIE_12_RATING, NUM_OF_VOTES_10, POSTER_PATH);
-        initializeOneMovieData(MOVIE_13_TITLE, MOVIE_13_RELEASE_TIME, action_crime_list, DIRECTOR_4, MOVIE_13_RATING, NUM_OF_VOTES_10, POSTER_PATH);
-    }
-
-    @Transactional()
-    public void initializeData() {
-        // Set up a Genre
-        Genre genre = new Genre();
-//        genre.setId(1); Do not set an ID before you save/persist it. That's the only problem here. Hibernate looks at
-//        the Entity you've passed in and assumes that because it has its PK populated that it is already in the database.
-        genre.setName(ACTION_GENRE);
-        entityManager.persist(genre);
-
-        // Set up a director Person
-        Person director = new Person();
-        director.setName(DIRECTOR_NOLAN);
-        director.setProfilePath(DIRECTOR_NOLAN_PROFILE_PATH);
-        entityManager.persist(director);
-
-        // Set up a Movie 1
-        Movie movie1 = new Movie();
-        movie1.setTitle(THE_DARK_KNIGHT);
-        movie1.setReleaseTime(THE_DARK_KNIGHT_RELEASE_TIME);
-        movie1.setOverview(THE_DARK_KNIGHT_OVERVIEW);
-        movie1.setBackdropPath(BACKDROP_PATH);
-        movie1.setPosterPath(POSTER_PATH);
-        entityManager.persist(movie1);
-
-        // Set up a Movie 2
-        Movie movie2 = new Movie();
-        movie2.setTitle(THE_DARK_KNIGHT_RISES);
-        movie2.setReleaseTime(THE_DARK_KNIGHT_RISES_RELEASE_TIME);
-        movie2.setBackdropPath(BACKDROP_PATH);
-        movie2.setPosterPath(POSTER_PATH);
-        entityManager.persist(movie2);
-
-        // Add the genre to the movie
-        Set<Genre> genres = new HashSet<>();
-        genres.add(genre);
-        movie1.setGenres(genres);
-        movie2.setGenres(genres);
-        entityManager.persist(movie1);
-        entityManager.persist(movie2);
-
-        // Set up MovieCrew
-        MovieCrew movieCrew1 = new MovieCrew(movie1, director, DIRECTOR_ROLE);
-        entityManager.persist(movieCrew1);
-        MovieCrew movieCrew2 = new MovieCrew(movie2, director, DIRECTOR_ROLE);
-        entityManager.persist(movieCrew2);
-
-        // Set up a Movie 3
-        Movie movie3 = new Movie();
-        movie3.setTitle(THE_DARK_KNIGHT_RISES_AGAIN);
-        movie3.setReleaseTime(THE_DARK_KNIGHT_RISES_AGAIN_RELEASE_TIME);
-        movie3.setBackdropPath(BACKDROP_PATH);
-        movie3.setPosterPath(POSTER_PATH);
-        entityManager.persist(movie3);
-
-        // Set up Movie 3 genre, director, and movie crew
-        Genre genre2 = new Genre();
-        genre2.setName("Love");
-        entityManager.persist(genre2);
-        Set<Genre> genreSet2 = new HashSet<>();
-        genreSet2.add(genre2);
-        movie3.setGenres(genreSet2);
-        entityManager.persist(movie3);
-
-        Person director2 = new Person();
-        director2.setName("Third director");
-        entityManager.persist(director2);
-
-        MovieCrew movieCrew3 = new MovieCrew(movie3, director2, "director");
-        entityManager.persist(movieCrew3);
-
-        // Set up Movie 4, which only contains title.
-        Movie movie4 = new Movie();
-        movie4.setTitle(MOVIE_WITH_TITLE_ONLY);
-        movie4.setBackdropPath(BACKDROP_PATH);
-        movie4.setPosterPath(POSTER_PATH);
-        entityManager.persist(movie4);
-
-        // Set up each movie1's rating
-        MovieRating movieRating1 = new MovieRating();
-        movieRating1.setMovie(movie1);
-        movieRating1.setAverageRating(9.5);
-        movieRating1.setNumVotes(10);
-        entityManager.persist(movieRating1);
-
-        // Set up each movie2's rating
-        MovieRating movieRating2 = new MovieRating();
-        movieRating2.setMovie(movie2);
-        movieRating2.setAverageRating(9.0);
-        movieRating2.setNumVotes(10);
-        entityManager.persist(movieRating2);
-
-        // Set up each movie3's rating
-        MovieRating movieRating3 = new MovieRating();
-        movieRating3.setMovie(movie3);
-        movieRating3.setAverageRating(8.5);
-        movieRating3.setNumVotes(10);
-        entityManager.persist(movieRating3);
-
-        // Add more crew member to movie 1
-        // 1 actor
-        Person actor = new Person();
-        actor.setName(ACTOR_1_NAME);
-        actor.setProfilePath(ACTOR_1_PROFILE_PATH);
-        entityManager.persist(actor);
-        MovieCrew movieCrew4 = new MovieCrew(movie1, actor, ACTOR);
-        entityManager.persist(movieCrew4);
-        // actress
-        Person actress = new Person();
-        actress.setName(ACTRESS_1_NAME);
-        actress.setProfilePath(ACTRESS_1_PROFILE_PATH);
-        entityManager.persist(actress);
-        MovieCrew movie1CrewActress = new MovieCrew(movie1, actress, ACTRESS);
-        entityManager.persist(movie1CrewActress);
-        // 1 composer
-        Person composer = new Person();
-        composer.setName(COMPOSER_1_NAME);
-        composer.setProfilePath(COMPOSER_1_PROFILE_PATH);
-        entityManager.persist(composer);
-        MovieCrew movie1CrewComposer = new MovieCrew(movie1, composer, COMPOSER);
-        entityManager.persist(movie1CrewComposer);
+        initializeOneMovieData(MOVIE_13_TITLE, MOVIE_13_RELEASE_TIME, action_crime_list, DIRECTOR_4, MOVIE_13_RATING, NUM_OF_VOTES_10, null);
+        // Add 3 crew members to movie 1
+        addCrewMemberToMovie(movie1, ACTOR_1_NAME, ACTOR_1_PROFILE_PATH, ACTOR);
+        addCrewMemberToMovie(movie1, ACTRESS_1_NAME, ACTRESS_1_PROFILE_PATH, ACTRESS);
+        addCrewMemberToMovie(movie1, COMPOSER_1_NAME, COMPOSER_1_PROFILE_PATH, COMPOSER);
     }
 
     @Transactional
-    public void initializeOneMovieData(String title, String releaseTime, List<String> genreNames, String directorName,
+    public void createMovieMaterializedViewTable() {
+        entityManager.createNativeQuery(MOVIE_MATERIALIZED_VIEW_QUERY_STRING).executeUpdate();
+    }
+
+
+    @Transactional
+    public void addCrewMemberToMovie(Movie movie, String crewName, String crewProfilePath, String jobTitle) {
+        Person crewMember = new Person();
+        crewMember.setName(crewName);
+        crewMember.setProfilePath(crewProfilePath);
+        entityManager.persist(crewMember);
+        MovieCrew movieCrew = new MovieCrew(movie, crewMember, jobTitle);
+        entityManager.persist(movieCrew);
+    }
+
+    @Transactional
+    public Movie initializeOneMovieData(String title, String releaseTime, List<String> genreNames, String directorName,
                                        Double averageRating, Integer numOfVotes, String posterPath) {
         // Set up genres
         // For each genre name, initialize a Genre, and add it to a Genre set
@@ -226,6 +112,8 @@ public class DataInitializerService {
 
         // Set up rating
         createAndPersistMovieRating(movie, averageRating, numOfVotes);
+
+        return movie;
     }
 
     private void createAndPersistMovieCrew(Movie movie, Person director) {
