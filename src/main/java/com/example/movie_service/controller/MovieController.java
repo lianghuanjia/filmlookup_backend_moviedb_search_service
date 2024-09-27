@@ -1,7 +1,7 @@
 package com.example.movie_service.controller;
 
 import com.example.movie_service.builder.MovieSearchParam;
-import com.example.movie_service.dto.MovieSearchResponseDTO;
+import lombok.extern.slf4j.Slf4j;
 import com.example.movie_service.dto.MovieSearchResultWithPaginationDTO;
 import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.response.CustomResponse;
@@ -17,12 +17,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
-import java.util.List;
-
 /**
  * Controller layer of the movie_service application
  */
 @Validated
+@Slf4j
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/v1/api")
@@ -61,6 +60,9 @@ public class MovieController {
             @RequestParam(required = false, defaultValue = "title") String orderBy,
             @RequestParam(required = false, defaultValue = "asc") String direction) {
 
+        log.info("Searching movies with title: {}, releasedYear: {}, director: {}, genre: {}, limit: {}, page: {}, orderBy: {}, direction: {}",
+                title, releasedYear, director, genre, limit, page, orderBy, direction);
+
         // Build the MovieSearchRequestParam using the builder pattern
         MovieSearchParam movieSearchRequestParam = MovieSearchParam.builder()
                 .title(title)
@@ -80,6 +82,9 @@ public class MovieController {
 
     @GetMapping("movies/{movie_id}")
     public ResponseEntity<CustomResponse<OneMovieDetailsDTO>> searchMovieByMovieId(@PathVariable("movie_id") String movieId){
+
+        log.info("Searching movie with ID: {}", movieId);
+
         return movieService.searchOneMovieDetails(movieId);
     }
 
