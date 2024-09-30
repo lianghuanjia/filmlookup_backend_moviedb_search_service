@@ -43,29 +43,35 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
      */
     @Override
     public MovieSearchWithTitleDTOFromRepoToService searchMovies(MovieSearchParam movieSearchParam) {
+        String titleCondition = " MATCH(m.primaryTitle) AGAINST(:title IN BOOLEAN MODE) ";
+        String titleValue = "\"" + movieSearchParam.getTitle() + "\"";
         // For counting the total rows for pagination
-        String countTotalRowsQueryString = buildCountQueryString(movieSearchParam.getReleasedYear(), movieSearchParam.getDirector(), movieSearchParam.getGenre());
+        String countTotalRowsQueryString = buildCountQueryString(movieSearchParam.getReleasedYear(), movieSearchParam.getDirector(), movieSearchParam.getGenre(), titleCondition);
 
         Query countTotalRowsQuery = entityManager.createNativeQuery(countTotalRowsQueryString);
 
-        setQueryParametersForCount(countTotalRowsQuery, movieSearchParam.getTitle(),
-                movieSearchParam.getReleasedYear(),
-                movieSearchParam.getDirector(),
-                movieSearchParam.getGenre());
+        setQueryParametersForCount(countTotalRowsQuery, titleValue, movieSearchParam.getReleasedYear(),
+                movieSearchParam.getDirector(), movieSearchParam.getGenre());
 
         int totalItems = ((Long)countTotalRowsQuery.getSingleResult()).intValue();
 
-        // For getting the movie(s) information
+        if (totalItems == 0) {
+            titleCondition = " m.primaryTitle LIKE :title "; //
+            titleValue = "%" + movieSearchParam.getTitle() + "%";
+            countTotalRowsQueryString = buildCountQueryString(movieSearchParam.getReleasedYear(), movieSearchParam.getDirector(), movieSearchParam.getGenre(), titleCondition);
+            countTotalRowsQuery = entityManager.createNativeQuery(countTotalRowsQueryString);
+            setQueryParametersForCount(countTotalRowsQuery, titleValue, movieSearchParam.getReleasedYear(),
+                    movieSearchParam.getDirector(), movieSearchParam.getGenre());
+            totalItems = ((Long)countTotalRowsQuery.getSingleResult()).intValue();
+        }
 
-        // Build string query with optional parameters
+        // Get the movie(s) information
         String sqlQuery = buildQueryStringToSearchMovieWithTitleAndOtherFields(movieSearchParam.getReleasedYear(), movieSearchParam.getDirector(),
-                movieSearchParam.getGenre(), movieSearchParam.getOrderBy(), movieSearchParam.getDirection());
+                movieSearchParam.getGenre(), movieSearchParam.getOrderBy(), movieSearchParam.getDirection(), titleCondition);
 
-        // Create bare-bones native SQL Query
         Query query = entityManager.createNativeQuery(sqlQuery, MOVIE_TITLE_SEARCH_QUERY_RESULT_DTO_MAPPING);
 
-        // Set the query's parameters based on the function's parameters
-        setQueryParameters(query, movieSearchParam.getTitle(), movieSearchParam.getReleasedYear(),
+        setQueryParameters(query, titleValue, movieSearchParam.getReleasedYear(),
                 movieSearchParam.getDirector(), movieSearchParam.getGenre(), movieSearchParam.getLimit(),
                 movieSearchParam.getPage());
 
@@ -228,7 +234,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
      * @return A query string
      */
     private String buildQueryStringToSearchMovieWithTitleAndOtherFields(String releasedYear, String director, String genre
-            , String orderBy, String direction) {
+            , String orderBy, String direction, String titleCondition) {
         StringBuilder queryBuilder = new StringBuilder(
                 "SELECT m.movie_id AS id, " +
                         "m.primaryTitle AS title, " +
@@ -239,14 +245,16 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
                         "m.averageRating AS rating, " +
                         "m.overview AS overview " +
                         "FROM movie_materialized_view m " +
-                        "WHERE m.poster_path IS NOT NULL AND m.primaryTitle LIKE :title ");
+                        "WHERE m.poster_path IS NOT NULL " +
+                        "AND " +
+                        titleCondition );
 
 
         appendConditionIfNotEmpty(releasedYear, ADD_MOVIE_RELEASE_TIME_FIELD_IN_QUERY_STRING, queryBuilder);
         appendConditionIfNotEmpty(director, ADD_DIRECTOR_FIELD_IN_QUERY_STRING, queryBuilder);
         appendConditionIfNotEmpty(genre, ADD_GENRE_FIELD_IN_QUERY_STRING, queryBuilder);
 
-        queryBuilder.append("ORDER BY ");
+        queryBuilder.append(" ORDER BY ");
 
         // Logic to ensure NULLs are at the end for both ASC and DESC
         queryBuilder.append(orderBy)
@@ -260,9 +268,13 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         return queryBuilder.toString();
     }
 
-    private String buildCountQueryString(String releasedYear, String director, String genre) {
+
+
+    private String buildCountQueryString(String releasedYear, String director, String genre, String titleCondition) {
         StringBuilder queryBuilder = new StringBuilder(
-                "SELECT COUNT(DISTINCT movie_id) FROM movie_materialized_view m WHERE m.poster_path IS NOT NULL AND m.primaryTitle LIKE :title ");
+                "SELECT COUNT(DISTINCT movie_id) FROM movie_materialized_view m WHERE m.poster_path IS NOT NULL " +
+                        "AND " +
+                        titleCondition);
 
 
 
@@ -291,7 +303,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
      * Sets the parameters for a database query based on the provided input criteria.
      *
      * @param query        The query object to set parameters on.
-     * @param title        The title of the movie to search for. Wildcards (%) are added for partial matching
+     * @param titleValue   The string value for the title. It either uses fulltext or Wildcards (%)
      * @param releasedYear The released year of the movie. Wildcards (%) are added for partial matching. Can be null.
      * @param director     The director of the movie. Wildcards (%) are added for partial matching. Can be null.
      * @param genre        The genre of the movie. Wildcards (%) are added for partial matching. Can be null.
@@ -300,8 +312,8 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
      *                     <p>
      *                     Assumes that the query object is a valid and non-null instance of a query with named parameters.
      */
-    private void setQueryParameters(Query query, String title, String releasedYear, String director, String genre, int limit, int page) {
-        query.setParameter("title", "%" + title + "%");
+    private void setQueryParameters(Query query, String titleValue, String releasedYear, String director, String genre, int limit, int page) {
+        query.setParameter("title", titleValue);
         query.setParameter("limit", limit);
         query.setParameter("offset", page * limit);
 
@@ -310,8 +322,8 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         setQueryParameterIfNotEmpty(query, genre, "genre", "%" + genre + "%");
     }
 
-    private void setQueryParametersForCount(Query countTotalRowsQuery, String title, String releasedYear, String director, String genre) {
-        countTotalRowsQuery.setParameter("title", "%" + title + "%");
+    private void setQueryParametersForCount(Query countTotalRowsQuery, String titleValue, String releasedYear, String director, String genre) {
+        countTotalRowsQuery.setParameter("title", titleValue);
         setQueryParameterIfNotEmpty(countTotalRowsQuery, releasedYear, "releasedYear", releasedYear + "%");
         setQueryParameterIfNotEmpty(countTotalRowsQuery, director, "director", "%" + director + "%");
         setQueryParameterIfNotEmpty(countTotalRowsQuery, genre, "genre", "%" + genre + "%");
