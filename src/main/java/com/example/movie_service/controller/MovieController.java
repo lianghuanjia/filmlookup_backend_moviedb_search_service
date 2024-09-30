@@ -35,6 +35,12 @@ public class MovieController {
         this.movieService = movieService;
     }
 
+    @GetMapping("/health")
+    public ResponseEntity<String> healthCheck() {
+        log.info("Health check received");
+        return ResponseEntity.ok("Healthy");
+    }
+
     /**
      * Handles GET requests for searching movies
      *
