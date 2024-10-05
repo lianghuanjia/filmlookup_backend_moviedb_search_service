@@ -1,7 +1,12 @@
 package com.example.movie_service.service;
 
 import com.example.movie_service.builder.MovieSearchParam;
-import com.example.movie_service.dto.MovieSearchResultDTO;
+import com.example.movie_service.converter.MovieSearchQueryToResponseConverter;
+import com.example.movie_service.dto.MovieTitleSearchSQLQueryResultDTO;
+import com.example.movie_service.dto.MovieSearchResponseDTO;
+import com.example.movie_service.dto.MovieSearchResultWithPaginationDTO;
+import com.example.movie_service.dto.MovieSearchWithTitleDTOFromRepoToService;
+import com.example.movie_service.dto.OneMovieDetailsDTO;
 import com.example.movie_service.exception.ValidationException;
 import com.example.movie_service.repository.CustomMovieRepository;
 import com.example.movie_service.response.CustomResponse;
@@ -12,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.example.movie_service.constant.MovieConstant.*;
 
@@ -23,6 +29,7 @@ public class MovieServiceImpl implements MovieService {
 
     private final CustomMovieRepository movieRepository;
     private final ValidationService validationService;
+    private final MovieSearchQueryToResponseConverter converter;
 
 
     /**
@@ -31,10 +38,11 @@ public class MovieServiceImpl implements MovieService {
      * @param movieRepository the repository for accessing movie data
      */
     @Autowired
-    public MovieServiceImpl(CustomMovieRepository movieRepository,
-                            ValidationService validationService) {
+    public MovieServiceImpl(CustomMovieRepository movieRepository, ValidationService validationService,
+                            MovieSearchQueryToResponseConverter converter) {
         this.movieRepository = movieRepository;
         this.validationService = validationService;
+        this.converter = converter;
     }
 
     /**
@@ -43,37 +51,88 @@ public class MovieServiceImpl implements MovieService {
      * @return a list of movies that match the search criteria
      */
     @Override
-    public ResponseEntity<CustomResponse<List<MovieSearchResultDTO>>> searchMovies(MovieSearchParam movieSearchParam)
+    public ResponseEntity<CustomResponse<MovieSearchResultWithPaginationDTO>> searchMovies(MovieSearchParam movieSearchParam)
             throws PersistenceException, ValidationException {
 
         String title = movieSearchParam.getTitle();
         String releasedYear = movieSearchParam.getReleasedYear();
         Integer limit = movieSearchParam.getLimit();
-        Integer page = movieSearchParam.getPage();
+        Integer pageNumberFromFrontend = movieSearchParam.getPage();
+
+        // Convert the page in movieSearchParam to zero index because its OFFSET, and in SQL OFFSET is 0-indexed
+        movieSearchParam.setPage(movieSearchParam.getPage()-1);
+
+        Integer zeroIndexPage = movieSearchParam.getPage();
         String orderBy = movieSearchParam.getOrderBy();
         String direction = movieSearchParam.getDirection();
 
         // Validate parameters:
-        validateSearchMoviesParameters(title, releasedYear, limit, page, orderBy, direction);
+        validateSearchMoviesParameters(title, releasedYear, limit, zeroIndexPage, orderBy, direction);
+
+
 
         // Get search results from repository layer
         // If the query times out, it's possible there will be QueryTimeoutException or PersistenceException
-        List<MovieSearchResultDTO> movieList = movieRepository.searchMovies(movieSearchParam);
+        MovieSearchWithTitleDTOFromRepoToService queryDTO = movieRepository.searchMovies(movieSearchParam);
+
+        List<MovieTitleSearchSQLQueryResultDTO> queryResults = queryDTO.getMovies();
+
+        int totalItems = queryDTO.getTotalItem();
 
         // Prepare the response's code and message
-        CustomResponse<List<MovieSearchResultDTO>> customResponse;
+        CustomResponse<MovieSearchResultWithPaginationDTO> customResponse;
+
+        // Perform the DTO conversions
+        List<MovieSearchResponseDTO> responseList = queryResults.stream()
+                .map(converter::convert)
+                .filter(Objects::nonNull)  // Removes null elements from the stream
+                .toList();
+
+        int itemsPerPage = movieSearchParam.getLimit();
+        int currentPage = pageNumberFromFrontend; // Page index starts from 1
+        int totalPages = (int) Math.ceil((double)totalItems / itemsPerPage);
+
+        MovieSearchResultWithPaginationDTO resultWithPaginationDTO = new MovieSearchResultWithPaginationDTO();
+        resultWithPaginationDTO.setMovies(responseList);
+        resultWithPaginationDTO.setTotalItems(totalItems);
+        resultWithPaginationDTO.setCurrentPage(currentPage);
+        resultWithPaginationDTO.setItemsPerPage(itemsPerPage);
+        resultWithPaginationDTO.setTotalPages(totalPages);
+        resultWithPaginationDTO.setHasNextPage(currentPage < totalPages); // e.g. totalPages = 10. if currentPage < 10, then it can go to next page. If it's >= 10, it can't go to next page
+        resultWithPaginationDTO.setHasPrevPage(currentPage > 1); // page starts from 1. If current page > 1, it has previous page to go, if it's <= 1, it's the first page and doesn't have previous page
 
         // If no movie is found, return a custom response with movie not found code and message inside, with the empty
         // movieList. Before I put null in the data. This is not good because it might cause NullPointerExceptions. It
         // also simplifies the handling of responses, as clients don't need to check for both 'null' and empty conditions.
-        if (movieList.isEmpty()) {
-            customResponse = new CustomResponse<>(MOVIE_NOT_FOUND_CODE, MOVIE_NOT_FOUND_MESSAGE, movieList);
+        if (responseList.isEmpty()) {
+            customResponse = new CustomResponse<>(MOVIE_NOT_FOUND_CODE, MOVIE_NOT_FOUND_MESSAGE, null);
         } else {
-            customResponse = new CustomResponse<>(MOVIE_FOUND_CODE, MOVIE_FOUND_MESSAGE, movieList);
+            customResponse = new CustomResponse<>(MOVIE_FOUND_CODE, MOVIE_FOUND_MESSAGE, resultWithPaginationDTO);
         }
 
 
         return new ResponseEntity<>(customResponse, HttpStatus.OK);
+    }
+
+
+    @Override
+    public ResponseEntity<CustomResponse<OneMovieDetailsDTO>> searchOneMovieDetails(String movieId) {
+        // validate movieId
+        validationService.validateMovieId(movieId);
+
+        // Get result from repository layer
+        OneMovieDetailsDTO oneMovieDetailsDTO = movieRepository.searchOneMovieDetails(movieId);
+
+        // Generate custom response:
+        CustomResponse<OneMovieDetailsDTO> customResponse;
+        ResponseEntity<CustomResponse<OneMovieDetailsDTO>> responseEntity;
+        if (oneMovieDetailsDTO != null) {
+            customResponse = new CustomResponse<>(MOVIE_FOUND_CODE, MOVIE_FOUND_MESSAGE, oneMovieDetailsDTO);
+        } else {
+            customResponse = new CustomResponse<>(MOVIE_NOT_FOUND_CODE, MOVIE_NOT_FOUND_MESSAGE, null);
+        }
+        responseEntity = new ResponseEntity<>(customResponse, HttpStatus.OK);
+        return responseEntity;
     }
 
     /**

@@ -13,6 +13,10 @@ public final class MovieConstant {
     private MovieConstant() {
     }
 
+    // CONVERTER:
+    public static final String DEFAULT_POSTER_PATH = "default-poster-path";
+    public static final Double DEFAULT_RATING_SCORE = 0.0;
+
     // ID PREFIX:
     public static final String MOVIE_ID_PREFIX = "tt";
     public static final String PERSON_ID_PREFIX = "nm";
@@ -28,8 +32,10 @@ public final class MovieConstant {
     public static final String INVALID_ORDER_BY_MESSAGE = "Invalid order by";
     public static final int INVALID_DIRECTION_CODE = 40005;
     public static final String INVALID_DIRECTION_MESSAGE = "Invalid direction";
-    public static final int MISSING_TITLE_CODE = 40006;
-    public static final String MISSING_TITLE_MESSAGE = "Missing title";
+    public static final int INVALID_TITLE_CODE = 40006;
+    public static final String INVALID_TITLE_MESSAGE = "Invalid title. Title cannot be null or an empty string";
+    public static final int INVALID_MOVIE_ID_CODE = 40007;
+    public static final String INVALID_MOVIE_ID_MESSAGE = "Invalid movie id. Movie id cannot be null or an empty string";
     public static final int UNAUTHORIZED_CODE = 40101;
     public static final String UNAUTHORIZED_MESSAGE = "Unauthorized request";
     public static final int INVALID_CREDENTIAL_CODE = 40102;
@@ -46,7 +52,6 @@ public final class MovieConstant {
     // SUCCESS CODE AND MESSAGE
     public static final int MOVIE_FOUND_CODE = 20001;
     public static final String MOVIE_FOUND_MESSAGE = "Movie(s) found";
-    public static final String MOVIE_FOUND = "MoviesFound";
 
     public static final int MOVIE_NOT_FOUND_CODE = 20002;
     public static final String MOVIE_NOT_FOUND_MESSAGE = "No movies found with the given search parameters";
@@ -56,7 +61,10 @@ public final class MovieConstant {
     public static final int MOVIE_NOT_FOUND_WITH_PERSON_ID_CODE = 20004;
     public static final String MOVIE_NOT_FOUND_WITH_PERSON_ID_MESSAGE = "No movies found with the given personId";
 
-    public static final String MOVIE_SEARCH_RESULT_DTO_MAPPING = "MovieSearchResultDTOMapping";
+    // SQL REQUEST DTO MAPPING
+    public static final String MOVIE_TITLE_SEARCH_QUERY_RESULT_DTO_MAPPING = "MovieSearchResultDTOMapping";
+    public static final String SINGLE_MOVIE_BASIC_DETAILS_DTO_MAPPING = "SingleMovieBasicDetailsDTOMapping";
+    public static final String SINGLE_MOVIE_CREW_MEMBER_DTO_MAPPING = "SingleMovieCrewMemberDTOMapping";
 
     // MISS PARAMETER MAP
     public static final String TITLE = "title";

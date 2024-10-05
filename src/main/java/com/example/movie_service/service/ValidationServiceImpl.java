@@ -21,7 +21,7 @@ public class ValidationServiceImpl implements ValidationService {
     @Override
     public void validateTitle(String title) throws ValidationException {
         if (title == null || title.isEmpty()) {
-            throw new ValidationException(MISSING_TITLE_CODE, MISSING_TITLE_MESSAGE);
+            throw new ValidationException(INVALID_TITLE_CODE, INVALID_TITLE_MESSAGE);
         }
     }
 
@@ -82,6 +82,13 @@ public class ValidationServiceImpl implements ValidationService {
     public void validateDirection(String direction) throws ValidationException {
         if (!direction.equals("asc") && !direction.equals("desc")) {
             throw new ValidationException(INVALID_DIRECTION_CODE, INVALID_DIRECTION_MESSAGE);
+        }
+    }
+
+    @Override
+    public void validateMovieId(String movieId) throws ValidationException {
+        if (movieId == null || movieId.isEmpty()){
+            throw new ValidationException(INVALID_MOVIE_ID_CODE, INVALID_MOVIE_ID_MESSAGE);
         }
     }
 }
