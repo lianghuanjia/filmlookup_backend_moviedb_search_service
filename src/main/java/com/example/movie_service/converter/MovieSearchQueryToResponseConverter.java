@@ -6,7 +6,6 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 import static com.example.movie_service.constant.MovieConstant.DEFAULT_POSTER_PATH;
-import static com.example.movie_service.constant.MovieConstant.DEFAULT_RATING_SCORE;
 
 @Component
 public class MovieSearchQueryToResponseConverter implements Converter<MovieTitleSearchSQLQueryResultDTO, MovieSearchResponseDTO> {
@@ -17,7 +16,7 @@ public class MovieSearchQueryToResponseConverter implements Converter<MovieTitle
                 source.getTitle(),
                 source.getReleaseTime(),
                 source.getPosterPath() != null ? source.getPosterPath() : DEFAULT_POSTER_PATH,
-                source.getRating() != null ? source.getRating() : DEFAULT_RATING_SCORE,
+                source.getRating(),
                 source.getOverview()
         );
     }
