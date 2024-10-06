@@ -23,7 +23,7 @@ public class CorsConfig {
                 // However, the CorsRegistry parameter in the addCorsMappings method is not explicitly annotated as
                 // @NonNull, leading to a potential mismatch between the annotations and the actual method signature.
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5173")  // Allow your frontend origin
+                        .allowedOrigins("http://localhost:*", "https://www.filmlookup.com")  // Allow your frontend origin
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .allowedHeaders("*");
             }
